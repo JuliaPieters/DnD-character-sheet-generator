@@ -1,0 +1,39 @@
+{
+  "Aragorn": {
+    "name": "Aragorn",
+    "race": "Human",
+    "class": "Ranger",
+    "level": 1,
+    "background": "Noble",
+    "prof_bonus": 2,
+    "abilities": {
+      "strength": 15,
+      "dexterity": 14,
+      "constitution": 13,
+      "intelligence": 12,
+      "wisdom": 10,
+      "charisma": 8
+    },
+    "skills": {
+      "Athletics": 4,
+      "Perception": 2
+    }
+  },
+  "Thoradin": {
+    "name": "Thoradin",
+    "race": "Dwarf",
+    "class": "Paladin",
+    "level": 2,
+    "background": "",
+    "prof_bonus": 0,
+    "abilities": {
+      "strength": 15,
+      "dexterity": 10,
+      "constitution": 14,
+      "intelligence": 8,
+      "wisdom": 12,
+      "charisma": 13
+    },
+    "skills": null
+  }
+}
