@@ -1,11 +1,12 @@
 {
   "Aragorn": {
+    "id": 0,
     "name": "Aragorn",
     "race": "Human",
     "class": "Ranger",
     "level": 1,
     "background": "Noble",
-    "prof_bonus": 2,
+    "proficiency_bonus": 0,
     "abilities": {
       "strength": 15,
       "dexterity": 14,
@@ -14,35 +15,120 @@
       "wisdom": 10,
       "charisma": 8
     },
+    "skill_proficiencies": null,
     "skills": {
       "Athletics": 4,
       "Perception": 2
-    }
+    },
+    "equipment": {
+      "weapons": [
+        {
+          "name": "Longsword",
+          "category": "Martial",
+          "range": "Melee",
+          "two_handed": true
+        }
+      ]
+    },
+    "armor_class": 0,
+    "initiative": 0,
+    "passive_perception": 0
   },
-  "Jesse": {
-    "name": "Jesse",
-    "race": "rat",
-    "class": " 3",
-    "level": 1,
-    "background": "",
-    "prof_bonus": 2,
+  "Arthas": {
+    "id": 6,
+    "name": "Arthas",
+    "race": "Human",
+    "class": "Wizard",
+    "level": 5,
+    "background": "Sage",
+    "proficiency_bonus": 2,
     "abilities": {
-      "strength": 10,
-      "dexterity": 10,
-      "constitution": 10,
-      "intelligence": 10,
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 12,
+      "intelligence": 16,
       "wisdom": 10,
       "charisma": 10
     },
-    "skills": {}
+    "skill_proficiencies": [
+      "Arcana",
+      "Investigation"
+    ],
+    "skills": {
+      "Acrobatics": 2,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 0,
+      "History": 3,
+      "Insight": 0,
+      "Intimidation": 0,
+      "Investigation": 5,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 3,
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 0
+    },
+    "equipment": {
+      "weapons": [
+        {
+          "name": "Quarterstaff",
+          "category": "Simple",
+          "range": "Melee",
+          "two_handed": true
+        }
+      ],
+      "armor": {
+        "name": "Robes",
+        "armor_class": 11,
+        "dex_bonus": true
+      },
+      "shield": {
+        "name": "Magic Shield",
+        "armor_class": 2
+      }
+    },
+    "spells": [
+      {
+        "name": "Magic Missile",
+        "level": 1,
+        "school": "Evocation",
+        "range": "120 feet"
+      },
+      {
+        "name": "Shield",
+        "level": 1,
+        "school": "Abjuration",
+        "range": "Self"
+      }
+    ],
+    "spell_slots": {
+      "1": 4,
+      "2": 2
+    },
+    "armor_class": 15,
+    "initiative": 2,
+    "passive_perception": 10,
+    "spellcasting_ability": "Intelligence",
+    "spell_save_dc": 13,
+    "spell_attack_bonus": 5,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
   },
   "Thoradin": {
+    "id": 0,
     "name": "Thoradin",
     "race": "Dwarf",
     "class": "Paladin",
     "level": 2,
     "background": "",
-    "prof_bonus": 0,
+    "proficiency_bonus": 0,
     "abilities": {
       "strength": 15,
       "dexterity": 10,
@@ -51,15 +137,23 @@
       "wisdom": 12,
       "charisma": 13
     },
-    "skills": null
+    "skill_proficiencies": null,
+    "skills": null,
+    "equipment": {
+      "weapons": null
+    },
+    "armor_class": 0,
+    "initiative": 0,
+    "passive_perception": 0
   },
   "Wynnie": {
+    "id": 0,
     "name": "Wynnie",
     "race": "Human",
     "class": "Wizard",
     "level": 1,
     "background": "moe",
-    "prof_bonus": 2,
+    "proficiency_bonus": 0,
     "abilities": {
       "strength": 15,
       "dexterity": 14,
@@ -68,8 +162,69 @@
       "wisdom": 10,
       "charisma": 1
     },
+    "skill_proficiencies": null,
     "skills": {
       "lui zijn": -3
-    }
+    },
+    "equipment": {
+      "weapons": null
+    },
+    "armor_class": 0,
+    "initiative": 0,
+    "passive_perception": 0
+  },
+  "gert": {
+    "id": 5,
+    "name": "gert",
+    "race": "Human",
+    "class": "Ranger",
+    "level": 4,
+    "background": "Noble",
+    "proficiency_bonus": 2,
+    "abilities": {
+      "strength": 16,
+      "dexterity": 14,
+      "constitution": 13,
+      "intelligence": 12,
+      "wisdom": 10,
+      "charisma": 8
+    },
+    "skill_proficiencies": [
+      "Athletics",
+      "Perception",
+      "Survival"
+    ],
+    "skills": {
+      "Acrobatics": 2,
+      "Animal Handling": 0,
+      "Arcana": 1,
+      "Athletics": 5,
+      "Deception": -1,
+      "History": 1,
+      "Insight": 0,
+      "Intimidation": -1,
+      "Investigation": 1,
+      "Medicine": 0,
+      "Nature": 1,
+      "Perception": 2,
+      "Performance": -1,
+      "Persuasion": -1,
+      "Religion": 1,
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 2
+    },
+    "equipment": {
+      "weapons": null
+    },
+    "armor_class": 12,
+    "initiative": 2,
+    "passive_perception": 12,
+    "spellcasting_ability": "Wisdom",
+    "spell_save_dc": 10,
+    "spell_attack_bonus": 2,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
   }
 }

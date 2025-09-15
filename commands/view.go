@@ -5,35 +5,31 @@ import (
 	"fmt"
 )
 
-// ViewCharacter toont alle details van een character in een nette layout
-func ViewCharacter(name string) error {
-	chars, err := storage.LoadCharacters()
+// ViewCharacter toont alle details van een character op basis van naam
+func ViewCharacter(characterName string) error {
+	allCharacters, err := storage.LoadCharacters()
 	if err != nil {
 		return err
 	}
 
-	c, ok := chars[name]
-	if !ok {
-		return fmt.Errorf("character %s not found", name)
-	}
-
-	fmt.Printf("📜 Character Sheet: %s\n", c.Name)
-	fmt.Printf("Race: %s | Class: %s | Level: %d | Background: %s\n", c.Race, c.Class, c.Level, c.Background)
-	fmt.Printf("Proficiency Bonus: +%d\n", c.ProfBonus)
-	fmt.Println("Abilities:")
-	fmt.Printf("  STR: %d (%+d)\n", c.Abilities.Strength, c.Abilities.Modifier("STR"))
-	fmt.Printf("  DEX: %d (%+d)\n", c.Abilities.Dexterity, c.Abilities.Modifier("DEX"))
-	fmt.Printf("  CON: %d (%+d)\n", c.Abilities.Constitution, c.Abilities.Modifier("CON"))
-	fmt.Printf("  INT: %d (%+d)\n", c.Abilities.Intelligence, c.Abilities.Modifier("INT"))
-	fmt.Printf("  WIS: %d (%+d)\n", c.Abilities.Wisdom, c.Abilities.Modifier("WIS"))
-	fmt.Printf("  CHA: %d (%+d)\n", c.Abilities.Charisma, c.Abilities.Modifier("CHA"))
-
-	if len(c.Skills) > 0 {
-		fmt.Println("Skills:")
-		for skill, mod := range c.Skills {
-			fmt.Printf("  %s: %+d\n", skill, mod)
+	for _, character := range allCharacters {
+		if character.Name == characterName {
+			fmt.Printf("Name: %s\n", character.Name)
+			fmt.Printf("Player Name: %s\n", character.PlayerName)
+			fmt.Printf("Level: %d | Race: %s | Class: %s\n", character.Level, character.Race, character.Class)
+			fmt.Printf("Background: %s | Alignment: %s\n", character.Background, character.Alignment)
+			fmt.Printf("Abilities:\n")
+			fmt.Printf("  Strength: %d | Dexterity: %d | Constitution: %d\n",
+				character.Abilities.Strength, character.Abilities.Dexterity, character.Abilities.Constitution)
+			fmt.Printf("  Intelligence: %d | Wisdom: %d | Charisma: %d\n",
+				character.Abilities.Intelligence, character.Abilities.Wisdom, character.Abilities.Charisma)
+			fmt.Printf("Skill Modifiers: %v\n", character.Skills)
+			fmt.Printf("Armor Class: %d | Initiative: %d | Passive Perception: %d\n",
+				character.ArmorClass, character.Initiative, character.PassivePerception)
+			fmt.Printf("Hit Points: %d/%d | Speed: %d\n", character.CurrentHitPoints, character.MaxHitPoints, character.Speed)
+			return nil
 		}
 	}
 
-	return nil
+	return fmt.Errorf("character not found: %s", characterName)
 }

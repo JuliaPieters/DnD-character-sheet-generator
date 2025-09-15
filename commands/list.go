@@ -1,30 +1,26 @@
 package commands
 
 import (
-	"dnd-character-sheet/models"
 	"dnd-character-sheet/storage"
 	"fmt"
 )
 
-// ListCharacters toont alle characters met level en class
+// ListCharacters toont alle characters kort
 func ListCharacters() error {
-    chars, err := storage.LoadCharacters()
-    if err != nil {
-        return err
-    }
+	allCharacters, err := storage.LoadCharacters()
+	if err != nil {
+		return err
+	}
 
-    if len(chars) == 0 {
-        fmt.Println("📜 No characters found.")
-        return nil
-    }
+	if len(allCharacters) == 0 {
+		fmt.Println("📜 No characters found.")
+		return nil
+	}
 
-    fmt.Println("📜 Characters:")
-    for _, c := range chars {
-        fmt.Printf(" - %s | Level %d %s %s\n", c.Name, c.Level, c.Race, c.Class)
-    }
-    return nil
-}
-
-func ListCharactersMap() (map[string]models.Character, error) {
-	return storage.LoadCharacters()
+	fmt.Println("📜 Characters:")
+	for _, character := range allCharacters {
+		fmt.Printf("- Name: %s | Level: %d | Race: %s | Class: %s\n",
+			character.Name, character.Level, character.Race, character.Class)
+	}
+	return nil
 }
