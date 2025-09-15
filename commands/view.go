@@ -30,7 +30,7 @@ func ViewCharacter(name string) error {
 			fmt.Printf("  CHA: %d (%+d)\n", c.Abilities.Charisma, abilityModifier(c.Abilities.Charisma))
 
 			fmt.Printf("Proficiency bonus: %+d\n", proficiencyBonus(c.Level))
-			fmt.Printf("Skill proficiencies: %s\n", formatSkills(c.Skills))
+			fmt.Printf("Skill proficiencies: %s\n", formatSkillProficiencies(c.SkillProficiencies))
 
 			return nil
 		}
@@ -49,19 +49,20 @@ func proficiencyBonus(level int) int {
 	return 2 + (level-1)/4
 }
 
-// formatSkills zet de skills map om naar een comma-separated lijst van skill names
-func formatSkills(skills map[string]int) string {
-	names := []string{}
-	for skill := range skills {
-		names = append(names, skill)
+// formatSkillProficiencies maakt een comma-separated lijst van skill proficiencies
+func formatSkillProficiencies(skills []string) string {
+	for i := range skills {
+		skills[i] = lowerCase(skills[i])
 	}
-	return joinLower(names)
+	return join(skills, ", ")
 }
 
-// joinLower join met comma en lowercase
-func joinLower(items []string) string {
-	for i := range items {
-		items[i] = strings.ToLower(items[i])
-	}
-	return strings.Join(items, ", ")
+// lowerCase zet een string naar lowercase
+func lowerCase(s string) string {
+	return strings.ToLower(s)
+}
+
+// join voegt een slice van strings samen met separator
+func join(items []string, sep string) string {
+	return strings.Join(items, sep)
 }

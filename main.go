@@ -113,7 +113,7 @@ func main() {
 			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
-		fmt.Printf("deleted character %s\n", *characterName)
+		fmt.Printf("deleted %s\n", *characterName)
 
 	// ---------------- UPDATE LEVEL ----------------
 	case "update-level":
