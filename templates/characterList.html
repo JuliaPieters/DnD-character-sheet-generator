@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Character List</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Characters</h1>
+  <ul>
+    {{range $name, $character := .}}
+      <li>
+        <a href="/character?id={{$character.Name}}">
+          {{$character.Name}} ({{$character.Race}} {{$character.Class}})
+        </a>
+      </li>
+    {{else}}
+      <li>No characters yet</li>
+    {{end}}
+  </ul>
+
+  <a href="/character" class="button">Create new character</a>
+</body>
+</html>

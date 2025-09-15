@@ -26,8 +26,8 @@ type Character struct {
 var StandardArray = []int{15, 14, 13, 12, 10, 8}
 
 // Nieuwe character aanmaken
-func NewCharacter(name, race, class, background string, level int, str, dex, con, intt, wis, cha int) *Character {
-	char := &Character{
+func NewCharacter(name string, race string, class string, background string, level int, strength int, dexterity int, constitution int, intelligence int, wisdom int, charisma int) *Character {
+	newCharacter := &Character{
 		Name:       name,
 		Race:       race,
 		Class:      class,
@@ -35,16 +35,16 @@ func NewCharacter(name, race, class, background string, level int, str, dex, con
 		Background: background,
 		ProfBonus:  CalculateProfBonus(level),
 		Abilities: AbilityScores{
-			Strength:     str,
-			Dexterity:    dex,
-			Constitution: con,
-			Intelligence: intt,
-			Wisdom:       wis,
-			Charisma:     cha,
+			Strength:     strength,
+			Dexterity:    dexterity,
+			Constitution: constitution,
+			Intelligence: intelligence,
+			Wisdom:       wisdom,
+			Charisma:     charisma,
 		},
 		Skills: make(map[string]int),
 	}
-	return char
+	return newCharacter
 }
 
 // Bereken de proficiency bonus op basis van level
@@ -53,55 +53,55 @@ func CalculateProfBonus(level int) int {
 }
 
 // Update level en pas proficiency bonus aan
-func (c *Character) UpdateLevel(newLevel int) {
-	c.Level = newLevel
-	c.ProfBonus = CalculateProfBonus(newLevel)
+func (currentCharacter *Character) UpdateLevel(newLevel int) {
+	currentCharacter.Level = newLevel
+	currentCharacter.ProfBonus = CalculateProfBonus(newLevel)
 }
 
 // Bereken ability modifier voor een gegeven ability score
-func (a AbilityScores) Modifier(score string) int {
+func (abilityScores AbilityScores) Modifier(score string) int {
 	switch score {
 	case "STR":
-		return (a.Strength - 10) / 2
+		return (abilityScores.Strength - 10) / 2
 	case "DEX":
-		return (a.Dexterity - 10) / 2
+		return (abilityScores.Dexterity - 10) / 2
 	case "CON":
-		return (a.Constitution - 10) / 2
+		return (abilityScores.Constitution - 10) / 2
 	case "INT":
-		return (a.Intelligence - 10) / 2
+		return (abilityScores.Intelligence - 10) / 2
 	case "WIS":
-		return (a.Wisdom - 10) / 2
+		return (abilityScores.Wisdom - 10) / 2
 	case "CHA":
-		return (a.Charisma - 10) / 2
+		return (abilityScores.Charisma - 10) / 2
 	}
 	return 0
 }
 
 // Bereken skill modifier: ability modifier + profBonus (als character proficiency heeft)
-func CalculateSkillModifier(abilityScore int, proficient bool, profBonus int) int {
-	mod := (abilityScore - 10) / 2
-	if proficient {
-		mod += profBonus
+func CalculateSkillModifier(abilityScore int, isProficient bool, proficiencyBonus int) int {
+	modifier := (abilityScore - 10) / 2
+	if isProficient {
+		modifier += proficiencyBonus
 	}
-	return mod
+	return modifier
 }
 
 // Voeg skills toe en bereken hun modifiers
-func (c *Character) AddSkills(skills []string) {
-	for _, skill := range skills {
+func (currentCharacter *Character) AddSkills(skillNames []string) {
+	for _, skillName := range skillNames {
 		var abilityScore int
-		switch skill {
+		switch skillName {
 		case "Athletics":
-			abilityScore = c.Abilities.Strength
+			abilityScore = currentCharacter.Abilities.Strength
 		case "Acrobatics", "Sleight of Hand", "Stealth":
-			abilityScore = c.Abilities.Dexterity
+			abilityScore = currentCharacter.Abilities.Dexterity
 		case "Arcana", "History", "Investigation", "Nature", "Religion":
-			abilityScore = c.Abilities.Intelligence
+			abilityScore = currentCharacter.Abilities.Intelligence
 		case "Animal Handling", "Insight", "Medicine", "Perception", "Survival":
-			abilityScore = c.Abilities.Wisdom
+			abilityScore = currentCharacter.Abilities.Wisdom
 		case "Deception", "Intimidation", "Performance", "Persuasion":
-			abilityScore = c.Abilities.Charisma
+			abilityScore = currentCharacter.Abilities.Charisma
 		}
-		c.Skills[skill] = CalculateSkillModifier(abilityScore, true, c.ProfBonus)
+		currentCharacter.Skills[skillName] = CalculateSkillModifier(abilityScore, true, currentCharacter.ProfBonus)
 	}
 }

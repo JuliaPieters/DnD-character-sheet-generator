@@ -7,75 +7,84 @@ import (
 	"net/http"
 )
 
-// Struct voor character data in de template
-type Character struct {
-	Name  string
-	Level int
-	Race  string
-	Class string
+// Struct die precies past bij de template
+type TemplateCharacter struct {
+	Name      string
+	Race      string
+	Class     string
+	Level     int
+	Background string
+	ProfBonus int
+	Abilities struct {
+		Strength     int
+		Dexterity    int
+		Constitution int
+		Intelligence int
+		Wisdom       int
+		Charisma     int
+	}
 }
 
 func main() {
-	// Static files serveren (CSS, JS, afbeeldingen)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// Routes
 	http.HandleFunc("/", listCharactersHandler)
-	http.HandleFunc("/create", createCharacterHandler)
+	http.HandleFunc("/character", characterDetailHandler)
 
 	fmt.Println("🌐 Server gestart op http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
-// Handler om alle characters te tonen
-func listCharactersHandler(responseWriter http.ResponseWriter, request *http.Request) {
-	// Haal characters op (zorg dat ListCharactersMap een slice of map teruggeeft)
-	characters, err := commands.ListCharactersMap()
+func listCharactersHandler(w http.ResponseWriter, r *http.Request) {
+	charactersMap, err := commands.ListCharactersMap()
 	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Laad template
-	tmpl := template.Must(template.ParseFiles("../templates/charactersheet.html"))
-
-	// Render template met characters
-	err = tmpl.Execute(responseWriter, characters)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	tmpl := template.Must(template.ParseFiles("templates/characterList.html"))
+	if err := tmpl.Execute(w, charactersMap); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
-// Handler om een character aan te maken
-func createCharacterHandler(responseWriter http.ResponseWriter, request *http.Request) {
-	if request.Method != http.MethodPost {
-		http.Error(responseWriter, "POST methode vereist", http.StatusMethodNotAllowed)
-		return
+func characterDetailHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+
+	var tmplChar TemplateCharacter
+
+	if id != "" {
+		charactersMap, err := commands.ListCharactersMap()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		foundCharacter, exists := charactersMap[id]
+		if !exists {
+			http.Error(w, "Character not found", http.StatusNotFound)
+			return
+		}
+
+		// Vul template struct
+		tmplChar.Name = foundCharacter.Name
+		tmplChar.Race = foundCharacter.Race
+		tmplChar.Class = foundCharacter.Class
+		tmplChar.Level = foundCharacter.Level
+		tmplChar.Background = foundCharacter.Background
+		tmplChar.ProfBonus = foundCharacter.ProfBonus
+		tmplChar.Abilities.Strength = foundCharacter.Abilities.Strength
+		tmplChar.Abilities.Dexterity = foundCharacter.Abilities.Dexterity
+		tmplChar.Abilities.Constitution = foundCharacter.Abilities.Constitution
+		tmplChar.Abilities.Intelligence = foundCharacter.Abilities.Intelligence
+		tmplChar.Abilities.Wisdom = foundCharacter.Abilities.Wisdom
+		tmplChar.Abilities.Charisma = foundCharacter.Abilities.Charisma
 	}
 
-	// Haal form values op
-	characterName := request.FormValue("charname")
-	characterRace := request.FormValue("race")
-	characterClass := request.FormValue("classlevel")
-	characterBackground := request.FormValue("background")
-
-	// Standaard ability scores
-	strength := 10
-	dexterity := 10
-	constitution := 10
-	intelligence := 10
-	wisdom := 10
-	charisma := 10
-	skills := []string{}
-
-	// Maak character aan via bestaande CLI functie
-	if err := commands.CreateCharacter(characterName, characterRace, characterClass, characterBackground, 1,
-		strength, dexterity, constitution, intelligence, wisdom, charisma, skills); err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	tmpl := template.Must(template.ParseFiles("templates/charactersheet.html"))
+	if err := tmpl.Execute(w, tmplChar); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Redirect terug naar homepage na aanmaken
-	http.Redirect(responseWriter, request, "/", http.StatusSeeOther)
 }

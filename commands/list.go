@@ -1,8 +1,9 @@
 package commands
 
 import (
-    "dnd-character-sheet/storage"
-    "fmt"
+	"dnd-character-sheet/models"
+	"dnd-character-sheet/storage"
+	"fmt"
 )
 
 // ListCharacters toont alle characters met level en class
@@ -22,4 +23,8 @@ func ListCharacters() error {
         fmt.Printf(" - %s | Level %d %s %s\n", c.Name, c.Level, c.Race, c.Class)
     }
     return nil
+}
+
+func ListCharactersMap() (map[string]models.Character, error) {
+	return storage.LoadCharacters()
 }
