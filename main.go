@@ -58,7 +58,7 @@ func main() {
 		_ = createCmd.Parse(os.Args[2:])
 
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			createCmd.Usage()
 			os.Exit(2)
 		}
@@ -74,10 +74,10 @@ func main() {
 		abilityScores := []int{*strength, *dexterity, *constitution, *intelligence, *wisdom, *charisma}
 
 		if err := commands.CreateCharacter(*characterName, *playerName, *characterRace, *characterClass, *background, *level, abilityScores, skillProficiencies); err != nil {
-			fmt.Println("❌ Error creating character:", err)
+			fmt.Printf(`failed to save character "%s"`+"\n", *characterName)
 			os.Exit(1)
 		}
-		fmt.Printf("✅ Character '%s' created successfully!\n", *characterName)
+		fmt.Printf("saved character %s\n", *characterName)
 
 	// ---------------- VIEW CHARACTER ----------------
 	case "view":
@@ -85,18 +85,18 @@ func main() {
 		characterName := viewCmd.String("name", "", "Character Name (required)")
 		_ = viewCmd.Parse(os.Args[2:])
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			os.Exit(2)
 		}
 		if err := commands.ViewCharacter(*characterName); err != nil {
-			fmt.Println("❌ Error viewing character:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
 
 	// ---------------- LIST CHARACTERS ----------------
 	case "list":
 		if err := commands.ListCharacters(); err != nil {
-			fmt.Println("❌ Error listing characters:", err)
+			fmt.Println(`failed to list characters`)
 			os.Exit(1)
 		}
 
@@ -106,14 +106,14 @@ func main() {
 		characterName := deleteCmd.String("name", "", "Character Name (required)")
 		_ = deleteCmd.Parse(os.Args[2:])
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			os.Exit(2)
 		}
 		if err := commands.DeleteCharacter(*characterName); err != nil {
-			fmt.Println("❌ Error deleting character:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
-		fmt.Printf("✅ Character '%s' deleted successfully!\n", *characterName)
+		fmt.Printf("deleted character %s\n", *characterName)
 
 	// ---------------- UPDATE LEVEL ----------------
 	case "update-level":
@@ -122,14 +122,14 @@ func main() {
 		newLevel := updateLevelCmd.Int("level", 1, "New Level")
 		_ = updateLevelCmd.Parse(os.Args[2:])
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			os.Exit(2)
 		}
 		if err := commands.UpdateCharacterLevel(*characterName, *newLevel); err != nil {
-			fmt.Println("❌ Error updating character level:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
-		fmt.Printf("✅ Character '%s' updated to level %d successfully!\n", *characterName, *newLevel)
+		fmt.Printf("updated character %s to level %d\n", *characterName, *newLevel)
 
 	// ---------------- ADD / REMOVE WEAPON ----------------
 	case "add-weapon":
@@ -141,7 +141,7 @@ func main() {
 		twoHanded := addWeaponCmd.Bool("two-handed", false, "Two-Handed Weapon")
 		_ = addWeaponCmd.Parse(os.Args[2:])
 		if *characterName == "" || *weaponName == "" {
-			fmt.Println("❌ Character Name and Weapon Name are required")
+			fmt.Println(`character name and weapon name are required`)
 			os.Exit(2)
 		}
 		newWeapon := models.Weapon{
@@ -151,23 +151,26 @@ func main() {
 			TwoHanded: *twoHanded,
 		}
 		if err := commands.AddWeapon(*characterName, newWeapon); err != nil {
-			fmt.Println("❌ Error adding weapon:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("added weapon %s to %s\n", *weaponName, *characterName)
 
+	// ---------------- REMOVE WEAPON ----------------
 	case "remove-weapon":
 		removeWeaponCmd := flag.NewFlagSet("remove-weapon", flag.ExitOnError)
 		characterName := removeWeaponCmd.String("name", "", "Character Name")
 		weaponName := removeWeaponCmd.String("weapon", "", "Weapon Name")
 		_ = removeWeaponCmd.Parse(os.Args[2:])
 		if *characterName == "" || *weaponName == "" {
-			fmt.Println("❌ Character Name and Weapon Name are required")
+			fmt.Println(`character name and weapon name are required`)
 			os.Exit(2)
 		}
 		if err := commands.RemoveWeapon(*characterName, *weaponName); err != nil {
-			fmt.Println("❌ Error removing weapon:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("removed weapon %s from %s\n", *weaponName, *characterName)
 
 	// ---------------- ADD / REMOVE ARMOR ----------------
 	case "add-armor":
@@ -179,7 +182,7 @@ func main() {
 		maxDexBonus := addArmorCmd.Int("max-dex", 0, "Maximum Dexterity Bonus")
 		_ = addArmorCmd.Parse(os.Args[2:])
 		if *characterName == "" || *armorName == "" {
-			fmt.Println("❌ Character Name and Armor Name are required")
+			fmt.Println(`character name and armor name are required`)
 			os.Exit(2)
 		}
 		newArmor := models.Armor{
@@ -189,22 +192,25 @@ func main() {
 			MaxDexBonus: *maxDexBonus,
 		}
 		if err := commands.AddArmor(*characterName, newArmor); err != nil {
-			fmt.Println("❌ Error adding armor:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("added armor %s to %s\n", *armorName, *characterName)
 
+	// ---------------- REMOVE ARMOR ----------------
 	case "remove-armor":
 		removeArmorCmd := flag.NewFlagSet("remove-armor", flag.ExitOnError)
 		characterName := removeArmorCmd.String("name", "", "Character Name")
 		_ = removeArmorCmd.Parse(os.Args[2:])
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			os.Exit(2)
 		}
 		if err := commands.RemoveArmor(*characterName); err != nil {
-			fmt.Println("❌ Error removing armor:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("removed armor from %s\n", *characterName)
 
 	// ---------------- ADD / REMOVE SHIELD ----------------
 	case "add-shield":
@@ -214,7 +220,7 @@ func main() {
 		armorClass := addShieldCmd.Int("armor-class", 0, "Armor Class")
 		_ = addShieldCmd.Parse(os.Args[2:])
 		if *characterName == "" || *shieldName == "" {
-			fmt.Println("❌ Character Name and Shield Name are required")
+			fmt.Println(`character name and shield name are required`)
 			os.Exit(2)
 		}
 		newShield := models.Shield{
@@ -222,22 +228,24 @@ func main() {
 			ArmorClass: *armorClass,
 		}
 		if err := commands.AddShield(*characterName, newShield); err != nil {
-			fmt.Println("❌ Error adding shield:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("added shield %s to %s\n", *shieldName, *characterName)
 
 	case "remove-shield":
 		removeShieldCmd := flag.NewFlagSet("remove-shield", flag.ExitOnError)
 		characterName := removeShieldCmd.String("name", "", "Character Name")
 		_ = removeShieldCmd.Parse(os.Args[2:])
 		if *characterName == "" {
-			fmt.Println("❌ Character Name is required")
+			fmt.Println(`character name is required`)
 			os.Exit(2)
 		}
 		if err := commands.RemoveShield(*characterName); err != nil {
-			fmt.Println("❌ Error removing shield:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("removed shield from %s\n", *characterName)
 
 	// ---------------- ADD / REMOVE SPELL ----------------
 	case "add-spell":
@@ -249,7 +257,7 @@ func main() {
 		spellRange := addSpellCmd.String("range", "", "Spell Range")
 		_ = addSpellCmd.Parse(os.Args[2:])
 		if *characterName == "" || *spellName == "" {
-			fmt.Println("❌ Character Name and Spell Name are required")
+			fmt.Println(`character name and spell name are required`)
 			os.Exit(2)
 		}
 		newSpell := models.Spell{
@@ -259,9 +267,10 @@ func main() {
 			Range:  *spellRange,
 		}
 		if err := commands.AddSpell(*characterName, newSpell); err != nil {
-			fmt.Println("❌ Error adding spell:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("added spell %s to %s\n", *spellName, *characterName)
 
 	case "remove-spell":
 		removeSpellCmd := flag.NewFlagSet("remove-spell", flag.ExitOnError)
@@ -269,13 +278,14 @@ func main() {
 		spellName := removeSpellCmd.String("spell", "", "Spell Name")
 		_ = removeSpellCmd.Parse(os.Args[2:])
 		if *characterName == "" || *spellName == "" {
-			fmt.Println("❌ Character Name and Spell Name are required")
+			fmt.Println(`character name and spell name are required`)
 			os.Exit(2)
 		}
 		if err := commands.RemoveSpell(*characterName, *spellName); err != nil {
-			fmt.Println("❌ Error removing spell:", err)
+			fmt.Printf(`character "%s" not found`+"\n", *characterName)
 			os.Exit(1)
 		}
+		fmt.Printf("removed spell %s from %s\n", *spellName, *characterName)
 
 	// ---------------- DEFAULT ----------------
 	default:
