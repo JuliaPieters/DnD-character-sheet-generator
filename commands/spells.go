@@ -1,64 +1,65 @@
 package commands
+
 import (
 	"dnd-character-sheet/models"
 	"dnd-character-sheet/storage"
 	"fmt"
 )
 
-// VoegSpellToe voegt een spell toe aan een caster character
-func VoegSpellToe(characterNaam string, nieuweSpell models.Spell) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// AddSpell adds a spell to a caster character
+func AddSpell(characterName string, newSpell models.Spell) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
 	if _, isCaster := models.SpellcastingClasses[character.Class]; !isCaster {
-		return fmt.Errorf("character '%s' is geen spellcaster", characterNaam)
+		return fmt.Errorf("character '%s' is not a spellcaster", characterName)
 	}
 
-	character.Spells = append(character.Spells, nieuweSpell)
+	character.Spells = append(character.Spells, newSpell)
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Spell '%s' toegevoegd aan character '%s'\n", nieuweSpell.Name, characterNaam)
+	fmt.Printf("✅ Spell '%s' added to character '%s'\n", newSpell.Name, characterName)
 	return nil
 }
 
-// VerwijderSpell verwijdert een spell van een caster character
-func VerwijderSpell(characterNaam string, naamVanSpell string) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// RemoveSpell removes a spell from a caster character
+func RemoveSpell(characterName string, spellName string) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
 	if _, isCaster := models.SpellcastingClasses[character.Class]; !isCaster {
-		return fmt.Errorf("character '%s' is geen spellcaster", characterNaam)
+		return fmt.Errorf("character '%s' is not a spellcaster", characterName)
 	}
 
-	nieuweLijstVanSpells := []models.Spell{}
-	for _, bestaandeSpell := range character.Spells {
-		if bestaandeSpell.Name != naamVanSpell {
-			nieuweLijstVanSpells = append(nieuweLijstVanSpells, bestaandeSpell)
+	newSpellList := []models.Spell{}
+	for _, existingSpell := range character.Spells {
+		if existingSpell.Name != spellName {
+			newSpellList = append(newSpellList, existingSpell)
 		}
 	}
-	character.Spells = nieuweLijstVanSpells
+	character.Spells = newSpellList
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Spell '%s' verwijderd van character '%s'\n", naamVanSpell, characterNaam)
+	fmt.Printf("✅ Spell '%s' removed from character '%s'\n", spellName, characterName)
 	return nil
 }

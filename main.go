@@ -150,7 +150,7 @@ func main() {
 			Range:     *weaponRange,
 			TwoHanded: *twoHanded,
 		}
-		if err := commands.VoegWapenToe(*characterName, newWeapon); err != nil {
+		if err := commands.AddWeapon(*characterName, newWeapon); err != nil {
 			fmt.Println("❌ Error adding weapon:", err)
 			os.Exit(1)
 		}
@@ -164,7 +164,7 @@ func main() {
 			fmt.Println("❌ Character Name and Weapon Name are required")
 			os.Exit(2)
 		}
-		if err := commands.VerwijderWapen(*characterName, *weaponName); err != nil {
+		if err := commands.RemoveWeapon(*characterName, *weaponName); err != nil {
 			fmt.Println("❌ Error removing weapon:", err)
 			os.Exit(1)
 		}
@@ -188,7 +188,7 @@ func main() {
 			DexBonus:    *dexBonus,
 			MaxDexBonus: *maxDexBonus,
 		}
-		if err := commands.VoegArmorToe(*characterName, newArmor); err != nil {
+		if err := commands.AddArmor(*characterName, newArmor); err != nil {
 			fmt.Println("❌ Error adding armor:", err)
 			os.Exit(1)
 		}
@@ -201,7 +201,7 @@ func main() {
 			fmt.Println("❌ Character Name is required")
 			os.Exit(2)
 		}
-		if err := commands.VerwijderArmor(*characterName); err != nil {
+		if err := commands.RemoveArmor(*characterName); err != nil {
 			fmt.Println("❌ Error removing armor:", err)
 			os.Exit(1)
 		}
@@ -221,7 +221,7 @@ func main() {
 			Name:       *shieldName,
 			ArmorClass: *armorClass,
 		}
-		if err := commands.VoegShieldToe(*characterName, newShield); err != nil {
+		if err := commands.AddShield(*characterName, newShield); err != nil {
 			fmt.Println("❌ Error adding shield:", err)
 			os.Exit(1)
 		}
@@ -234,7 +234,7 @@ func main() {
 			fmt.Println("❌ Character Name is required")
 			os.Exit(2)
 		}
-		if err := commands.VerwijderShield(*characterName); err != nil {
+		if err := commands.RemoveShield(*characterName); err != nil {
 			fmt.Println("❌ Error removing shield:", err)
 			os.Exit(1)
 		}
@@ -258,7 +258,7 @@ func main() {
 			School: *spellSchool,
 			Range:  *spellRange,
 		}
-		if err := commands.VoegSpellToe(*characterName, newSpell); err != nil {
+		if err := commands.AddSpell(*characterName, newSpell); err != nil {
 			fmt.Println("❌ Error adding spell:", err)
 			os.Exit(1)
 		}
@@ -272,7 +272,7 @@ func main() {
 			fmt.Println("❌ Character Name and Spell Name are required")
 			os.Exit(2)
 		}
-		if err := commands.VerwijderSpell(*characterName, *spellName); err != nil {
+		if err := commands.RemoveSpell(*characterName, *spellName); err != nil {
 			fmt.Println("❌ Error removing spell:", err)
 			os.Exit(1)
 		}

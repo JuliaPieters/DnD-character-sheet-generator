@@ -6,144 +6,144 @@ import (
 	"fmt"
 )
 
-// VoegWapenToe voegt een wapen toe aan een character
-func VoegWapenToe(characterNaam string, nieuwWapen models.Weapon) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// AddWeapon adds a weapon to a character
+func AddWeapon(characterName string, newWeapon models.Weapon) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Weapons = append(character.Equipment.Weapons, nieuwWapen)
+	character.Equipment.Weapons = append(character.Equipment.Weapons, newWeapon)
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Wapen '%s' toegevoegd aan character '%s'\n", nieuwWapen.Name, characterNaam)
+	fmt.Printf("✅ Weapon '%s' added to character '%s'\n", newWeapon.Name, characterName)
 	return nil
 }
 
-// VerwijderWapen verwijdert een wapen van een character
-func VerwijderWapen(characterNaam string, naamVanWapen string) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// RemoveWeapon removes a weapon from a character
+func RemoveWeapon(characterName string, weaponName string) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	nieuweLijstVanWapens := []models.Weapon{}
-	for _, bestaandWapen := range character.Equipment.Weapons {
-		if bestaandWapen.Name != naamVanWapen {
-			nieuweLijstVanWapens = append(nieuweLijstVanWapens, bestaandWapen)
+	newWeaponList := []models.Weapon{}
+	for _, existingWeapon := range character.Equipment.Weapons {
+		if existingWeapon.Name != weaponName {
+			newWeaponList = append(newWeaponList, existingWeapon)
 		}
 	}
-	character.Equipment.Weapons = nieuweLijstVanWapens
+	character.Equipment.Weapons = newWeaponList
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Wapen '%s' verwijderd van character '%s'\n", naamVanWapen, characterNaam)
+	fmt.Printf("✅ Weapon '%s' removed from character '%s'\n", weaponName, characterName)
 	return nil
 }
 
-// VoegArmorToe voegt armor toe en berekent Armor Class opnieuw
-func VoegArmorToe(characterNaam string, nieuwArmor models.Armor) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// AddArmor adds armor to a character and recalculates AC
+func AddArmor(characterName string, newArmor models.Armor) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Armor = &nieuwArmor
+	character.Equipment.Armor = &newArmor
 	character.CalculateCombatStats()
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Armor '%s' toegevoegd aan character '%s'\n", nieuwArmor.Name, characterNaam)
+	fmt.Printf("✅ Armor '%s' added to character '%s'\n", newArmor.Name, characterName)
 	return nil
 }
 
-// VerwijderArmor verwijdert armor en herberekent Armor Class
-func VerwijderArmor(characterNaam string) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// RemoveArmor removes armor from a character and recalculates AC
+func RemoveArmor(characterName string) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
 	character.Equipment.Armor = nil
 	character.CalculateCombatStats()
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Armor verwijderd van character '%s'\n", characterNaam)
+	fmt.Printf("✅ Armor removed from character '%s'\n", characterName)
 	return nil
 }
 
-// VoegShieldToe voegt een shield toe en herberekent Armor Class
-func VoegShieldToe(characterNaam string, nieuwShield models.Shield) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// AddShield adds a shield to a character and recalculates AC
+func AddShield(characterName string, newShield models.Shield) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Shield = &nieuwShield
+	character.Equipment.Shield = &newShield
 	character.CalculateCombatStats()
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Shield '%s' toegevoegd aan character '%s'\n", nieuwShield.Name, characterNaam)
+	fmt.Printf("✅ Shield '%s' added to character '%s'\n", newShield.Name, characterName)
 	return nil
 }
 
-// VerwijderShield verwijdert het shield en herberekent Armor Class
-func VerwijderShield(characterNaam string) error {
-	characters, laadFout := storage.LoadCharacters()
-	if laadFout != nil {
-		return fmt.Errorf("kon characters niet laden: %w", laadFout)
+// RemoveShield removes a shield from a character and recalculates AC
+func RemoveShield(characterName string) error {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
-	character, bestaat := characters[characterNaam]
-	if !bestaat {
-		return fmt.Errorf("character '%s' niet gevonden", characterNaam)
+	character, exists := characters[characterName]
+	if !exists {
+		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
 	character.Equipment.Shield = nil
 	character.CalculateCombatStats()
 
-	if slaFout := storage.SaveCharacter(character); slaFout != nil {
-		return fmt.Errorf("kon character niet opslaan: %w", slaFout)
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Shield verwijderd van character '%s'\n", characterNaam)
+	fmt.Printf("✅ Shield removed from character '%s'\n", characterName)
 	return nil
 }
