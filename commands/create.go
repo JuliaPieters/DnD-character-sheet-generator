@@ -8,21 +8,46 @@ import (
 
 // CreateCharacter maakt een nieuw D&D character aan
 func CreateCharacter(
-    name, race, class, background string,
+    name string,
+    playerName string,
+    race string,
+    class string,
+    background string,
+    alignment string,
     level int,
-    str, dex, con, intt, wis, cha int,
+    str int,
+    dex int,
+    con int,
+    intt int,
+    wis int,
+    cha int,
     skills []string,
 ) error {
-    // Gebruik de NewCharacter functie uit models
-    c := models.NewCharacter(name, race, class, background, level, str, dex, con, intt, wis, cha)
+
+    // Maak een nieuw character aan met alle velden uit models
+    character := models.NewCharacter(
+        name,
+        playerName,
+        race,
+        class,
+        background,
+        alignment,
+        level,
+        str,
+        dex,
+        con,
+        intt,
+        wis,
+        cha,
+    )
 
     // Voeg skills toe en bereken modifiers
     if len(skills) > 0 {
-        c.AddSkills(skills)
+        character.AddSkills(skills)
     }
 
     // Sla het character op in storage
-    if err := storage.SaveCharacter(*c); err != nil {
+    if err := storage.SaveCharacter(*character); err != nil {
         return err
     }
 

@@ -1,76 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>DnD Character Sheet</title>
-  <link rel="stylesheet" href="/static/normalize.css">
-  <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/normalize.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>MPP Character Sheet</title>
 </head>
 <body>
-  <main id="character-sheet">
-    <form class="charsheet" method="POST" action="{{ if .Name }}/update/{{ .Name }}{{ else }}/create{{ end }}">
+<form class="charsheet">
+  <header>
+    <section class="charname">
+      <label for="charname">Character Name</label>
+      <input name="charname" placeholder="Thoradin Fireforge" value="{{ .Name }}" />
+    </section>
+    <section class="misc">
+      <ul>
+        <li>
+          <label for="classlevel">Class & Level</label>
+          <input name="classlevel" placeholder="Paladin 2" value="{{ .Class }} {{ .Level }}" />
+        </li>
+        <li>
+          <label for="background">Background</label>
+          <input name="background" placeholder="Acolyte" value="{{ .Background }}" />
+        </li>
+        <li>
+          <label for="playername">Player Name</label>
+          <input name="playername" placeholder="Player McPlayerface" value="{{ .PlayerName }}" />
+        </li>
+        <li>
+          <label for="race">Race</label>
+          <input name="race" placeholder="Half-elf" value="{{ .Race }}" />
+        </li>
+        <li>
+          <label for="alignment">Alignment</label>
+          <input name="alignment" placeholder="Lawful Good" value="{{ .Alignment }}" />
+        </li>
+        <li>
+          <label for="experiencepoints">Experience Points</label>
+          <input name="experiencepoints" placeholder="3240" value="{{ .ExperiencePoints }}" />
+        </li>
+      </ul>
+    </section>
+  </header>
 
-      <header>
-        <section class="charname">
-          <label for="charname">Character Name</label>
-          <input name="charname" id="charname" placeholder="Thoradin Fireforge" value="{{ .Name }}">
-        </section>
+  <main>
+    <!-- Attributes -->
+    <section class="attributes">
+      <div class="scores">
+        <ul>
+          {{ $abilities := .Abilities }}
+          {{ range $name, $value := dict "Strength" $abilities.Strength "Dexterity" $abilities.Dexterity "Constitution" $abilities.Constitution "Intelligence" $abilities.Intelligence "Wisdom" $abilities.Wisdom "Charisma" $abilities.Charisma }}
+          <li>
+            <div class="score">
+              <label>{{ $name }}</label>
+              <input name="{{ $name }}" class="stat" value="{{ $value }}" />
+            </div>
+            <div class="modifier">
+              <input name="{{ $name }}mod" class="statmod" value="{{ div (sub $value 10) 2 }}" />
+            </div>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
 
-        <section class="misc">
-          <ul>
-            <li>
-              <label for="race">Race</label>
-              <input name="race" id="race" placeholder="Half-elf" value="{{ .Race }}">
-            </li>
-            <li>
-              <label for="classlevel">Class & Level</label>
-              <input name="classlevel" id="classlevel" placeholder="Paladin 2" value="{{ .Class }} {{ .Level }}">
-            </li>
-            <li>
-              <label for="background">Background</label>
-              <input name="background" id="background" placeholder="Acolyte" value="{{ .Background }}">
-            </li>
-            <li>
-              <label for="proficiencybonus">Proficiency Bonus</label>
-              <input name="proficiencybonus" id="proficiencybonus" placeholder="+2" value="{{ .ProficiencyBonus }}">
-            </li>
-          </ul>
-        </section>
-      </header>
+      <div class="attr-applications">
+        <div class="inspiration box">
+          <div class="label-container"><label for="inspiration">Inspiration</label></div>
+          <input name="inspiration" type="checkbox" />
+        </div>
+        <div class="proficiencybonus box">
+          <div class="label-container"><label for="proficiencybonus">Proficiency Bonus</label></div>
+          <input name="proficiencybonus" value="{{ .ProfBonus }}" />
+        </div>
+      </div>
+    </section>
 
-      <section id="scores">
-        <div class="score">
-          <label for="strength">STR</label>
-          <input name="strength" id="strength" value="{{ .Strength }}">
-        </div>
-        <div class="score">
-          <label for="dexterity">DEX</label>
-          <input name="dexterity" id="dexterity" value="{{ .Dexterity }}">
-        </div>
-        <div class="score">
-          <label for="constitution">CON</label>
-          <input name="constitution" id="constitution" value="{{ .Constitution }}">
-        </div>
-        <div class="score">
-          <label for="intelligence">INT</label>
-          <input name="intelligence" id="intelligence" value="{{ .Intelligence }}">
-        </div>
-        <div class="score">
-          <label for="wisdom">WIS</label>
-          <input name="wisdom" id="wisdom" value="{{ .Wisdom }}">
-        </div>
-        <div class="score">
-          <label for="charisma">CHA</label>
-          <input name="charisma" id="charisma" value="{{ .Charisma }}">
-        </div>
-      </section>
+    <!-- Saving Throws -->
+    <div class="saves list-section box">
+      <ul>
+        {{ range $name, $value := dict "Strength" .Abilities.Strength "Dexterity" .Abilities.Dexterity "Constitution" .Abilities.Constitution "Wisdom" .Abilities.Wisdom "Intelligence" .Abilities.Intelligence "Charisma" .Abilities.Charisma }}
+        <li>
+          <label>{{$name}}</label>
+          <input name="{{$name}}-save" value="{{ div (sub $value 10) 2 }}" type="text" />
+          <input name="{{$name}}-save-prof" type="checkbox" />
+        </li>
+        {{ end }}
+      </ul>
+      <div class="label">Saving Throws</div>
+    </div>
 
-      <footer>
-        <button type="submit">
-          {{ if .Name }}Update Character{{ else }}Create Character{{ end }}
-        </button>
-      </footer>
-    </form>
+    <!-- Skills -->
+    <div class="skills list-section box">
+      <ul>
+        {{ range $skill, $mod := .Skills }}
+        <li>
+          <label>{{$skill}}</label>
+          <input name="{{$skill}}" value="{{ $mod }}" type="text" />
+          <input name="{{$skill}}-prof" type="checkbox" checked />
+        </li>
+        {{ end }}
+      </ul>
+      <div class="label">Skills</div>
+    </div>
+
+    <!-- Combat Section -->
+    <section class="combat">
+      <div class="armorclass">
+        <label for="ac">Armor Class</label>
+        <input name="ac" placeholder="10" type="text" value="{{ .ArmorClass }}" />
+      </div>
+      <div class="initiative">
+        <label for="initiative">Initiative</label>
+        <input name="initiative" placeholder="+0" type="text" value="{{ .Initiative }}" />
+      </div>
+      <div class="speed">
+        <label for="speed">Speed</label>
+        <input name="speed" placeholder="30" type="text" value="{{ .Speed }}" />
+      </div>
+      <div class="hp">
+        <label for="maxhp">Hit Points</label>
+        <input name="maxhp" placeholder="10" type="text" value="{{ .MaxHitPoints }}" />
+        <input name="currenthp" type="text" value="{{ .CurrentHitPoints }}" />
+        <input name="temphp" type="text" value="{{ .TemporaryHitPoints }}" />
+      </div>
+    </section>
+
+    <!-- Attacks & Spellcasting -->
+    <section class="attacksandspellcasting">
+      <div>
+        <label>Attacks & Spellcasting</label>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Atk Bonus</th>
+              <th>Damage/Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range $index, $attack := .Attacks }}
+            <tr>
+              <td><input name="atkname{{ add $index 1 }}" type="text" value="{{ $attack.Name }}" /></td>
+              <td><input name="atkbonus{{ add $index 1 }}" type="text" value="{{ $attack.AttackBonus }}" /></td>
+              <td><input name="atkdamage{{ add $index 1 }}" type="text" value="{{ $attack.Damage }}" /></td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Equipment -->
+    <section class="equipment">
+      <label>Equipment</label>
+      <div class="money">
+        <ul>
+          <li><label for="cp">cp</label><input name="cp" value="{{ .CopperPieces }}" /></li>
+          <li><label for="sp">sp</label><input name="sp" value="{{ .SilverPieces }}" /></li>
+          <li><label for="ep">ep</label><input name="ep" value="{{ .ElectrumPieces }}" /></li>
+          <li><label for="gp">gp</label><input name="gp" value="{{ .GoldPieces }}" /></li>
+          <li><label for="pp">pp</label><input name="pp" value="{{ .PlatinumPieces }}" /></li>
+        </ul>
+      </div>
+      <textarea placeholder="Equipment list here">{{ .EquipmentText }}</textarea>
+    </section>
+
+    <!-- Flavor Section -->
+    <section class="flavor">
+      <div class="personality"><label>Personality</label><textarea name="personality">{{ .Personality }}</textarea></div>
+      <div class="ideals"><label>Ideals</label><textarea name="ideals">{{ .Ideals }}</textarea></div>
+      <div class="bonds"><label>Bonds</label><textarea name="bonds">{{ .Bonds }}</textarea></div>
+      <div class="flaws"><label>Flaws</label><textarea name="flaws">{{ .Flaws }}</textarea></div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <label>Features & Traits</label>
+      <textarea name="features">{{ .Features }}</textarea>
+    </section>
+
   </main>
+</form>
 </body>
 </html>

@@ -52,5 +52,24 @@
       "charisma": 13
     },
     "skills": null
+  },
+  "Wynnie": {
+    "name": "Wynnie",
+    "race": "Human",
+    "class": "Wizard",
+    "level": 1,
+    "background": "moe",
+    "prof_bonus": 2,
+    "abilities": {
+      "strength": 15,
+      "dexterity": 14,
+      "constitution": 12,
+      "intelligence": 15,
+      "wisdom": 10,
+      "charisma": 1
+    },
+    "skills": {
+      "lui zijn": -3
+    }
   }
 }
