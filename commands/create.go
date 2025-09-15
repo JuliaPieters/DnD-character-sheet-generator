@@ -1,31 +1,69 @@
 package commands
 
 import (
-    "dnd-character-sheet/models"
-    "dnd-character-sheet/storage"
-    "fmt"
+	"dnd-character-sheet/models"
+	"dnd-character-sheet/storage"
+	"errors"
+	"fmt"
 )
 
-// CreateCharacter maakt een nieuw D&D character aan
+// CreateCharacter maakt een nieuw character aan en slaat deze op
 func CreateCharacter(
-    name, race, class, background string,
-    level int,
-    str, dex, con, intt, wis, cha int,
-    skills []string,
+	characterName string,
+	playerName string,
+	characterRace string,
+	characterClass string,
+	characterBackground string,
+	characterLevel int,
+	abilityScores []int,        // ints in plaats van []string
+	skillProficiencies []string,
 ) error {
-    // Gebruik de NewCharacter functie uit models
-    c := models.NewCharacter(name, race, class, background, level, str, dex, con, intt, wis, cha)
+	// Laad bestaande characters
+	existingCharacters, err := storage.LoadCharacters()
+	if err != nil {
+		return fmt.Errorf("failed to load characters: %w", err)
+	}
 
-    // Voeg skills toe en bereken modifiers
-    if len(skills) > 0 {
-        c.AddSkills(skills)
-    }
+	if _, exists := existingCharacters[characterName]; exists {
+		return errors.New("character met deze naam bestaat al")
+	}
 
-    // Sla het character op in storage
-    if err := storage.SaveCharacter(*c); err != nil {
-        return err
-    }
+	newCharacterID := len(existingCharacters) + 1
 
-    fmt.Printf("✅ Character %s created!\n", name)
-    return nil
+	// Standaard volgorde voor ability names
+	abilityOrder := []string{"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"}
+
+	// Maak nieuw character aan
+	newCharacter := models.NewCharacter(
+		newCharacterID,
+		characterName,
+		characterRace,
+		characterClass,
+		characterBackground,
+		characterLevel,
+		abilityOrder,       // names blijven nodig voor NewCharacter
+		skillProficiencies,
+	)
+
+	// Overschrijf ability scores met de ints die doorgegeven zijn
+	if len(abilityScores) != 6 {
+		return errors.New("abilityScores moet exact 6 waarden bevatten")
+	}
+	newCharacter.Abilities.Strength = abilityScores[0]
+	newCharacter.Abilities.Dexterity = abilityScores[1]
+	newCharacter.Abilities.Constitution = abilityScores[2]
+	newCharacter.Abilities.Intelligence = abilityScores[3]
+	newCharacter.Abilities.Wisdom = abilityScores[4]
+	newCharacter.Abilities.Charisma = abilityScores[5]
+
+	// Herbereken skills en stats
+	newCharacter.CalculateAllSkills()
+	newCharacter.CalculateCombatStats()
+	newCharacter.SetupSpellcasting()
+
+	// Opslaan
+	if err := storage.SaveCharacter(*newCharacter); err != nil {
+		return fmt.Errorf("failed to save character: %w", err)
+	}
+	return nil
 }
