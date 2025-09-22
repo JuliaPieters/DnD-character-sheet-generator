@@ -46,7 +46,7 @@ func main() {
 		playerName := createCmd.String("player", "", "Player Name")
 		characterRace := createCmd.String("race", "", "Race")
 		characterClass := createCmd.String("class", "", "Class")
-		background := createCmd.String("background", "", "Background")
+		background := createCmd.String("background", "acolyte", "Background")
 		level := createCmd.Int("level", 1, "Level")
 		strength := createCmd.Int("str", 10, "Strength")
 		dexterity := createCmd.Int("dex", 10, "Dexterity")

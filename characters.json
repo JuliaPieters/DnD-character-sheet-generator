@@ -121,6 +121,63 @@
     "max_hit_points": 10,
     "current_hit_points": 10
   },
+  "Gandalf": {
+    "id": 5,
+    "name": "Gandalf",
+    "race": "Human",
+    "class": "Wizard",
+    "level": 3,
+    "background": "Sage",
+    "proficiency_bonus": 2,
+    "abilities": {
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 12,
+      "intelligence": 16,
+      "wisdom": 10,
+      "charisma": 10
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "Investigation"
+    ],
+    "skills": {
+      "Acrobatics": 2,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 0,
+      "History": 3,
+      "Insight": 0,
+      "Intimidation": 0,
+      "Investigation": 5,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 3,
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 0
+    },
+    "equipment": {
+      "weapons": null
+    },
+    "spell_slots": {
+      "1": 4,
+      "2": 2
+    },
+    "armor_class": 12,
+    "initiative": 2,
+    "passive_perception": 10,
+    "spellcasting_ability": "Intelligence",
+    "spell_save_dc": 13,
+    "spell_attack_bonus": 5,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
+  },
   "Thoradin": {
     "id": 0,
     "name": "Thoradin",
@@ -173,56 +230,116 @@
     "initiative": 0,
     "passive_perception": 0
   },
-  "gert": {
-    "id": 5,
-    "name": "gert",
-    "race": "Human",
-    "class": "Ranger",
-    "level": 4,
-    "background": "Noble",
+  "bert": {
+    "id": 7,
+    "name": "bert",
+    "race": "human",
+    "class": "cleric",
+    "level": 3,
+    "background": "Sage",
     "proficiency_bonus": 2,
     "abilities": {
-      "strength": 16,
+      "strength": 8,
       "dexterity": 14,
-      "constitution": 13,
-      "intelligence": 12,
+      "constitution": 12,
+      "intelligence": 16,
       "wisdom": 10,
-      "charisma": 8
+      "charisma": 10
     },
     "skill_proficiencies": [
-      "Athletics",
-      "Perception",
-      "Survival"
+      "Arcana",
+      "Investigation"
     ],
     "skills": {
       "Acrobatics": 2,
       "Animal Handling": 0,
-      "Arcana": 1,
-      "Athletics": 5,
-      "Deception": -1,
-      "History": 1,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 0,
+      "History": 3,
       "Insight": 0,
-      "Intimidation": -1,
-      "Investigation": 1,
+      "Intimidation": 0,
+      "Investigation": 5,
       "Medicine": 0,
-      "Nature": 1,
-      "Perception": 2,
-      "Performance": -1,
-      "Persuasion": -1,
-      "Religion": 1,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 3,
       "Sleight of Hand": 2,
       "Stealth": 2,
-      "Survival": 2
+      "Survival": 0
     },
     "equipment": {
       "weapons": null
     },
+    "spell_slots": {
+      "1": 4,
+      "2": 2
+    },
     "armor_class": 12,
     "initiative": 2,
-    "passive_perception": 12,
+    "passive_perception": 10,
     "spellcasting_ability": "Wisdom",
     "spell_save_dc": 10,
     "spell_attack_bonus": 2,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
+  },
+  "gert": {
+    "id": 6,
+    "name": "gert",
+    "race": "Human",
+    "class": "Wizard",
+    "level": 3,
+    "background": "Sage",
+    "proficiency_bonus": 2,
+    "abilities": {
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 12,
+      "intelligence": 16,
+      "wisdom": 10,
+      "charisma": 10
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "Investigation"
+    ],
+    "skills": {
+      "Acrobatics": 2,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 0,
+      "History": 3,
+      "Insight": 0,
+      "Intimidation": 0,
+      "Investigation": 5,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 3,
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 0
+    },
+    "equipment": {
+      "weapons": null
+    },
+    "spell_slots": {
+      "1": 4,
+      "2": 2
+    },
+    "armor_class": 12,
+    "initiative": 2,
+    "passive_perception": 10,
+    "spellcasting_ability": "Intelligence",
+    "spell_save_dc": 13,
+    "spell_attack_bonus": 5,
     "speed": 30,
     "max_hit_points": 10,
     "current_hit_points": 10

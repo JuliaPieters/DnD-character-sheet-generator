@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Character List</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/list-style.css">
 </head>
 <body>
   <h1>Characters</h1>
@@ -11,7 +11,7 @@
     {{range $name, $character := .}}
       <li>
         <a href="/character?id={{$character.Name}}">
-          {{$character.Name}} ({{$character.Race}} {{$character.Class}})
+          {{$character.Name}}
         </a>
       </li>
     {{else}}

@@ -15,7 +15,7 @@ func CreateCharacter(
 	characterClass string,
 	characterBackground string,
 	characterLevel int,
-	abilityScores []int,        // ints in plaats van []string
+	abilityScores []int,
 	skillProficiencies []string,
 ) error {
 	// Laad bestaande characters
@@ -28,12 +28,23 @@ func CreateCharacter(
 		return errors.New("character met deze naam bestaat al")
 	}
 
+
+	if len(abilityScores) != 6 {
+		abilityScores = nil 
+	}
+
+
+	if len(skillProficiencies) == 0 {
+		availableSkills := models.GetAvailableSkills(characterClass)
+		skillProficiencies = availableSkills
+		if len(skillProficiencies) > 4 {
+			skillProficiencies = skillProficiencies[:4] 
+		}
+	}
+
 	newCharacterID := len(existingCharacters) + 1
 
-	// Standaard volgorde voor ability names
-	abilityOrder := []string{"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"}
-
-	// Maak nieuw character aan
+	// Maak nieuw character aan met de juiste abilityScores en skills
 	newCharacter := models.NewCharacter(
 		newCharacterID,
 		characterName,
@@ -41,27 +52,10 @@ func CreateCharacter(
 		characterClass,
 		characterBackground,
 		characterLevel,
-		abilityOrder,       // names blijven nodig voor NewCharacter
+		abilityScores,
 		skillProficiencies,
 	)
 
-	// Overschrijf ability scores met de ints die doorgegeven zijn
-	if len(abilityScores) != 6 {
-		return errors.New("abilityScores moet exact 6 waarden bevatten")
-	}
-	newCharacter.Abilities.Strength = abilityScores[0]
-	newCharacter.Abilities.Dexterity = abilityScores[1]
-	newCharacter.Abilities.Constitution = abilityScores[2]
-	newCharacter.Abilities.Intelligence = abilityScores[3]
-	newCharacter.Abilities.Wisdom = abilityScores[4]
-	newCharacter.Abilities.Charisma = abilityScores[5]
-
-	// Herbereken skills en stats
-	newCharacter.CalculateAllSkills()
-	newCharacter.CalculateCombatStats()
-	newCharacter.SetupSpellcasting()
-
-	// Opslaan
 	if err := storage.SaveCharacter(*newCharacter); err != nil {
 		return fmt.Errorf("failed to save character: %w", err)
 	}

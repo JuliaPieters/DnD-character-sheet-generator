@@ -6,7 +6,6 @@ import (
 	"fmt"
 )
 
-// AddWeapon adds a weapon to a character
 func AddWeapon(characterName string, newWeapon models.Weapon) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -28,7 +27,6 @@ func AddWeapon(characterName string, newWeapon models.Weapon) error {
 	return nil
 }
 
-// RemoveWeapon removes a weapon from a character
 func RemoveWeapon(characterName string, weaponName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -52,11 +50,10 @@ func RemoveWeapon(characterName string, weaponName string) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Weapon '%s' removed from character '%s'\n", weaponName, characterName)
+	fmt.Printf(" Weapon '%s' removed from character '%s'\n", weaponName, characterName)
 	return nil
 }
 
-// AddArmor adds armor to a character and recalculates AC
 func AddArmor(characterName string, newArmor models.Armor) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {

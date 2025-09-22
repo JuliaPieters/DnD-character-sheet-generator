@@ -60,6 +60,6 @@ func RemoveSpell(characterName string, spellName string) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Spell '%s' removed from character '%s'\n", spellName, characterName)
+	fmt.Printf(" Spell '%s' removed from character '%s'\n", spellName, characterName)
 	return nil
 }

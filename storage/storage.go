@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const charactersFilePath = "characters.json"
+const charactersFilePath = "../characters.json"
 
 // SaveCharacter voegt een nieuw character toe of update een bestaand character
 func SaveCharacter(character models.Character) error {
