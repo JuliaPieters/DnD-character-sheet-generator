@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"dnd-character-sheet/api"
 	"dnd-character-sheet/models"
 	"dnd-character-sheet/storage"
 )
@@ -17,18 +18,15 @@ var templates = template.Must(template.ParseGlob("../templates/*.html"))
 // Handlers
 // ------------------------
 func listHandler(w http.ResponseWriter, r *http.Request) {
-	// Load characters van JSON
 	characters, err := storage.LoadCharacters()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// characters is map[string]models.Character
-	// log om te checken
 	log.Println("Loaded characters:")
-	for k, v := range characters {
-		log.Printf("%s -> %+v\n", k, v)
+	for characterName, characterData := range characters {
+		log.Printf("%s -> %+v\n", characterName, characterData)
 	}
 
 	err = templates.ExecuteTemplate(w, "characterList.html", characters)
@@ -39,12 +37,12 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 
 func characterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		name := r.URL.Query().Get("id")
+		characterID := r.URL.Query().Get("id")
 		var character models.Character
-		if name != "" {
-			c, err := storage.GetCharacterByName(name)
+		if characterID != "" {
+			foundCharacter, err := storage.GetCharacterByName(characterID)
 			if err == nil {
-				character = c
+				character = foundCharacter
 			}
 		}
 
@@ -59,15 +57,16 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 
 		level, _ := strconv.Atoi(r.FormValue("level"))
-		xp, _ := strconv.Atoi(r.FormValue("experiencepoints"))
-		str, _ := strconv.Atoi(r.FormValue("Strengthscore"))
-		dex, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
-		con, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
-		intt, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
-		wis, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
-		cha, _ := strconv.Atoi(r.FormValue("Charismascore"))
+		experiencePoints, _ := strconv.Atoi(r.FormValue("experiencepoints"))
+		strengthScore, _ := strconv.Atoi(r.FormValue("Strengthscore"))
+		dexterityScore, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
+		constitutionScore, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
+		intelligenceScore, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
+		wisdomScore, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
+		charismaScore, _ := strconv.Atoi(r.FormValue("Charismascore"))
 
-		var skills []string
+		// Verzamel skill proficiencies
+		var skillProficiencies []string
 		for _, skill := range []string{
 			"Acrobatics", "Animal Handling", "Arcana", "Athletics",
 			"Deception", "History", "Insight", "Intimidation",
@@ -76,28 +75,29 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			"Stealth", "Survival",
 		} {
 			if r.FormValue(skill+"-prof") == "on" {
-				skills = append(skills, skill)
+				skillProficiencies = append(skillProficiencies, skill)
 			}
 		}
 
-		char := models.Character{
-			Name:       r.FormValue("charname"),
-			PlayerName: r.FormValue("playername"),
-			Race:       r.FormValue("race"),
-			Class:      r.FormValue("classlevel"),
-			Level:      level,
-			Background: r.FormValue("background"),
-			Alignment:  r.FormValue("alignment"),
-			ExperiencePoints: xp,
+		// Maak nieuw Character object
+		character := models.Character{
+			Name:               r.FormValue("charname"),
+			PlayerName:         r.FormValue("playername"),
+			Race:               r.FormValue("race"),
+			Class:              r.FormValue("classlevel"),
+			Level:              level,
+			Background:         r.FormValue("background"),
+			Alignment:          r.FormValue("alignment"),
+			ExperiencePoints:   experiencePoints,
 			Abilities: models.AbilityScores{
-				Strength:     str,
-				Dexterity:    dex,
-				Constitution: con,
-				Intelligence: intt,
-				Wisdom:       wis,
-				Charisma:     cha,
+				Strength:     strengthScore,
+				Dexterity:    dexterityScore,
+				Constitution: constitutionScore,
+				Intelligence: intelligenceScore,
+				Wisdom:       wisdomScore,
+				Charisma:     charismaScore,
 			},
-			SkillProficiencies: skills,
+			SkillProficiencies: skillProficiencies,
 			Equipment: models.Equipment{
 				Weapons: []models.Weapon{},
 				Armor:   nil,
@@ -110,8 +110,32 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			Features:    r.FormValue("features"),
 		}
 
-		// Opslaan via storage
-		err := storage.SaveCharacter(char)
+		// ---------- Voeg spells toe ----------
+		if character.SpellSlots == nil {
+			character.SetupSpellcasting() // Zorg dat spell slots aanwezig zijn
+		}
+
+		spells, err := api.GetSpellsForClass(character.Class, character.SpellSlots)
+		if err != nil {
+			log.Println("Error fetching spells:", err)
+		} else {
+			character.Spells = spells
+		}
+
+		// ---------- Voeg equipment toe ----------
+		weapons, armor, shield, err := api.GetEquipment()
+		if err != nil {
+			log.Println("Error fetching equipment:", err)
+		} else {
+			character.Equipment = models.Equipment{
+				Weapons: weapons,
+				Armor:   armor,
+				Shield:  shield,
+			}
+		}
+
+		// Sla character op
+		err = storage.SaveCharacter(character)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
