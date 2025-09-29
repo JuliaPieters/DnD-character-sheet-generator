@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"dnd-character-sheet/api"
 	"dnd-character-sheet/models"
@@ -36,7 +37,8 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func characterHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
+	switch r.Method {
+	case http.MethodGet:
 		characterID := r.URL.Query().Get("id")
 		var character models.Character
 		if characterID != "" {
@@ -51,21 +53,40 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
-	}
 
-	if r.Method == http.MethodPost {
+	case http.MethodPost:
 		r.ParseForm()
 
+		// Parse basic fields
+		charName := r.FormValue("charname")
+		playerName := r.FormValue("playername")
+		race := r.FormValue("race")
+		class := r.FormValue("classlevel")
+		background := r.FormValue("background")
 		level, _ := strconv.Atoi(r.FormValue("level"))
-		experiencePoints, _ := strconv.Atoi(r.FormValue("experiencepoints"))
-		strengthScore, _ := strconv.Atoi(r.FormValue("Strengthscore"))
-		dexterityScore, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
-		constitutionScore, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
-		intelligenceScore, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
-		wisdomScore, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
-		charismaScore, _ := strconv.Atoi(r.FormValue("Charismascore"))
+		expPoints, _ := strconv.Atoi(r.FormValue("experiencepoints"))
 
-		// Verzamel skill proficiencies
+		// Parse ability scores
+		strength, _ := strconv.Atoi(r.FormValue("Strengthscore"))
+		dexterity, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
+		constitution, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
+		intelligence, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
+		wisdom, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
+		charisma, _ := strconv.Atoi(r.FormValue("Charismascore"))
+
+		// Apply racial modifiers
+		raceKey := strings.ToLower(race)
+		modifiers := models.RaceModifiers[raceKey]
+		abilities := models.AbilityScores{
+			Strength:     strength + modifiers["Strength"],
+			Dexterity:    dexterity + modifiers["Dexterity"],
+			Constitution: constitution + modifiers["Constitution"],
+			Intelligence: intelligence + modifiers["Intelligence"],
+			Wisdom:       wisdom + modifiers["Wisdom"],
+			Charisma:     charisma + modifiers["Charisma"],
+		}
+
+		// Skill proficiencies
 		var skillProficiencies []string
 		for _, skill := range []string{
 			"Acrobatics", "Animal Handling", "Arcana", "Athletics",
@@ -79,50 +100,41 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Maak nieuw Character object
-		character := models.Character{
-			Name:               r.FormValue("charname"),
-			PlayerName:         r.FormValue("playername"),
-			Race:               r.FormValue("race"),
-			Class:              r.FormValue("classlevel"),
-			Level:              level,
-			Background:         r.FormValue("background"),
-			Alignment:          r.FormValue("alignment"),
-			ExperiencePoints:   experiencePoints,
-			Abilities: models.AbilityScores{
-				Strength:     strengthScore,
-				Dexterity:    dexterityScore,
-				Constitution: constitutionScore,
-				Intelligence: intelligenceScore,
-				Wisdom:       wisdomScore,
-				Charisma:     charismaScore,
-			},
-			SkillProficiencies: skillProficiencies,
-			Equipment: models.Equipment{
-				Weapons: []models.Weapon{},
-				Armor:   nil,
-				Shield:  nil,
-			},
-			Personality: r.FormValue("personality"),
-			Ideals:      r.FormValue("ideals"),
-			Bonds:       r.FormValue("bonds"),
-			Flaws:       r.FormValue("flaws"),
-			Features:    r.FormValue("features"),
-		}
-
-		// ---------- Voeg spells toe ----------
-		if character.SpellSlots == nil {
-			character.SetupSpellcasting() // Zorg dat spell slots aanwezig zijn
-		}
-
-		spells, err := api.GetSpellsForClass(character.Class, character.SpellSlots)
+		// Check if character exists
+		character, err := storage.GetCharacterByName(charName)
 		if err != nil {
-			log.Println("Error fetching spells:", err)
+			// Create new character
+			character = models.Character{
+				Name:               charName,
+				PlayerName:         playerName,
+				Race:               race,
+				Class:              class,
+				Level:              level,
+				Background:         background,
+				ExperiencePoints:   expPoints,
+				ProficiencyBonus:   models.CalculateProfBonus(level),
+				Abilities:          abilities,
+				SkillProficiencies: skillProficiencies,
+			}
 		} else {
-			character.Spells = spells
+			// Update existing character
+			character.PlayerName = playerName
+			character.Race = race
+			character.Class = class
+			character.Level = level
+			character.Background = background
+			character.ExperiencePoints = expPoints
+			character.ProficiencyBonus = models.CalculateProfBonus(level)
+			character.Abilities = abilities
+			character.SkillProficiencies = skillProficiencies
 		}
 
-		// ---------- Voeg equipment toe ----------
+		// Calculate derived stats
+		character.CalculateAllSkills()
+		character.CalculateCombatStats()
+		character.SetupSpellcasting()
+
+		// Fetch equipment from API
 		weapons, armor, shield, err := api.GetEquipment()
 		if err != nil {
 			log.Println("Error fetching equipment:", err)
@@ -134,18 +146,26 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Sla character op
-		err = storage.SaveCharacter(character)
+		// Fetch spells for class
+		spells, err := api.GetSpellsForClass(class, character.SpellSlots)
 		if err != nil {
+			log.Println("Error fetching spells:", err)
+		} else {
+			character.Spells = spells
+		}
+
+		// Save character
+		if err := storage.SaveCharacter(character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
-	}
 
-	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
 }
 
 // ------------------------
