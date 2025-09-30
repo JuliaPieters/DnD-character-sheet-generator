@@ -86,7 +86,7 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			Charisma:     charisma + modifiers["Charisma"],
 		}
 
-		// Skill proficiencies
+		// Skill proficiencies (from form)
 		var skillProficiencies []string
 		for _, skill := range []string{
 			"Acrobatics", "Animal Handling", "Arcana", "Athletics",
@@ -98,6 +98,11 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			if r.FormValue(skill+"-prof") == "on" {
 				skillProficiencies = append(skillProficiencies, skill)
 			}
+		}
+
+		// Als er geen skills in het formulier zijn ingevuld, gebruik class skills inclusief duplicaten
+		if len(skillProficiencies) == 0 {
+			skillProficiencies = append([]string{}, models.ClassSkills[strings.ToLower(class)]...)
 		}
 
 		// Check if character exists
@@ -134,15 +139,16 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		character.CalculateCombatStats()
 		character.SetupSpellcasting()
 
-		// Fetch equipment from API
-		weapons, armor, shield, err := api.GetEquipment()
+		// Fetch equipment from API (fixed assignment)
+		mainHand, offHand, armor, shield, err := api.GetEquipment()
 		if err != nil {
 			log.Println("Error fetching equipment:", err)
 		} else {
 			character.Equipment = models.Equipment{
-				Weapons: weapons,
-				Armor:   armor,
-				Shield:  shield,
+				MainHand: mainHand,
+				OffHand:  offHand,
+				Armor:    armor,
+				Shield:   shield,
 			}
 		}
 
