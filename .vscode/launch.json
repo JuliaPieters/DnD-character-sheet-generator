@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Configuration that launches the current package without arguments
+            // This should return an error.
+            "name": "Empty",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": []
+        },
+
+        {
+            // Confuration for getting usage information
+            "name": "Help",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": ["help"]
+        },
+
+        {
+            // Configuration for creating a character named "Jules" with specified attributes
+            "name": "Create Jules",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": ["create", "-name", "Jules", "-race", "Dwarf", "-class", "Fighter", "-level", "1", "-str", "16", "-dex", "12", "-con", "14", "-int", "10", "-wis", "9", "-cha", "11"]
+        },
+
+        {
+            // Configuration to view Jules
+            "name": "View Jules",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": ["view", "-name", "Jules"]
+        }
+    ]
+}

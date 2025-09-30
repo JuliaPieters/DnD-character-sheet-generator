@@ -3,6 +3,7 @@ package commands
 import (
 	"dnd-character-sheet/storage"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -31,6 +32,20 @@ func ViewCharacter(name string) error {
 			fmt.Printf("Proficiency bonus: %+d\n", proficiencyBonus(c.Level))
 			fmt.Printf("Skill proficiencies: %s\n", formatSkillProficiencies(c.SkillProficiencies))
 
+			// 🔑 Equipment toevoegen
+			if c.Equipment.MainHand != nil {
+				fmt.Printf("Main hand: %s\n", c.Equipment.MainHand.Name)
+			}
+			if c.Equipment.OffHand != nil {
+				fmt.Printf("Off hand: %s\n", c.Equipment.OffHand.Name)
+			}
+			if c.Equipment.Armor != nil {
+				fmt.Printf("Armor: %s\n", c.Equipment.Armor.Name)
+			}
+			if c.Equipment.Shield != nil {
+				fmt.Printf("Shield: %s\n", c.Equipment.Shield.Name)
+			}
+
 			return nil
 		}
 	}
@@ -39,7 +54,7 @@ func ViewCharacter(name string) error {
 }
 
 func abilityModifier(score int) int {
-	return (score - 10) / 2
+	return int(math.Floor(float64(score-10) / 2))
 }
 
 func proficiencyBonus(level int) int {

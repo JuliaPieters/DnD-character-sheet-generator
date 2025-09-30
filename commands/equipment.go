@@ -6,27 +6,72 @@ import (
 	"fmt"
 )
 
-func AddWeapon(characterName string, newWeapon models.Weapon) error {
+// AddWeapon equips a weapon to the first available hand (main or off) and returns which hand it was equipped to
+func AddWeapon(characterName string, newWeapon models.Weapon) (string, error) {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
-		return fmt.Errorf("could not load characters: %w", loadErr)
+		return "", fmt.Errorf("could not load characters: %w", loadErr)
 	}
 
 	character, exists := characters[characterName]
 	if !exists {
-		return fmt.Errorf("character '%s' not found", characterName)
+		return "", fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Weapons = append(character.Equipment.Weapons, newWeapon)
+	var hand string
+	if character.Equipment.MainHand == nil {
+		character.Equipment.MainHand = &newWeapon
+		hand = "main hand"
+	} else if character.Equipment.OffHand == nil {
+		character.Equipment.OffHand = &newWeapon
+		hand = "off hand"
+	} else {
+		return "", fmt.Errorf("both hands already occupied")
+	}
 
 	if saveErr := storage.SaveCharacter(character); saveErr != nil {
-		return fmt.Errorf("could not save character: %w", saveErr)
+		return "", fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Weapon '%s' added to character '%s'\n", newWeapon.Name, characterName)
-	return nil
+	return hand, nil
+}
+func AddWeaponToSlot(characterName string, newWeapon models.Weapon, slot string) (string, error) {
+	characters, loadErr := storage.LoadCharacters()
+	if loadErr != nil {
+		return "", fmt.Errorf("could not load characters: %w", loadErr)
+	}
+
+	character, exists := characters[characterName]
+	if !exists {
+		return "", fmt.Errorf("character '%s' not found", characterName)
+	}
+
+	var hand string
+	switch slot {
+	case "main hand":
+		if character.Equipment.MainHand != nil {
+			return "", fmt.Errorf("main hand already occupied")
+		}
+		character.Equipment.MainHand = &newWeapon
+		hand = "main hand"
+	case "off hand":
+		if character.Equipment.OffHand != nil {
+			return "", fmt.Errorf("off hand already occupied")
+		}
+		character.Equipment.OffHand = &newWeapon
+		hand = "off hand"
+	default:
+		return "", fmt.Errorf("invalid slot: must be 'main hand' or 'off hand'")
+	}
+
+	if saveErr := storage.SaveCharacter(character); saveErr != nil {
+		return "", fmt.Errorf("could not save character: %w", saveErr)
+	}
+
+	return hand, nil
 }
 
+// RemoveWeapon removes a weapon from main hand or off hand
 func RemoveWeapon(characterName string, weaponName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -38,22 +83,28 @@ func RemoveWeapon(characterName string, weaponName string) error {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	newWeaponList := []models.Weapon{}
-	for _, existingWeapon := range character.Equipment.Weapons {
-		if existingWeapon.Name != weaponName {
-			newWeaponList = append(newWeaponList, existingWeapon)
-		}
+	removed := false
+	if character.Equipment.MainHand != nil && character.Equipment.MainHand.Name == weaponName {
+		character.Equipment.MainHand = nil
+		removed = true
 	}
-	character.Equipment.Weapons = newWeaponList
+	if character.Equipment.OffHand != nil && character.Equipment.OffHand.Name == weaponName {
+		character.Equipment.OffHand = nil
+		removed = true
+	}
+
+	if !removed {
+		return fmt.Errorf("weapon '%s' not found on character '%s'", weaponName, characterName)
+	}
 
 	if saveErr := storage.SaveCharacter(character); saveErr != nil {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf(" Weapon '%s' removed from character '%s'\n", weaponName, characterName)
 	return nil
 }
 
+// AddArmor equips armor
 func AddArmor(characterName string, newArmor models.Armor) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -72,11 +123,10 @@ func AddArmor(characterName string, newArmor models.Armor) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Armor '%s' added to character '%s'\n", newArmor.Name, characterName)
 	return nil
 }
 
-// RemoveArmor removes armor from a character and recalculates AC
+// RemoveArmor removes armor
 func RemoveArmor(characterName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -95,11 +145,10 @@ func RemoveArmor(characterName string) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Armor removed from character '%s'\n", characterName)
 	return nil
 }
 
-// AddShield adds a shield to a character and recalculates AC
+// AddShield equips shield
 func AddShield(characterName string, newShield models.Shield) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -118,11 +167,10 @@ func AddShield(characterName string, newShield models.Shield) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Shield '%s' added to character '%s'\n", newShield.Name, characterName)
 	return nil
 }
 
-// RemoveShield removes a shield from a character and recalculates AC
+// RemoveShield removes shield
 func RemoveShield(characterName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -141,6 +189,5 @@ func RemoveShield(characterName string) error {
 		return fmt.Errorf("could not save character: %w", saveErr)
 	}
 
-	fmt.Printf("✅ Shield removed from character '%s'\n", characterName)
 	return nil
 }

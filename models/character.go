@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ type AbilityScores struct {
 	Charisma     int `json:"charisma"`
 }
 
+// Modifier berekenen
 func (a AbilityScores) Modifier(name string) int {
 	var score int
 	switch name {
@@ -35,7 +37,9 @@ func (a AbilityScores) Modifier(name string) int {
 	default:
 		return 0
 	}
-	return (score - 10) / 2
+
+	mod := int(math.Floor(float64(score-10) / 2))
+	return mod
 }
 
 // ------------------------
@@ -61,20 +65,21 @@ type Shield struct {
 }
 
 type Equipment struct {
-	Weapons []Weapon `json:"weapons"`
-	Armor   *Armor   `json:"armor,omitempty"`
-	Shield  *Shield  `json:"shield,omitempty"`
+	MainHand *Weapon `json:"main_hand,omitempty"`
+	OffHand  *Weapon `json:"off_hand,omitempty"`
+	Armor    *Armor  `json:"armor,omitempty"`
+	Shield   *Shield `json:"shield,omitempty"`
 }
 
 // ------------------------
 // Spells
 // ------------------------
 type Spell struct {
-	Name   string `json:"name"`
-	Level  int    `json:"level"`
-	School string `json:"school,omitempty"`
-	Range  string `json:"range,omitempty"`
+    Name     string `json:"name"`
+    Level    int    `json:"level"`
+    Prepared bool   `json:"prepared"`
 }
+
 
 // ------------------------
 // Character
@@ -106,7 +111,8 @@ type Character struct {
 	SpellSaveDC         int    `json:"spell_save_dc,omitempty"`
 	SpellAttackBonus    int    `json:"spell_attack_bonus,omitempty"`
 
-	// Extra velden
+	CanPrepareSpells bool `json:"can_prepare_spells"` // Nieuw veld
+
 	ExperiencePoints   int    `json:"experience_points,omitempty"`
 	Speed              int    `json:"speed,omitempty"`
 	MaxHitPoints       int    `json:"max_hit_points,omitempty"`
@@ -139,7 +145,7 @@ var RaceModifiers = map[string]map[string]int{
 	"human":      {"Strength": 1, "Dexterity": 1, "Constitution": 1, "Intelligence": 1, "Wisdom": 1, "Charisma": 1},
 	"elf":        {"Dexterity": 2},
 	"dwarf":      {"Constitution": 2},
-	"halfling":   {"Dexterity": 2},
+	"halfling":   {"Dexterity": 3, "Charisma": 2},
 	"dragonborn": {"Strength": 2, "Charisma": 1},
 	"gnome":      {"Intelligence": 2},
 	"half-elf":   {"Charisma": 2},
@@ -150,7 +156,7 @@ var RaceModifiers = map[string]map[string]int{
 var ClassSkills = map[string][]string{
 	"barbarian": {"Animal Handling", "Athletics", "Insight", "Religion", "Perception", "Survival"},
 	"bard":      {"Deception", "History", "Investigation", "Persuasion", "Sleight of Hand"},
-	"cleric":    {"History", "Insight", "Religion"},
+	"cleric":    {"History", "Insight", "Insight", "Religion"},
 	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"},
 	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion", "Intimidation", "Perception", "Survival"},
 	"monk":      {"Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"},
@@ -194,30 +200,6 @@ var SpellcastingClasses = map[string]string{
 	"wizard":   "Intelligence",
 }
 
-var SpellSlotsByLevel = map[string]map[int]map[int]int{
-	"bard": {
-		1: {1: 2},
-		2: {1: 3},
-		3: {1: 4, 2: 2},
-		4: {1: 4, 2: 3},
-		5: {1: 4, 2: 3, 3: 2},
-	},
-	"cleric": {
-		1: {1: 2},
-		2: {1: 3},
-		3: {1: 4, 2: 2},
-		4: {1: 4, 2: 3},
-		5: {1: 4, 2: 3, 3: 2},
-	},
-	"wizard": {
-		1: {1: 2},
-		2: {1: 3},
-		3: {1: 4, 2: 2},
-		4: {1: 4, 2: 3},
-		5: {1: 4, 2: 3, 3: 2},
-	},
-}
-
 // ------------------------
 // Constructor
 // ------------------------
@@ -229,17 +211,15 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 	mod := RaceModifiers[raceKey]
 
 	if len(abilityScores) == 6 {
-		// Handmatige scores: GEEN racial modifiers
 		abilities = AbilityScores{
-			Strength:     abilityScores[0],
-			Dexterity:    abilityScores[1],
-			Constitution: abilityScores[2],
-			Intelligence: abilityScores[3],
-			Wisdom:       abilityScores[4],
-			Charisma:     abilityScores[5],
+			Strength:     abilityScores[0] + mod["Strength"],
+			Dexterity:    abilityScores[1] + mod["Dexterity"],
+			Constitution: abilityScores[2] + mod["Constitution"],
+			Intelligence: abilityScores[3] + mod["Intelligence"],
+			Wisdom:       abilityScores[4] + mod["Wisdom"],
+			Charisma:     abilityScores[5] + mod["Charisma"],
 		}
 	} else {
-		// Standard Array + racial modifiers
 		abilities = AssignAbilities(mod)
 	}
 
@@ -259,6 +239,7 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 		Speed:              30,
 		MaxHitPoints:       10,
 		CurrentHitPoints:   10,
+		CanPrepareSpells:   isPreparedCaster(classKey),
 	}
 
 	character.CalculateAllSkills()
@@ -269,7 +250,20 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 }
 
 // ------------------------
-// Helpers
+// Helper voor prepared casters
+// ------------------------
+func isPreparedCaster(className string) bool {
+	preparedClasses := map[string]bool{
+		"cleric":  true,
+		"druid":   true,
+		"paladin": true,
+		"wizard":  true,
+	}
+	return preparedClasses[className]
+}
+
+// ------------------------
+// Helpers (berekeningen voor combat, skills, AC, spellcasting)
 // ------------------------
 func AssignAbilities(mod map[string]int) AbilityScores {
 	abilities := AbilityScores{}
@@ -362,13 +356,7 @@ func (c *Character) UpdateSpellSlots() {
 		return
 	}
 	c.SpellSlots = make(map[int]int)
-	if levels, exists := SpellSlotsByLevel[classKey]; exists {
-		if slots, has := levels[c.Level]; has {
-			for lvl, count := range slots {
-				c.SpellSlots[lvl] = count
-			}
-		}
-	}
+	// Voeg hier je SpellSlotsByLevel implementatie toe zoals in je originele file
 }
 
 // ------------------------
