@@ -75,11 +75,10 @@ type Equipment struct {
 // Spells
 // ------------------------
 type Spell struct {
-    Name     string `json:"name"`
-    Level    int    `json:"level"`
-    Prepared bool   `json:"prepared"`
+	Name     string `json:"name"`
+	Level    int    `json:"level"`
+	Prepared bool   `json:"prepared"`
 }
-
 
 // ------------------------
 // Character
@@ -162,7 +161,7 @@ var ClassSkills = map[string][]string{
 	"monk":      {"Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"},
 	"paladin":   {"Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"},
 	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"},
-	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "Sleight of Hand", "Stealth"},
+	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Insight", "Religion"},
 	"sorcerer":  {"Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"},
 	"warlock":   {"Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"},
 	"wizard":    {"Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"},

@@ -28,18 +28,26 @@ func CreateCharacter(
 		return errors.New("character met deze naam bestaat al")
 	}
 
-
+	// Als geen scores meegegeven, gebruik standaard array
 	if len(abilityScores) != 6 {
-		abilityScores = nil 
+		abilityScores = nil
 	}
 
-
+	// Skill proficiencies beperken en uniek maken
 	if len(skillProficiencies) == 0 {
 		availableSkills := models.GetAvailableSkills(characterClass)
-		skillProficiencies = availableSkills
-		if len(skillProficiencies) > 4 {
-			skillProficiencies = skillProficiencies[:4] 
+		skillSet := map[string]bool{}
+		uniqueSkills := []string{}
+		for _, s := range availableSkills {
+			if !skillSet[s] {
+				skillSet[s] = true
+				uniqueSkills = append(uniqueSkills, s)
+			}
+			if len(uniqueSkills) == 4 { // maximaal 4 skills
+				break
+			}
 		}
+		skillProficiencies = uniqueSkills
 	}
 
 	newCharacterID := len(existingCharacters) + 1
