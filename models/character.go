@@ -18,7 +18,6 @@ type AbilityScores struct {
 	Charisma     int `json:"charisma"`
 }
 
-// Modifier berekenen
 func (a AbilityScores) Modifier(name string) int {
 	var score int
 	switch name {
@@ -141,15 +140,15 @@ type Character struct {
 var StandardArray = []int{15, 14, 13, 12, 10, 8}
 
 var RaceModifiers = map[string]map[string]int{
-	"human":      {"Strength": 1, "Dexterity": 1, "Constitution": 1, "Intelligence": 1, "Wisdom": 1, "Charisma": 1},
-	"elf":        {"Dexterity": 2},
-	"dwarf":      {"Constitution": 2},
-	"halfling":   {"Dexterity": 3, "Charisma": 2},
-	"dragonborn": {"Strength": 2, "Charisma": 1},
-	"gnome":      {"Intelligence": 2},
-	"half-elf":   {"Charisma": 2},
-	"half-orc":   {"Strength": 2, "Constitution": 1},
-	"tiefling":   {"Intelligence": 1, "Charisma": 2},
+	"human":              {"Strength": 1, "Dexterity": 1, "Constitution": 1, "Intelligence": 1, "Wisdom": 1, "Charisma": 1},
+	"elf":                {"Dexterity": 2},
+	"dwarf":              {"Constitution": 2},
+	"lightfoot halfling": {"Dexterity": 2, "Charisma": 1},
+	"dragonborn":         {"Strength": 2, "Charisma": 1},
+	"gnome":              {"Intelligence": 2},
+	"half-elf":           {"Charisma": 2},
+	"half-orc":           {"Strength": 2, "Constitution": 1},
+	"tiefling":           {"Intelligence": 1, "Charisma": 2},
 }
 
 var ClassSkills = map[string][]string{
@@ -159,11 +158,11 @@ var ClassSkills = map[string][]string{
 	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"},
 	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion", "Intimidation", "Perception", "Survival"},
 	"monk":      {"Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"},
-	"paladin":   {"Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"},
+	"paladin":   {"Athletics", "Insight","Insight", "Religion"},
 	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"},
 	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Insight", "Religion"},
 	"sorcerer":  {"Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"},
-	"warlock":   {"Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"},
+	"warlock":   {"Arcana", "Deception", "Insight", "Religion"},
 	"wizard":    {"Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"},
 }
 

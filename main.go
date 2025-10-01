@@ -88,7 +88,7 @@ func main() {
 			os.Exit(2)
 		}
 		if err := commands.ViewCharacter(*characterName); err != nil {
-			fmt.Printf(`character "%s" not found`+"\n", *characterName)
+			fmt.Println(err)
 			os.Exit(1)
 		}
 
@@ -109,7 +109,7 @@ func main() {
 			os.Exit(2)
 		}
 		if err := commands.DeleteCharacter(*characterName); err != nil {
-			fmt.Printf(`character "%s" not found`+"\n", *characterName)
+			fmt.Println(err)
 			os.Exit(1)
 		}
 		fmt.Printf("deleted %s\n", *characterName)
@@ -165,7 +165,7 @@ func main() {
 				MaxDexBonus: *maxDexBonus,
 			}
 			if err := commands.AddArmor(*characterName, newArmor); err != nil {
-				fmt.Printf(`character "%s" not found`+"\n", *characterName)
+				fmt.Println(err)
 				os.Exit(1)
 			}
 			fmt.Printf("Equipped armor %s\n", *armorName)
@@ -178,7 +178,7 @@ func main() {
 				ArmorClass: *armorClass,
 			}
 			if err := commands.AddShield(*characterName, newShield); err != nil {
-				fmt.Printf(`character "%s" not found`+"\n", *characterName)
+				fmt.Println(err)
 				os.Exit(1)
 			}
 			fmt.Printf("Equipped shield %s\n", *shieldName)
@@ -188,12 +188,11 @@ func main() {
 		fmt.Println("You must provide either -weapon, -armor or -shield")
 		os.Exit(2)
 
-	// ---------------- LEARN SPELL ----------------
+		// ---------------- LEARN SPELL ----------------
 	case "learn-spell":
 		learnCmd := flag.NewFlagSet("learn-spell", flag.ExitOnError)
 		characterName := learnCmd.String("name", "", "Character Name")
 		spellName := learnCmd.String("spell", "", "Spell Name")
-		spellLevel := learnCmd.Int("level", 1, "Spell Level")
 		_ = learnCmd.Parse(os.Args[2:])
 
 		if *characterName == "" || *spellName == "" {
@@ -201,12 +200,8 @@ func main() {
 			os.Exit(2)
 		}
 
-		newSpell := models.Spell{
-			Name:  *spellName,
-			Level: *spellLevel,
-		}
-		if err := commands.LearnSpell(*characterName, newSpell); err != nil {
-			fmt.Printf(`character "%s" not found`+"\n", *characterName)
+		if err := commands.LearnSpell(*characterName, *spellName); err != nil {
+			fmt.Println(err)
 			os.Exit(1)
 		}
 
@@ -223,10 +218,10 @@ func main() {
 		}
 
 		if err := commands.PrepareSpell(*characterName, *spellName); err != nil {
-			fmt.Printf(`could not prepare spell "%s" for character "%s"`+"\n", *spellName, *characterName)
+			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Printf("prepared spell %s for %s\n", *spellName, *characterName)
+	
 
 	// ---------------- DEFAULT ----------------
 	default:

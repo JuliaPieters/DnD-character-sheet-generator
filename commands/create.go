@@ -64,8 +64,18 @@ func CreateCharacter(
 		skillProficiencies,
 	)
 
+	// **Zet of de class prepared spells kan gebruiken**
+	newCharacter.CanPrepareSpells = PreparedCasters[characterClass]
+
+	// **Voeg de startspells toe**
+	if err := GiveStartingSpells(newCharacter); err != nil {
+		return fmt.Errorf("failed to give starting spells: %w", err)
+	}
+
+	// Sla character op
 	if err := storage.SaveCharacter(*newCharacter); err != nil {
 		return fmt.Errorf("failed to save character: %w", err)
 	}
+
 	return nil
 }
