@@ -75,7 +75,6 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 			continue
 		}
 
-		// Alleen spells die passen bij een beschikbare level
 		if _, ok := slots[spell.Level]; ok {
 			selected = append(selected, models.Spell{
 				Name:   spell.Name,
@@ -84,7 +83,6 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 		}
 	}
 
-	// Willekeurig kiezen uit geselecteerde spells per slot
 	rand.Seed(time.Now().UnixNano())
 	final := []models.Spell{}
 	for lvl, count := range slots {
@@ -105,7 +103,6 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 	return final, nil
 }
 
-// GetEquipment haalt equipment op en verdeelt weapons over main hand en off hand
 func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shield, error) {
 	var list APIListResponse
 	err := getJSON("https://www.dnd5eapi.co/api/equipment", &list)

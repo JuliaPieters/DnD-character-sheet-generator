@@ -36,9 +36,7 @@ func (a AbilityScores) Modifier(name string) int {
 	default:
 		return 0
 	}
-
-	mod := int(math.Floor(float64(score-10) / 2))
-	return mod
+	return int(math.Floor(float64(score-10) / 2))
 }
 
 // ------------------------
@@ -109,7 +107,7 @@ type Character struct {
 	SpellSaveDC         int    `json:"spell_save_dc,omitempty"`
 	SpellAttackBonus    int    `json:"spell_attack_bonus,omitempty"`
 
-	CanPrepareSpells bool `json:"can_prepare_spells"` // Nieuw veld
+	CanPrepareSpells bool `json:"can_prepare_spells"`
 
 	ExperiencePoints   int    `json:"experience_points,omitempty"`
 	Speed              int    `json:"speed,omitempty"`
@@ -158,7 +156,7 @@ var ClassSkills = map[string][]string{
 	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"},
 	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion", "Intimidation", "Perception", "Survival"},
 	"monk":      {"Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"},
-	"paladin":   {"Athletics", "Insight","Insight", "Religion"},
+	"paladin":   {"Athletics", "Insight", "Insight", "Religion"},
 	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"},
 	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Insight", "Religion"},
 	"sorcerer":  {"Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"},
@@ -198,6 +196,15 @@ var SpellcastingClasses = map[string]string{
 	"wizard":   "Intelligence",
 }
 
+// Spell slot tables voor full casters level 1–20
+var FullCasterSpellSlots = [][]int{
+	{2}, {3}, {4}, {4, 2}, {4, 3}, {4, 3, 2}, {4, 3, 3}, {4, 3, 3, 1},
+	{4, 3, 3, 2}, {4, 3, 3, 3}, {4, 3, 3, 3, 1}, {4, 3, 3, 3, 2}, {4, 3, 3, 3, 2, 1},
+	{4, 3, 3, 3, 2, 1}, {4, 3, 3, 3, 2, 1, 1}, {4, 3, 3, 3, 2, 1, 1},
+	{4, 3, 3, 3, 2, 1, 1, 1}, {4, 3, 3, 3, 2, 1, 1, 1}, {4, 3, 3, 3, 2, 1, 1, 1, 1},
+	{4, 3, 3, 3, 2, 1, 1, 1, 1},
+}
+
 // ------------------------
 // Constructor
 // ------------------------
@@ -205,9 +212,8 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 	raceKey := strings.ToLower(race)
 	classKey := strings.ToLower(class)
 
-	var abilities AbilityScores
 	mod := RaceModifiers[raceKey]
-
+	var abilities AbilityScores
 	if len(abilityScores) == 6 {
 		abilities = AbilityScores{
 			Strength:     abilityScores[0] + mod["Strength"],
@@ -221,7 +227,7 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 		abilities = AssignAbilities(mod)
 	}
 
-	character := &Character{
+	char := &Character{
 		ID:                 id,
 		Name:               name,
 		Race:               raceKey,
@@ -237,18 +243,17 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 		Speed:              30,
 		MaxHitPoints:       10,
 		CurrentHitPoints:   10,
-		CanPrepareSpells:   isPreparedCaster(classKey),
 	}
 
-	character.CalculateAllSkills()
-	character.CalculateCombatStats()
-	character.SetupSpellcasting()
+	char.CalculateAllSkills()
+	char.CalculateCombatStats()
+	char.SetupSpellcasting()
 
-	return character
+	return char
 }
 
 // ------------------------
-// Helper voor prepared casters
+// Helpers voor spells
 // ------------------------
 func isPreparedCaster(className string) bool {
 	preparedClasses := map[string]bool{
@@ -260,13 +265,17 @@ func isPreparedCaster(className string) bool {
 	return preparedClasses[className]
 }
 
+func canCastSpells(className string) bool {
+	_, ok := SpellcastingClasses[className]
+	return ok
+}
+
 // ------------------------
-// Helpers (berekeningen voor combat, skills, AC, spellcasting)
+// General Helpers
 // ------------------------
 func AssignAbilities(mod map[string]int) AbilityScores {
 	abilities := AbilityScores{}
 	order := []string{"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"}
-
 	for i, name := range order {
 		score := StandardArray[i] + mod[name]
 		switch name {
@@ -284,7 +293,6 @@ func AssignAbilities(mod map[string]int) AbilityScores {
 			abilities.Charisma = score
 		}
 	}
-
 	return abilities
 }
 
@@ -297,7 +305,7 @@ func (c *Character) UpdateLevel(newLevel int) {
 	c.ProficiencyBonus = CalculateProfBonus(newLevel)
 	c.CalculateAllSkills()
 	c.CalculateCombatStats()
-	c.UpdateSpellSlots()
+	c.SetupSpellcasting()
 }
 
 func (c *Character) CalculateAllSkills() {
@@ -339,22 +347,113 @@ func (c *Character) CalculateArmorClass() {
 }
 
 func (c *Character) SetupSpellcasting() {
+	if !canCastSpells(c.Class) {
+		c.SpellcastingAbility = ""
+		c.SpellSaveDC = 0
+		c.SpellAttackBonus = 0
+		c.SpellSlots = nil
+		c.CanPrepareSpells = false
+		return
+	}
+
 	if ability, ok := SpellcastingClasses[c.Class]; ok {
 		c.SpellcastingAbility = ability
 		mod := c.Abilities.Modifier(ability)
 		c.SpellSaveDC = 8 + c.ProficiencyBonus + mod
 		c.SpellAttackBonus = c.ProficiencyBonus + mod
-		c.UpdateSpellSlots()
+	}
+
+	c.CanPrepareSpells = isPreparedCaster(c.Class)
+	c.UpdateSpellSlots()
+}
+
+// ------------------------
+// Spell Slots
+// ------------------------
+func (c *Character) UpdateSpellSlots() {
+	if !canCastSpells(c.Class) {
+		c.SpellSlots = nil
+		return
+	}
+
+	c.SpellSlots = make(map[int]int)
+
+	switch c.Class {
+	case "wizard", "cleric", "druid", "bard", "sorcerer":
+		if c.Level <= len(FullCasterSpellSlots) {
+			for lvl, slots := range FullCasterSpellSlots[c.Level-1] {
+				c.SpellSlots[lvl+1] = slots
+			}
+		}
+	case "paladin":
+		c.SpellSlots = calculatePaladinSlots(c.Level)
+	case "ranger":
+		c.SpellSlots = calculateRangerSlots(c.Level)
+	case "warlock":
+		c.SpellSlots = calculateWarlockSlots(c.Level)
 	}
 }
 
-func (c *Character) UpdateSpellSlots() {
-	classKey := c.Class
-	if _, ok := SpellcastingClasses[classKey]; !ok {
-		return
+// ------------------------
+// Spell Slot Helpers
+// ------------------------
+func calculatePaladinSlots(level int) map[int]int {
+	slots := map[int]int{}
+	if level >= 1 {
+		slots[1] = 4
 	}
-	c.SpellSlots = make(map[int]int)
-	// Voeg hier je SpellSlotsByLevel implementatie toe zoals in je originele file
+	if level >= 2 {
+		slots[2] = 3
+	}
+	if level >= 3 {
+		slots[3] = 3
+	}
+	if level >= 4 {
+		slots[4] = 3
+	}
+	if level >= 5 {
+		slots[5] = 2
+	}
+	return slots
+}
+
+func calculateRangerSlots(level int) map[int]int {
+	slots := map[int]int{}
+	slots[1] = (level + 1) / 2
+	if level >= 4 {
+		slots[2] = level / 2
+	}
+	return slots
+}
+
+func calculateWarlockSlots(level int) map[int]int {
+	slots := map[int]int{}
+
+	// Cantrips (Level 0)
+	slots[0] = 4
+
+	// Pact slots
+	var pactLevel, numSlots int
+	switch {
+	case level >= 1 && level <= 1:
+		numSlots = 1
+		pactLevel = 1
+	case level >= 2 && level <= 8:
+		numSlots = 2
+		pactLevel = 1
+	case level >= 9 && level <= 11:
+		numSlots = 3
+		pactLevel = 2
+	case level >= 12 && level <= 16:
+		numSlots = 3
+		pactLevel = 3
+	case level >= 17 && level <= 20:
+		numSlots = 4
+		pactLevel = 5
+	}
+
+	slots[pactLevel] = numSlots
+	return slots
 }
 
 // ------------------------

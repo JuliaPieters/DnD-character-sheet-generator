@@ -12,7 +12,7 @@ import (
 	"dnd-character-sheet/storage"
 )
 
-// Templates
+
 var templates = template.Must(template.ParseGlob("../templates/*.html"))
 
 // ------------------------
@@ -57,7 +57,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		r.ParseForm()
 
-		// Parse basic fields
 		charName := r.FormValue("charname")
 		playerName := r.FormValue("playername")
 		race := r.FormValue("race")
@@ -66,7 +65,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		level, _ := strconv.Atoi(r.FormValue("level"))
 		expPoints, _ := strconv.Atoi(r.FormValue("experiencepoints"))
 
-		// Parse ability scores
 		strength, _ := strconv.Atoi(r.FormValue("Strengthscore"))
 		dexterity, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
 		constitution, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
@@ -74,7 +72,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		wisdom, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
 		charisma, _ := strconv.Atoi(r.FormValue("Charismascore"))
 
-		// Apply racial modifiers
 		raceKey := strings.ToLower(race)
 		modifiers := models.RaceModifiers[raceKey]
 		abilities := models.AbilityScores{
@@ -86,7 +83,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			Charisma:     charisma + modifiers["Charisma"],
 		}
 
-		// Skill proficiencies (from form)
 		var skillProficiencies []string
 		for _, skill := range []string{
 			"Acrobatics", "Animal Handling", "Arcana", "Athletics",
@@ -100,15 +96,12 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Als er geen skills in het formulier zijn ingevuld, gebruik class skills inclusief duplicaten
 		if len(skillProficiencies) == 0 {
 			skillProficiencies = append([]string{}, models.ClassSkills[strings.ToLower(class)]...)
 		}
 
-		// Check if character exists
 		character, err := storage.GetCharacterByName(charName)
 		if err != nil {
-			// Create new character
 			character = models.Character{
 				Name:               charName,
 				PlayerName:         playerName,
@@ -122,7 +115,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 				SkillProficiencies: skillProficiencies,
 			}
 		} else {
-			// Update existing character
 			character.PlayerName = playerName
 			character.Race = race
 			character.Class = class
@@ -134,12 +126,10 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			character.SkillProficiencies = skillProficiencies
 		}
 
-		// Calculate derived stats
 		character.CalculateAllSkills()
 		character.CalculateCombatStats()
 		character.SetupSpellcasting()
 
-		// Fetch equipment from API (fixed assignment)
 		mainHand, offHand, armor, shield, err := api.GetEquipment()
 		if err != nil {
 			log.Println("Error fetching equipment:", err)

@@ -42,13 +42,17 @@ func GiveStartingSpells(character *models.Character) error {
 	}
 
 	for _, name := range spells {
+		level := 0 // cantrips
 		spell := models.Spell{
 			Name:     name,
-			Level:    1,
+			Level:    level,
 			Prepared: false,
 		}
 		character.Spells = append(character.Spells, spell)
 	}
+
+	// Gebruik de Character-logica voor spell slots
+	character.SetupSpellcasting()
 
 	if err := storage.SaveCharacter(*character); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
@@ -56,12 +60,12 @@ func GiveStartingSpells(character *models.Character) error {
 
 	return nil
 }
-func LearnSpell(characterName string, spellName string) error {
+
+func LearnSpell(characterName, spellName string) error {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
-		return fmt.Errorf("could not load characters: %w", err)
+		return err
 	}
-
 	character, exists := characters[characterName]
 	if !exists {
 		return fmt.Errorf("character \"%s\" not found", characterName)
@@ -81,42 +85,43 @@ func LearnSpell(characterName string, spellName string) error {
 		}
 	}
 
-	newSpell := models.Spell{
+	character.Spells = append(character.Spells, models.Spell{
 		Name:     spellName,
 		Level:    1,
 		Prepared: false,
-	}
-
-	character.Spells = append(character.Spells, newSpell)
+	})
 
 	if err := storage.SaveCharacter(character); err != nil {
-		return fmt.Errorf("could not save character: %w", err)
+		return err
 	}
 
 	fmt.Printf("Learned spell %s\n", spellName)
 	return nil
 }
 
-func PrepareSpell(characterName string, spellName string) error {
+func PrepareSpell(characterName, spellName string) error {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
-		return fmt.Errorf("could not load characters: %w", err)
+		return err
 	}
-
 	character, exists := characters[characterName]
 	if !exists {
 		return fmt.Errorf("character \"%s\" not found", characterName)
 	}
 
-	if !character.CanPrepareSpells {
+	if !SpellcastingClasses[character.Class] {
 		return fmt.Errorf("this class can't cast spells")
+	}
+
+	if !character.CanPrepareSpells {
+		return fmt.Errorf("this class learns spells and can't prepare them")
 	}
 
 	for i, spell := range character.Spells {
 		if spell.Name == spellName {
 			character.Spells[i].Prepared = true
 			if err := storage.SaveCharacter(character); err != nil {
-				return fmt.Errorf("could not save character: %w", err)
+				return err
 			}
 			fmt.Printf("Prepared spell %s\n", spellName)
 			return nil
@@ -126,12 +131,11 @@ func PrepareSpell(characterName string, spellName string) error {
 	return fmt.Errorf("spell '%s' not known by character '%s'", spellName, characterName)
 }
 
-func RemoveSpell(characterName string, spellName string) error {
+func RemoveSpell(characterName, spellName string) error {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
-		return fmt.Errorf("could not load characters: %w", err)
+		return err
 	}
-
 	character, exists := characters[characterName]
 	if !exists {
 		return fmt.Errorf("character \"%s\" not found", characterName)
@@ -149,7 +153,7 @@ func RemoveSpell(characterName string, spellName string) error {
 	character.Spells = newSpells
 
 	if err := storage.SaveCharacter(character); err != nil {
-		return fmt.Errorf("could not save character: %w", err)
+		return err
 	}
 
 	if removed {

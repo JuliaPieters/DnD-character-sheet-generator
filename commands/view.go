@@ -1,32 +1,12 @@
 package commands
 
 import (
-	"dnd-character-sheet/models"
 	"dnd-character-sheet/storage"
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 )
-
-// Spell slot tabel voor full casters (level 1-10)
-var FullCasterSlots = map[int]map[int]int{
-	1:  {1: 2},
-	2:  {1: 3},
-	3:  {1: 4, 2: 2},
-	4:  {1: 4, 2: 3},
-	5:  {1: 4, 2: 3, 3: 2},
-	6:  {1: 4, 2: 3, 3: 3},
-	7:  {1: 4, 2: 3, 3: 3, 4: 1},
-	8:  {1: 4, 2: 3, 3: 3, 4: 2},
-	9:  {1: 4, 2: 3, 3: 3, 4: 3, 5: 1},
-	10: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2},
-}
-
-// HalfCasters: paladin & ranger
-var HalfCasters = map[string]bool{
-	"paladin": true,
-	"ranger":  true,
-}
 
 func ViewCharacter(name string) error {
 	characters, err := storage.LoadCharacters()
@@ -69,29 +49,18 @@ func ViewCharacter(name string) error {
 			fmt.Printf("Shield: %s\n", c.Equipment.Shield.Name)
 		}
 
-		// Spell slots voor full casters
-		if _, isCaster := models.SpellcastingClasses[c.Class]; isCaster {
+		// Spell slots
+		if len(c.SpellSlots) == 0 {
+			fmt.Println("this class can't cast spells")
+		} else {
 			fmt.Println("Spell slots:")
-
-			// Check half casters
-			if HalfCasters[c.Class] {
-				if slots, ok := FullCasterSlots[c.Level]; ok {
-					for lvl := 1; lvl <= 9; lvl++ {
-						if n, exists := slots[lvl]; exists && n > 0 {
-							half := (n + 1) / 2 // helft van full caster slots, afgerond omhoog
-							fmt.Printf("  Level %d: %d\n", lvl, half)
-						}
-					}
-				}
-			} else {
-				// Full caster
-				if slots, ok := FullCasterSlots[c.Level]; ok {
-					for lvl := 1; lvl <= 9; lvl++ {
-						if n, exists := slots[lvl]; exists && n > 0 {
-							fmt.Printf("  Level %d: %d\n", lvl, n)
-						}
-					}
-				}
+			levels := make([]int, 0, len(c.SpellSlots))
+			for lvl := range c.SpellSlots {
+				levels = append(levels, lvl) // Level 0 wordt nu ook meegenomen
+			}
+			sort.Ints(levels)
+			for _, lvl := range levels {
+				fmt.Printf("  Level %d: %d\n", lvl, c.SpellSlots[lvl])
 			}
 		}
 
