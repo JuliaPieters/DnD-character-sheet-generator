@@ -206,21 +206,24 @@ func main() {
 		}
 
 	// ---------------- PREPARE SPELL ----------------
-	case "prepare-spell":
-		prepareCmd := flag.NewFlagSet("prepare-spell", flag.ExitOnError)
-		characterName := prepareCmd.String("name", "", "Character Name")
-		spellName := prepareCmd.String("spell", "", "Spell Name")
-		_ = prepareCmd.Parse(os.Args[2:])
+case "prepare-spell":
+	prepareCmd := flag.NewFlagSet("prepare-spell", flag.ExitOnError)
+	characterName := prepareCmd.String("name", "", "Character Name")
+	spellName := prepareCmd.String("spell", "", "Spell Name")
+	level := prepareCmd.Int("level", 1, "Spell Level")
+	_ = prepareCmd.Parse(os.Args[2:])
 
-		if *characterName == "" || *spellName == "" {
-			fmt.Println("character name and spell name are required")
-			os.Exit(2)
-		}
+	if *characterName == "" || *spellName == "" {
+		fmt.Println("character name and spell name are required")
+		os.Exit(2)
+	}
 
-		if err := commands.PrepareSpell(*characterName, *spellName); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	if err := commands.PrepareSpell(*characterName, *spellName, *level); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+
 	
 
 	// ---------------- DEFAULT ----------------

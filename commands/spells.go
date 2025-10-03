@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// Welke classes spellcasting gebruiken
 var SpellcastingClasses = map[string]bool{
 	"bard":     true,
 	"cleric":   true,
@@ -17,6 +18,7 @@ var SpellcastingClasses = map[string]bool{
 	"wizard":   true,
 }
 
+// Welke classes spells kunnen preparen
 var PreparedCasters = map[string]bool{
 	"cleric":  true,
 	"druid":   true,
@@ -24,15 +26,33 @@ var PreparedCasters = map[string]bool{
 	"wizard":  true,
 }
 
+// Startspells per class
 var StartingSpells = map[string][]string{
 	"wizard":   {"burning hands", "disguise self"},
-	"cleric":   {"guidance", "sacred flame"},
+	"cleric":   {"guidance", "sacred flame", "etherealness"},
 	"druid":    {"shillelagh", "thorn whip"},
 	"bard":     {"vicious mockery", "dancing lights"},
 	"sorcerer": {"fire bolt", "light"},
 	"warlock":  {"eldritch blast", "mage hand"},
 	"paladin":  {"divine sense", "lay on hands"},
-	"ranger":   {"hunter's mark", "cure wounds"},
+}
+
+var SpellLevels = map[string]int{
+	"guidance":        0,
+	"sacred flame":    0,
+	"etherealness":    7,
+	"burning hands":   1,
+	"disguise self":   1,
+	"shillelagh":      0,
+	"thorn whip":      0,
+	"vicious mockery": 0,
+	"dancing lights":  0,
+	"fire bolt":       0,
+	"light":           0,
+	"eldritch blast":  0,
+	"mage hand":       0,
+	"divine sense":    0,
+	"lay on hands":    0,
 }
 
 func GiveStartingSpells(character *models.Character) error {
@@ -42,7 +62,7 @@ func GiveStartingSpells(character *models.Character) error {
 	}
 
 	for _, name := range spells {
-		level := 0 // cantrips
+		level := 0
 		spell := models.Spell{
 			Name:     name,
 			Level:    level,
@@ -51,7 +71,6 @@ func GiveStartingSpells(character *models.Character) error {
 		character.Spells = append(character.Spells, spell)
 	}
 
-	// Gebruik de Character-logica voor spell slots
 	character.SetupSpellcasting()
 
 	if err := storage.SaveCharacter(*character); err != nil {
@@ -99,14 +118,14 @@ func LearnSpell(characterName, spellName string) error {
 	return nil
 }
 
-func PrepareSpell(characterName, spellName string) error {
+func PrepareSpell(characterName, spellName string, spellLevel int) error {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
 		return err
 	}
 	character, exists := characters[characterName]
 	if !exists {
-		return fmt.Errorf("character \"%s\" not found", characterName)
+		return fmt.Errorf(`character "%s" not found`, characterName)
 	}
 
 	if !SpellcastingClasses[character.Class] {
@@ -117,18 +136,39 @@ func PrepareSpell(characterName, spellName string) error {
 		return fmt.Errorf("this class learns spells and can't prepare them")
 	}
 
-	for i, spell := range character.Spells {
-		if spell.Name == spellName {
-			character.Spells[i].Prepared = true
-			if err := storage.SaveCharacter(character); err != nil {
-				return err
-			}
-			fmt.Printf("Prepared spell %s\n", spellName)
-			return nil
+	var spellIndex int = -1
+	for i, s := range character.Spells {
+		if s.Name == spellName {
+			spellIndex = i
+			break
 		}
 	}
+	if spellIndex == -1 {
+		return fmt.Errorf("spell '%s' not known by character '%s'", spellName, characterName)
+	}
 
-	return fmt.Errorf("spell '%s' not known by character '%s'", spellName, characterName)
+	requiredLevel := character.Spells[spellIndex].Level
+	if lvl, ok := SpellLevels[spellName]; ok {
+		requiredLevel = lvl
+	}
+
+	if spellLevel < requiredLevel {
+		return fmt.Errorf("the spell has higher level than the available spell slots")
+	}
+
+	if slots, ok := character.SpellSlots[spellLevel]; !ok || slots == 0 {
+		return fmt.Errorf("no available spell slots of level %d", spellLevel)
+	}
+
+	character.Spells[spellIndex].Prepared = true
+	character.Spells[spellIndex].Level = spellLevel
+
+	if err := storage.SaveCharacter(character); err != nil {
+		return err
+	}
+
+	fmt.Printf("Prepared spell %s\n", spellName)
+	return nil
 }
 
 func RemoveSpell(characterName, spellName string) error {
