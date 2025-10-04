@@ -6,7 +6,36 @@ import (
 	"fmt"
 )
 
-// AddWeapon equips a weapon to the first available hand (main or off) and returns which hand it was equipped to
+// ------------------------
+// Standaard Armors & Shields
+// ------------------------
+var Armors = map[string]models.Armor{
+	// Light
+	"padded":          {"padded", 11, true, 0},
+	"leather armor":   {"leather armor", 11, true, 0},
+	"studded leather": {"studded leather", 12, true, 0},
+
+	// Medium
+	"hide":        {"hide", 12, true, 2},
+	"chain shirt": {"chain shirt", 13, true, 2},
+	"scale mail":  {"scale mail", 14, true, 2},
+	"breastplate": {"breastplate", 14, true, 2},
+	"half plate":  {"half plate", 15, true, 2},
+
+	// Heavy
+	"ring mail":   {"ring mail", 14, false, 0},
+	"chain mail":  {"chain mail", 16, false, 0},
+	"splint":      {"splint", 17, false, 0},
+	"plate armor": {"plate armor", 18, false, 0},
+}
+
+var Shields = map[string]models.Shield{
+	"shield": {"shield", 2},
+}
+
+// ------------------------
+// Weapon functions
+// ------------------------
 func AddWeapon(characterName string, newWeapon models.Weapon) (string, error) {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -35,6 +64,7 @@ func AddWeapon(characterName string, newWeapon models.Weapon) (string, error) {
 
 	return hand, nil
 }
+
 func AddWeaponToSlot(characterName string, newWeapon models.Weapon, slot string) (string, error) {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -71,7 +101,6 @@ func AddWeaponToSlot(characterName string, newWeapon models.Weapon, slot string)
 	return hand, nil
 }
 
-// RemoveWeapon removes a weapon from main hand or off hand
 func RemoveWeapon(characterName string, weaponName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -104,8 +133,10 @@ func RemoveWeapon(characterName string, weaponName string) error {
 	return nil
 }
 
-// AddArmor equips armor
-func AddArmor(characterName string, newArmor models.Armor) error {
+// ------------------------
+// Armor functions
+// ------------------------
+func AddArmor(characterName string, armorName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
 		return fmt.Errorf("could not load characters: %w", loadErr)
@@ -116,7 +147,12 @@ func AddArmor(characterName string, newArmor models.Armor) error {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Armor = &newArmor
+	armor, ok := Armors[armorName]
+	if !ok {
+		return fmt.Errorf("armor '%s' not found", armorName)
+	}
+
+	character.Equipment.Armor = &armor
 	character.CalculateCombatStats()
 
 	if saveErr := storage.SaveCharacter(character); saveErr != nil {
@@ -126,7 +162,6 @@ func AddArmor(characterName string, newArmor models.Armor) error {
 	return nil
 }
 
-// RemoveArmor removes armor
 func RemoveArmor(characterName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
@@ -148,8 +183,10 @@ func RemoveArmor(characterName string) error {
 	return nil
 }
 
-// AddShield equips shield
-func AddShield(characterName string, newShield models.Shield) error {
+// ------------------------
+// Shield functions
+// ------------------------
+func AddShield(characterName string, shieldName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {
 		return fmt.Errorf("could not load characters: %w", loadErr)
@@ -160,7 +197,12 @@ func AddShield(characterName string, newShield models.Shield) error {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
 
-	character.Equipment.Shield = &newShield
+	shield, ok := Shields[shieldName]
+	if !ok {
+		return fmt.Errorf("shield '%s' not found", shieldName)
+	}
+
+	character.Equipment.Shield = &shield
 	character.CalculateCombatStats()
 
 	if saveErr := storage.SaveCharacter(character); saveErr != nil {
@@ -170,7 +212,6 @@ func AddShield(characterName string, newShield models.Shield) error {
 	return nil
 }
 
-// RemoveShield removes shield
 func RemoveShield(characterName string) error {
 	characters, loadErr := storage.LoadCharacters()
 	if loadErr != nil {

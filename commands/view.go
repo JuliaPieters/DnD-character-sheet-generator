@@ -3,10 +3,17 @@ package commands
 import (
 	"dnd-character-sheet/storage"
 	"fmt"
-	"math"
 	"sort"
 	"strings"
 )
+
+var fullCasters = map[string]bool{
+	"wizard": true, "cleric": true, "druid": true, "bard": true, "sorcerer": true,
+}
+
+var pactCasters = map[string]bool{
+	"warlock": true,
+}
 
 func ViewCharacter(name string) error {
 	characters, err := storage.LoadCharacters()
@@ -19,21 +26,23 @@ func ViewCharacter(name string) error {
 			continue
 		}
 
+		c.CalculateCombatStats()
+
 		fmt.Printf("Name: %s\n", c.Name)
 		fmt.Printf("Class: %s\n", strings.ToLower(c.Class))
 		fmt.Printf("Race: %s\n", strings.ToLower(c.Race))
 		fmt.Printf("Background: %s\n", strings.ToLower(c.Background))
 		fmt.Printf("Level: %d\n", c.Level)
 
-		fmt.Printf("Ability scores:\n")
-		fmt.Printf("  STR: %d (%+d)\n", c.Abilities.Strength, abilityModifier(c.Abilities.Strength))
-		fmt.Printf("  DEX: %d (%+d)\n", c.Abilities.Dexterity, abilityModifier(c.Abilities.Dexterity))
-		fmt.Printf("  CON: %d (%+d)\n", c.Abilities.Constitution, abilityModifier(c.Abilities.Constitution))
-		fmt.Printf("  INT: %d (%+d)\n", c.Abilities.Intelligence, abilityModifier(c.Abilities.Intelligence))
-		fmt.Printf("  WIS: %d (%+d)\n", c.Abilities.Wisdom, abilityModifier(c.Abilities.Wisdom))
-		fmt.Printf("  CHA: %d (%+d)\n", c.Abilities.Charisma, abilityModifier(c.Abilities.Charisma))
+		fmt.Println("Ability scores:")
+		fmt.Printf("  STR: %d (%+d)\n", c.Abilities.Strength, c.Abilities.Modifier("Strength"))
+		fmt.Printf("  DEX: %d (%+d)\n", c.Abilities.Dexterity, c.Abilities.Modifier("Dexterity"))
+		fmt.Printf("  CON: %d (%+d)\n", c.Abilities.Constitution, c.Abilities.Modifier("Constitution"))
+		fmt.Printf("  INT: %d (%+d)\n", c.Abilities.Intelligence, c.Abilities.Modifier("Intelligence"))
+		fmt.Printf("  WIS: %d (%+d)\n", c.Abilities.Wisdom, c.Abilities.Modifier("Wisdom"))
+		fmt.Printf("  CHA: %d (%+d)\n", c.Abilities.Charisma, c.Abilities.Modifier("Charisma"))
 
-		fmt.Printf("Proficiency bonus: %+d\n", proficiencyBonus(c.Level))
+		fmt.Printf("Proficiency bonus: %+d\n", c.ProficiencyBonus)
 		fmt.Printf("Skill proficiencies: %s\n", formatSkillProficiencies(c.SkillProficiencies))
 
 		if c.Equipment.MainHand != nil {
@@ -49,14 +58,11 @@ func ViewCharacter(name string) error {
 			fmt.Printf("Shield: %s\n", c.Equipment.Shield.Name)
 		}
 
-		// Spell slots
-		if len(c.SpellSlots) == 0 {
-			fmt.Println("this class can't cast spells")
-		} else {
+		if len(c.SpellSlots) > 0 {
 			fmt.Println("Spell slots:")
 			levels := make([]int, 0, len(c.SpellSlots))
 			for lvl := range c.SpellSlots {
-				levels = append(levels, lvl) // Level 0 wordt nu ook meegenomen
+				levels = append(levels, lvl)
 			}
 			sort.Ints(levels)
 			for _, lvl := range levels {
@@ -64,18 +70,22 @@ func ViewCharacter(name string) error {
 			}
 		}
 
+		if fullCasters[strings.ToLower(c.Class)] || pactCasters[strings.ToLower(c.Class)] {
+			if c.SpellcastingAbility != "" {
+				fmt.Printf("Spellcasting ability: %s\n", strings.ToLower(c.SpellcastingAbility))
+				fmt.Printf("Spell save DC: %d\n", c.SpellSaveDC)
+				fmt.Printf("Spell attack bonus: %+d\n", c.SpellAttackBonus)
+			}
+		}
+
+		fmt.Printf("Armor class: %d\n", c.ArmorClass)
+		fmt.Printf("Initiative bonus: %d\n", c.Initiative)
+		fmt.Printf("Passive perception: %d\n", c.PassivePerception)
+
 		return nil
 	}
 
 	return fmt.Errorf(`character "%s" not found`, name)
-}
-
-func abilityModifier(score int) int {
-	return int(math.Floor(float64(score-10) / 2))
-}
-
-func proficiencyBonus(level int) int {
-	return 2 + (level-1)/4
 }
 
 func formatSkillProficiencies(skills []string) string {

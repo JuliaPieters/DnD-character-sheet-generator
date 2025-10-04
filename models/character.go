@@ -147,21 +147,23 @@ var RaceModifiers = map[string]map[string]int{
 	"half-elf":           {"Charisma": 2},
 	"half-orc":           {"Strength": 2, "Constitution": 1},
 	"tiefling":           {"Intelligence": 1, "Charisma": 2},
+	"hill dwarf":         {"Constitution": 2, "Wisdom": 1},
+	"half orc":           {"Strength": 2, "Constitution": 1},
 }
 
 var ClassSkills = map[string][]string{
-	"barbarian": {"Animal Handling", "Athletics", "Insight", "Religion", "Perception", "Survival"},
+	"barbarian": {"Animal Handling", "Athletics", "Insight", "Religion"},
 	"bard":      {"Deception", "History", "Investigation", "Persuasion", "Sleight of Hand"},
 	"cleric":    {"History", "Insight", "Insight", "Religion"},
-	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"},
-	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion", "Intimidation", "Perception", "Survival"},
-	"monk":      {"Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"},
+	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine"},
+	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion"},
+	"monk":      {"Acrobatics", "Athletics", "Insight", "Religion"},
 	"paladin":   {"Athletics", "Insight", "Insight", "Religion"},
-	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"},
+	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation"},
 	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Insight", "Religion"},
 	"sorcerer":  {"Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"},
 	"warlock":   {"Arcana", "Deception", "Insight", "Religion"},
-	"wizard":    {"Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"},
+	"wizard":    {"Arcana", "History", "Insight", "Religion"},
 }
 
 var SkillAbilities = map[string]string{
@@ -329,20 +331,34 @@ func (c *Character) CalculateCombatStats() {
 }
 
 func (c *Character) CalculateArmorClass() {
-	ac := 10 + c.Abilities.Modifier("Dexterity")
+	ac := 10
+
 	if c.Equipment.Armor != nil {
 		ac = c.Equipment.Armor.ArmorClass
+
 		if c.Equipment.Armor.DexBonus {
 			dexMod := c.Abilities.Modifier("Dexterity")
+
 			if c.Equipment.Armor.MaxDexBonus > 0 && dexMod > c.Equipment.Armor.MaxDexBonus {
 				dexMod = c.Equipment.Armor.MaxDexBonus
 			}
 			ac += dexMod
 		}
+	} else {
+		switch strings.ToLower(c.Class) {
+		case "barbarian":
+			ac = 10 + c.Abilities.Modifier("Dexterity") + c.Abilities.Modifier("Constitution")
+		case "monk":
+			ac = 10 + c.Abilities.Modifier("Dexterity") + c.Abilities.Modifier("Wisdom")
+		default:
+			ac = 10 + c.Abilities.Modifier("Dexterity")
+		}
 	}
+
 	if c.Equipment.Shield != nil {
 		ac += c.Equipment.Shield.ArmorClass
 	}
+
 	c.ArmorClass = ac
 }
 

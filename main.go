@@ -125,9 +125,6 @@ func main() {
 		category := equipCmd.String("category", "", "Weapon Category")
 		weaponRange := equipCmd.String("range", "", "Weapon Range")
 		twoHanded := equipCmd.Bool("two-handed", false, "Two-Handed Weapon")
-		armorClass := equipCmd.Int("armor-class", 0, "Armor Class")
-		dexBonus := equipCmd.Bool("dex-bonus", false, "Dexterity Bonus applies")
-		maxDexBonus := equipCmd.Int("max-dex", 0, "Maximum Dexterity Bonus")
 		_ = equipCmd.Parse(os.Args[2:])
 
 		if *characterName == "" {
@@ -158,13 +155,7 @@ func main() {
 		}
 
 		if *armorName != "" {
-			newArmor := models.Armor{
-				Name:        *armorName,
-				ArmorClass:  *armorClass,
-				DexBonus:    *dexBonus,
-				MaxDexBonus: *maxDexBonus,
-			}
-			if err := commands.AddArmor(*characterName, newArmor); err != nil {
+			if err := commands.AddArmor(*characterName, *armorName); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
@@ -173,11 +164,7 @@ func main() {
 		}
 
 		if *shieldName != "" {
-			newShield := models.Shield{
-				Name:       *shieldName,
-				ArmorClass: *armorClass,
-			}
-			if err := commands.AddShield(*characterName, newShield); err != nil {
+			if err := commands.AddShield(*characterName, *shieldName); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
@@ -188,7 +175,7 @@ func main() {
 		fmt.Println("You must provide either -weapon, -armor or -shield")
 		os.Exit(2)
 
-		// ---------------- LEARN SPELL ----------------
+	// ---------------- LEARN SPELL ----------------
 	case "learn-spell":
 		learnCmd := flag.NewFlagSet("learn-spell", flag.ExitOnError)
 		characterName := learnCmd.String("name", "", "Character Name")
@@ -206,25 +193,22 @@ func main() {
 		}
 
 	// ---------------- PREPARE SPELL ----------------
-case "prepare-spell":
-	prepareCmd := flag.NewFlagSet("prepare-spell", flag.ExitOnError)
-	characterName := prepareCmd.String("name", "", "Character Name")
-	spellName := prepareCmd.String("spell", "", "Spell Name")
-	level := prepareCmd.Int("level", 1, "Spell Level")
-	_ = prepareCmd.Parse(os.Args[2:])
+	case "prepare-spell":
+		prepareCmd := flag.NewFlagSet("prepare-spell", flag.ExitOnError)
+		characterName := prepareCmd.String("name", "", "Character Name")
+		spellName := prepareCmd.String("spell", "", "Spell Name")
+		level := prepareCmd.Int("level", 1, "Spell Level")
+		_ = prepareCmd.Parse(os.Args[2:])
 
-	if *characterName == "" || *spellName == "" {
-		fmt.Println("character name and spell name are required")
-		os.Exit(2)
-	}
+		if *characterName == "" || *spellName == "" {
+			fmt.Println("character name and spell name are required")
+			os.Exit(2)
+		}
 
-	if err := commands.PrepareSpell(*characterName, *spellName, *level); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-
-	
+		if err := commands.PrepareSpell(*characterName, *spellName, *level); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 	// ---------------- DEFAULT ----------------
 	default:
