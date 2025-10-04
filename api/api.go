@@ -3,6 +3,7 @@ package api
 import (
 	"dnd-character-sheet/models"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -19,7 +20,6 @@ type APIListResponse struct {
 	Results []APIResource `json:"results"`
 }
 
-// Voor individuele spell/equipment details:
 type APISpell struct {
 	Name   string `json:"name"`
 	Level  int    `json:"level"`
@@ -27,6 +27,11 @@ type APISpell struct {
 		Name string `json:"name"`
 	} `json:"school"`
 	Range string `json:"range"`
+}
+
+type EquipmentRange struct {
+	Normal int `json:"normal,omitempty"`
+	Long   int `json:"long,omitempty"`
 }
 
 type APIEquipment struct {
@@ -39,8 +44,8 @@ type APIEquipment struct {
 		DexBonus bool `json:"dex_bonus"`
 		MaxDex   int  `json:"max_bonus"`
 	} `json:"armor_class,omitempty"`
-	TwoHanded bool   `json:"two_handed,omitempty"`
-	Range     string `json:"range,omitempty"`
+	TwoHanded bool            `json:"two_handed,omitempty"`
+	Range     json.RawMessage `json:"range,omitempty"`
 }
 
 func getJSON(url string, target interface{}) error {
@@ -60,26 +65,48 @@ func getJSON(url string, target interface{}) error {
 
 func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, error) {
 	var list APIListResponse
-	err := getJSON("https://www.dnd5eapi.co/api/spells", &list)
-	if err != nil {
+	if err := getJSON("https://www.dnd5eapi.co/api/spells", &list); err != nil {
 		return nil, err
 	}
 
-	selected := []models.Spell{}
+	type SpellResult struct {
+		Spell models.Spell
+		Err   error
+	}
+
+	results := make(chan SpellResult)
+	ticker := time.NewTicker(200 * time.Millisecond)
+	defer ticker.Stop()
 
 	for _, res := range list.Results {
-		var spell APISpell
-		err := getJSON("https://www.dnd5eapi.co"+res.URL, &spell)
-		if err != nil {
-			log.Println("Error fetching spell:", res.Name, err)
+		<-ticker.C
+		go func(res APIResource) {
+			var spell APISpell
+			err := getJSON("https://www.dnd5eapi.co"+res.URL, &spell)
+			if err != nil {
+				results <- SpellResult{Err: fmt.Errorf("error fetching %s: %w", res.Name, err)}
+				return
+			}
+			results <- SpellResult{
+				Spell: models.Spell{
+					Name:   spell.Name,
+					Level:  spell.Level,
+					School: spell.School.Name,
+					Range:  spell.Range,
+				},
+			}
+		}(res)
+	}
+
+	selected := []models.Spell{}
+	for i := 0; i < len(list.Results); i++ {
+		result := <-results
+		if result.Err != nil {
+			log.Println(result.Err)
 			continue
 		}
-
-		if _, ok := slots[spell.Level]; ok {
-			selected = append(selected, models.Spell{
-				Name:   spell.Name,
-				Level:  spell.Level,
-			})
+		if _, ok := slots[result.Spell.Level]; ok {
+			selected = append(selected, result.Spell)
 		}
 	}
 
@@ -103,10 +130,24 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 	return final, nil
 }
 
+func parseRange(raw json.RawMessage) string {
+	var s string
+	if err := json.Unmarshal(raw, &s); err == nil {
+		return s
+	}
+
+	var r EquipmentRange
+	if err := json.Unmarshal(raw, &r); err == nil {
+		if r.Normal > 0 {
+			return fmt.Sprintf("%d", r.Normal)
+		}
+	}
+	return ""
+}
+
 func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shield, error) {
 	var list APIListResponse
-	err := getJSON("https://www.dnd5eapi.co/api/equipment", &list)
-	if err != nil {
+	if err := getJSON("https://www.dnd5eapi.co/api/equipment", &list); err != nil {
 		return nil, nil, nil, nil, err
 	}
 
@@ -117,8 +158,7 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 
 	for _, res := range list.Results {
 		var eq APIEquipment
-		err := getJSON("https://www.dnd5eapi.co"+res.URL, &eq)
-		if err != nil {
+		if err := getJSON("https://www.dnd5eapi.co"+res.URL, &eq); err != nil {
 			log.Println("Error fetching equipment:", res.Name, err)
 			continue
 		}
@@ -128,7 +168,7 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 			weapon := &models.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
-				Range:     eq.Range,
+				Range:     parseRange(eq.Range),
 			}
 			if mainHand == nil {
 				mainHand = weapon

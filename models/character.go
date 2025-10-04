@@ -75,6 +75,8 @@ type Spell struct {
 	Name     string `json:"name"`
 	Level    int    `json:"level"`
 	Prepared bool   `json:"prepared"`
+	School   string `json:"school,omitempty"`
+	Range    string `json:"range,omitempty"`
 }
 
 // ------------------------

@@ -378,22 +378,23 @@
               </ul>
             </div>
 <textarea name="equipment_text" placeholder="Equipment list here">
-  {{- if .Equipment.Armor -}}
-    Armor: {{.Equipment.Armor.Name}} (AC {{.Equipment.Armor.ArmorClass}})
-  {{- end}}
+{{- if .Equipment.Armor }}
+Armor: {{.Equipment.Armor.Name}} (AC {{.Equipment.Armor.ArmorClass}}{{if .Equipment.Armor.DexBonus}} + DEX{{end}})
+{{- end}}
 
-  {{- if .Equipment.Shield -}}
-    Shield: {{.Equipment.Shield.Name}} (AC {{.Equipment.Shield.ArmorClass}})
-  {{- end}}
+{{- if .Equipment.Shield }}
+Shield: {{.Equipment.Shield.Name}} (AC {{.Equipment.Shield.ArmorClass}})
+{{- end}}
 
-  {{- if .Equipment.MainHand -}}
-    Weapon (Main Hand): {{.Equipment.MainHand.Name}}{{if .Equipment.MainHand.Category}} ({{.Equipment.MainHand.Category}}){{end}}{{if .Equipment.MainHand.Range}} - Range: {{.Equipment.MainHand.Range}}{{end}}
-  {{- end}}
+{{- if .Equipment.MainHand }}
+Weapon (Main Hand): {{.Equipment.MainHand.Name}}{{if .Equipment.MainHand.Category}} ({{.Equipment.MainHand.Category}}){{end}}{{if .Equipment.MainHand.Range}} - Range: {{.Equipment.MainHand.Range}}{{end}}
+{{- end}}
 
-  {{- if .Equipment.OffHand -}}
-    Weapon (Off Hand): {{.Equipment.OffHand.Name}}{{if .Equipment.OffHand.Category}} ({{.Equipment.OffHand.Category}}){{end}}{{if .Equipment.OffHand.Range}} - Range: {{.Equipment.OffHand.Range}}{{end}}
-  {{- end}}
+{{- if .Equipment.OffHand }}
+Weapon (Off Hand): {{.Equipment.OffHand.Name}}{{if .Equipment.OffHand.Category}} ({{.Equipment.OffHand.Category}}){{end}}{{if .Equipment.OffHand.Range}} - Range: {{.Equipment.OffHand.Range}}{{end}}
+{{- end}}
 </textarea>
+
 
           </div>
         </section>

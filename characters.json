@@ -161,6 +161,61 @@
     "passive_perception": 0,
     "can_prepare_spells": false
   },
+  "Femmie": {
+    "id": 0,
+    "name": "Femmie",
+    "race": "half-orc",
+    "class": "monk",
+    "level": 6,
+    "background": "Acolyte",
+    "proficiency_bonus": 3,
+    "abilities": {
+      "strength": 22,
+      "dexterity": 16,
+      "constitution": 15,
+      "intelligence": 17,
+      "wisdom": 19,
+      "charisma": 14
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "History",
+      "Investigation",
+      "Nature"
+    ],
+    "skills": {
+      "Acrobatics": 3,
+      "Animal Handling": 4,
+      "Arcana": 6,
+      "Athletics": 6,
+      "Deception": 2,
+      "History": 6,
+      "Insight": 4,
+      "Intimidation": 2,
+      "Investigation": 6,
+      "Medicine": 4,
+      "Nature": 6,
+      "Perception": 4,
+      "Performance": 2,
+      "Persuasion": 2,
+      "Religion": 3,
+      "Sleight of Hand": 3,
+      "Stealth": 3,
+      "Survival": 4
+    },
+    "equipment": {
+      "armor": {
+        "name": "Studded Leather Armor",
+        "armor_class": 12,
+        "dex_bonus": true
+      }
+    },
+    "armor_class": 17,
+    "initiative": 3,
+    "passive_perception": 14,
+    "can_prepare_spells": false,
+    "experience_points": 5
+  },
   "Gandalf": {
     "id": 5,
     "name": "Gandalf",
@@ -571,6 +626,68 @@
     "armor_class": 6,
     "initiative": -4,
     "passive_perception": 6,
+    "can_prepare_spells": false
+  },
+  "test": {
+    "id": 0,
+    "name": "test",
+    "race": "Half-Human",
+    "class": "Ranger",
+    "level": 6,
+    "background": "Acolyte",
+    "proficiency_bonus": 3,
+    "abilities": {
+      "strength": 10,
+      "dexterity": 7,
+      "constitution": 3,
+      "intelligence": 10,
+      "wisdom": 15,
+      "charisma": 15
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "Intimidation",
+      "Medicine",
+      "Perception"
+    ],
+    "skills": {
+      "Acrobatics": -2,
+      "Animal Handling": 2,
+      "Arcana": 3,
+      "Athletics": 0,
+      "Deception": 2,
+      "History": 0,
+      "Insight": 2,
+      "Intimidation": 5,
+      "Investigation": 0,
+      "Medicine": 5,
+      "Nature": 0,
+      "Perception": 5,
+      "Performance": 2,
+      "Persuasion": 2,
+      "Religion": 0,
+      "Sleight of Hand": -2,
+      "Stealth": -2,
+      "Survival": 2
+    },
+    "equipment": {
+      "main_hand": {
+        "name": "Battleaxe",
+        "range": "5"
+      },
+      "off_hand": {
+        "name": "Blowgun",
+        "range": "25/100"
+      },
+      "armor": {
+        "name": "Studded Leather Armor",
+        "armor_class": 12,
+        "dex_bonus": true
+      }
+    },
+    "armor_class": 8,
+    "initiative": -2,
+    "passive_perception": 15,
     "can_prepare_spells": false
   }
 }
