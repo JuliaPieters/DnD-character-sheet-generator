@@ -11,26 +11,26 @@ import (
 // ------------------------
 var Armors = map[string]models.Armor{
 	// Light
-	"padded":          {"padded", 11, true, 0},
-	"leather armor":   {"leather armor", 11, true, 0},
-	"studded leather": {"studded leather", 12, true, 0},
+	"padded":          {Name: "padded", ArmorClass: 11, DexBonus: true},
+	"leather armor":   {Name: "leather armor", ArmorClass: 11, DexBonus: true},
+	"studded leather": {Name: "studded leather", ArmorClass: 12, DexBonus: true},
 
 	// Medium
-	"hide":        {"hide", 12, true, 2},
-	"chain shirt": {"chain shirt", 13, true, 2},
-	"scale mail":  {"scale mail", 14, true, 2},
-	"breastplate": {"breastplate", 14, true, 2},
-	"half plate":  {"half plate", 15, true, 2},
+	"hide":        {Name: "hide", ArmorClass: 12, DexBonus: true},
+	"chain shirt": {Name: "chain shirt", ArmorClass: 13, DexBonus: true},
+	"scale mail":  {Name: "scale mail", ArmorClass: 14, DexBonus: true},
+	"breastplate": {Name: "breastplate", ArmorClass: 14, DexBonus: true},
+	"half plate":  {Name: "half plate", ArmorClass: 15, DexBonus: true},
 
 	// Heavy
-	"ring mail":   {"ring mail", 14, false, 0},
-	"chain mail":  {"chain mail", 16, false, 0},
-	"splint":      {"splint", 17, false, 0},
-	"plate armor": {"plate armor", 18, false, 0},
+	"ring mail":   {Name: "ring mail", ArmorClass: 14, DexBonus: false},
+	"chain mail":  {Name: "chain mail", ArmorClass: 16, DexBonus: false},
+	"splint":      {Name: "splint", ArmorClass: 17, DexBonus: false},
+	"plate armor": {Name: "plate armor", ArmorClass: 18, DexBonus: false},
 }
 
 var Shields = map[string]models.Shield{
-	"shield": {"shield", 2},
+	"shield": {Name: "shield", ArmorClass: 2},
 }
 
 // ------------------------

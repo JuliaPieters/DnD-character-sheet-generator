@@ -24,6 +24,13 @@ func printUsage() {
 }
 
 func main() {
+	// ------------------- LOAD SPELLS -------------------
+	err := commands.LoadSpellsFromCSV("data/spells.csv")
+	if err != nil {
+		fmt.Println("failed to load spells:", err)
+		os.Exit(1)
+	}
+
 	if len(os.Args) < 2 {
 		printUsage()
 		os.Exit(1)

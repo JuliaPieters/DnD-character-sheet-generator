@@ -3,7 +3,10 @@ package commands
 import (
 	"dnd-character-sheet/models"
 	"dnd-character-sheet/storage"
+	"encoding/csv"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -12,7 +15,6 @@ var SpellcastingClasses = map[string]bool{
 	"cleric":   true,
 	"druid":    true,
 	"paladin":  true,
-	"ranger":   true,
 	"sorcerer": true,
 	"warlock":  true,
 	"wizard":   true,
@@ -25,43 +27,81 @@ var PreparedCasters = map[string]bool{
 	"wizard":  true,
 }
 
-var StartingSpells = map[string][]string{
-	"wizard":   {"burning hands", "disguise self"},
-	"cleric":   {"guidance", "sacred flame", "etherealness"},
-	"druid":    {"shillelagh", "thorn whip"},
-	"bard":     {"vicious mockery", "dancing lights"},
-	"sorcerer": {"fire bolt", "light"},
-	"warlock":  {"eldritch blast", "mage hand"},
-	"paladin":  {"divine sense", "lay on hands"},
+var SpellList []models.Spell
+
+var SpellClasses = map[string][]string{}
+
+func LoadSpellsFromCSV(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to open spells file: %v", err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = -1
+	rows, err := reader.ReadAll()
+	if err != nil {
+		return fmt.Errorf("failed to read spells file: %v", err)
+	}
+
+	SpellList = []models.Spell{}
+	SpellClasses = map[string][]string{}
+	for i, row := range rows {
+		if i == 0 {
+			continue
+		}
+		name := strings.ToLower(strings.TrimSpace(row[0]))
+		level, _ := strconv.Atoi(row[1])
+		classes := strings.Split(strings.ToLower(row[2]), ",")
+		for i := range classes {
+			classes[i] = strings.TrimSpace(classes[i])
+		}
+
+		SpellList = append(SpellList, models.Spell{
+			Name:  name,
+			Level: level,
+		})
+		SpellClasses[name] = classes
+	}
+	return nil
 }
 
-var SpellLevels = map[string]int{
-	"guidance":        0,
-	"sacred flame":    0,
-	"etherealness":    7,
-	"burning hands":   1,
-	"disguise self":   1,
-	"shillelagh":      0,
-	"thorn whip":      0,
-	"vicious mockery": 0,
-	"dancing lights":  0,
-	"fire bolt":       0,
-	"light":           0,
-	"eldritch blast":  0,
-	"mage hand":       0,
-	"divine sense":    0,
-	"lay on hands":    0,
+func FindSpellByName(name string) *models.Spell {
+	name = strings.ToLower(name)
+	for _, s := range SpellList {
+		if s.Name == name {
+			return &s
+		}
+	}
+	return nil
+}
+
+func FindSpellsForClass(class string) []models.Spell {
+	class = strings.ToLower(class)
+	var spells []models.Spell
+	for _, s := range SpellList {
+		for _, c := range SpellClasses[s.Name] {
+			if c == class {
+				spells = append(spells, s)
+				break
+			}
+		}
+	}
+	return spells
 }
 
 func GiveStartingSpells(character *models.Character) error {
-	if spells, ok := StartingSpells[character.Class]; ok {
-		for _, name := range spells {
-			level := SpellLevels[name]
-			character.Spells = append(character.Spells, models.Spell{
-				Name:     name,
-				Level:    level,
-				Prepared: false,
-			})
+	if character.CanPrepareSpells {
+		spells := FindSpellsForClass(character.Class)
+		for _, s := range spells {
+			if s.Level == 0 {
+				character.Spells = append(character.Spells, models.Spell{
+					Name:     s.Name,
+					Level:    s.Level,
+					Prepared: false,
+				})
+			}
 		}
 	}
 	SetupSpellcasting(character)
@@ -83,24 +123,38 @@ func LearnSpell(characterName, spellName string) error {
 	if character.CanPrepareSpells {
 		return fmt.Errorf("this class prepares spells and can't learn them")
 	}
-	for _, s := range character.Spells {
-		if s.Name == spellName {
-			return fmt.Errorf("character '%s' already knows spell '%s'", characterName, spellName)
+
+	spell := FindSpellByName(spellName)
+	if spell == nil {
+		return fmt.Errorf("spell '%s' not found in spell list", spellName)
+	}
+
+	valid := false
+	for _, c := range SpellClasses[spell.Name] {
+		if c == strings.ToLower(character.Class) {
+			valid = true
+			break
 		}
 	}
-	level := 1
-	if lvl, ok := SpellLevels[spellName]; ok {
-		level = lvl
+	if !valid {
+		return fmt.Errorf("%s cannot learn %s", character.Class, spellName)
 	}
+
+	for _, s := range character.Spells {
+		if s.Name == spell.Name {
+			return fmt.Errorf("character '%s' already knows spell '%s'", characterName, spell.Name)
+		}
+	}
+
 	character.Spells = append(character.Spells, models.Spell{
-		Name:     spellName,
-		Level:    level,
+		Name:     spell.Name,
+		Level:    spell.Level,
 		Prepared: false,
 	})
 	if err := storage.SaveCharacter(character); err != nil {
 		return err
 	}
-	fmt.Printf("Learned spell %s\n", spellName)
+	fmt.Printf("Learned spell %s\n", spell.Name)
 	return nil
 }
 
@@ -127,55 +181,47 @@ func PrepareSpell(characterName, spellName string, spellLevel int) error {
 			break
 		}
 	}
-	if spellIndex == -1 {
-		return fmt.Errorf("spell '%s' not known by character '%s'", spellName, characterName)
+
+	if spellIndex == -1 && character.CanPrepareSpells {
+		classSpells := FindSpellsForClass(character.Class)
+		for _, s := range classSpells {
+			if s.Name == spellName {
+				spellIndex = -2
+				break
+			}
+		}
+		if spellIndex == -1 {
+			return fmt.Errorf("spell '%s' not available for class '%s'", spellName, character.Class)
+		}
 	}
 
-	requiredLevel := SpellLevels[spellName]
-	if spellLevel < requiredLevel {
+	spell := FindSpellByName(spellName)
+	if spell == nil {
+		return fmt.Errorf("spell '%s' not found in spell list", spellName)
+	}
+
+	if spellLevel < spell.Level {
 		return fmt.Errorf("the spell has higher level than the available spell slots")
 	}
 	if slots, ok := character.SpellSlots[spellLevel]; !ok || slots == 0 {
 		return fmt.Errorf("no available spell slots of level %d", spellLevel)
 	}
 
-	character.Spells[spellIndex].Prepared = true
-	character.Spells[spellIndex].Level = spellLevel
+	if spellIndex == -2 {
+		character.Spells = append(character.Spells, models.Spell{
+			Name:     spell.Name,
+			Level:    spellLevel,
+			Prepared: true,
+		})
+	} else {
+		character.Spells[spellIndex].Prepared = true
+		character.Spells[spellIndex].Level = spellLevel
+	}
+
 	if err := storage.SaveCharacter(character); err != nil {
 		return err
 	}
 	fmt.Printf("Prepared spell %s\n", spellName)
-	return nil
-}
-
-func RemoveSpell(characterName, spellName string) error {
-	characters, err := storage.LoadCharacters()
-	if err != nil {
-		return err
-	}
-	character, exists := characters[characterName]
-	if !exists {
-		return fmt.Errorf("character \"%s\" not found", characterName)
-	}
-
-	newSpells := []models.Spell{}
-	removed := false
-	for _, s := range character.Spells {
-		if s.Name != spellName {
-			newSpells = append(newSpells, s)
-		} else {
-			removed = true
-		}
-	}
-	character.Spells = newSpells
-	if err := storage.SaveCharacter(character); err != nil {
-		return err
-	}
-	if removed {
-		fmt.Printf("Removed spell %s\n", spellName)
-	} else {
-		fmt.Printf("Spell '%s' not found for character '%s'\n", spellName, characterName)
-	}
 	return nil
 }
 
@@ -211,31 +257,37 @@ func GenerateSpellSlots(class string, level int) map[int]int {
 			slots[0] = 5
 		}
 
-		slotTable := map[int][]int{
-			1:  {2, 0, 0, 0, 0, 0, 0, 0, 0},
-			2:  {3, 0, 0, 0, 0, 0, 0, 0, 0},
-			3:  {4, 2, 0, 0, 0, 0, 0, 0, 0},
-			4:  {4, 3, 0, 0, 0, 0, 0, 0, 0},
-			5:  {4, 3, 2, 0, 0, 0, 0, 0, 0},
-			6:  {4, 3, 3, 0, 0, 0, 0, 0, 0},
-			7:  {4, 3, 3, 1, 0, 0, 0, 0, 0},
-			8:  {4, 3, 3, 2, 0, 0, 0, 0, 0},
-			9:  {4, 3, 3, 3, 1, 0, 0, 0, 0},
-			10: {4, 3, 3, 3, 2, 0, 0, 0, 0},
-			11: {4, 3, 3, 3, 2, 1, 0, 0, 0},
-			12: {4, 3, 3, 3, 2, 1, 1, 0, 0},
-			13: {4, 3, 3, 3, 2, 1, 1, 1, 0},
-			14: {4, 3, 3, 3, 2, 1, 1, 1, 1},
-			15: {4, 3, 3, 3, 2, 1, 1, 1, 1},
-			16: {4, 3, 3, 3, 3, 1, 1, 1, 1},
-			17: {4, 3, 3, 3, 3, 2, 1, 1, 1},
-			18: {4, 3, 3, 3, 3, 2, 2, 1, 1},
-			19: {4, 3, 3, 3, 3, 2, 2, 2, 1},
-			20: {4, 3, 3, 3, 3, 2, 2, 1, 1},
+		fullCasterSlots := [][]int{
+			{2, 0, 0, 0, 0, 0, 0, 0, 0},
+			{3, 0, 0, 0, 0, 0, 0, 0, 0},
+			{4, 2, 0, 0, 0, 0, 0, 0, 0},
+			{4, 3, 0, 0, 0, 0, 0, 0, 0},
+			{4, 3, 2, 0, 0, 0, 0, 0, 0},
+			{4, 3, 3, 0, 0, 0, 0, 0, 0},
+			{4, 3, 3, 1, 0, 0, 0, 0, 0},
+			{4, 3, 3, 2, 0, 0, 0, 0, 0},
+			{4, 3, 3, 3, 0, 0, 0, 0, 0},
+			{4, 3, 3, 3, 2, 0, 0, 0, 0},
+			{4, 3, 3, 3, 3, 0, 0, 0, 0},
+			{4, 3, 3, 3, 3, 1, 0, 0, 0},
+			{4, 3, 3, 3, 3, 2, 0, 0, 0},
+			{4, 3, 3, 3, 3, 2, 1, 0, 0},
+			{4, 3, 3, 3, 3, 3, 1, 0, 0},
+			{4, 3, 3, 3, 3, 3, 2, 0, 0},
+			{4, 3, 3, 3, 3, 3, 2, 1, 0},
+			{4, 3, 3, 3, 3, 3, 2, 2, 1},
+			{4, 3, 3, 3, 3, 3, 3, 2, 2},
+			{4, 3, 3, 3, 3, 2, 2, 1, 1},
 		}
 
-		if l, ok := slotTable[level]; ok {
-			for i, count := range l {
+		if class == "cleric" || class == "druid" {
+			if level > 10 {
+				level = 10
+			}
+		}
+
+		if level >= 1 && level <= len(fullCasterSlots) {
+			for i, count := range fullCasterSlots[level-1] {
 				if count > 0 {
 					slots[i+1] = count
 				}
