@@ -200,7 +200,6 @@ var SpellcastingClasses = map[string]string{
 	"wizard":   "Intelligence",
 }
 
-// Spell slot tables voor full casters level 1–20
 var FullCasterSpellSlots = [][]int{
 	{2}, {3}, {4}, {4, 2}, {4, 3}, {4, 3, 2}, {4, 3, 3}, {4, 3, 3, 1},
 	{4, 3, 3, 2}, {4, 3, 3, 3}, {4, 3, 3, 3, 1}, {4, 3, 3, 3, 2}, {4, 3, 3, 3, 2, 1},

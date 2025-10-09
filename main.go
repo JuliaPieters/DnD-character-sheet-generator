@@ -24,10 +24,13 @@ func printUsage() {
 }
 
 func main() {
-	// ------------------- LOAD SPELLS -------------------
-	err := commands.LoadSpellsFromCSV("data/spells.csv")
-	if err != nil {
+	if err := commands.LoadSpellsFromCSV("data/spells.csv"); err != nil {
 		fmt.Println("failed to load spells:", err)
+		os.Exit(1)
+	}
+
+	if err := commands.LoadEquipmentCSV("data/equipment.csv"); err != nil {
+		fmt.Println("failed to load equipment:", err)
 		os.Exit(1)
 	}
 
@@ -129,9 +132,6 @@ func main() {
 		armorName := equipCmd.String("armor", "", "Armor Name")
 		shieldName := equipCmd.String("shield", "", "Shield Name")
 		slot := equipCmd.String("slot", "", "Weapon Slot (main hand / off hand)")
-		category := equipCmd.String("category", "", "Weapon Category")
-		weaponRange := equipCmd.String("range", "", "Weapon Range")
-		twoHanded := equipCmd.Bool("two-handed", false, "Two-Handed Weapon")
 		_ = equipCmd.Parse(os.Args[2:])
 
 		if *characterName == "" {
@@ -139,43 +139,54 @@ func main() {
 			os.Exit(2)
 		}
 
+		// --- Equip weapon ---
 		if *weaponName != "" {
-			newWeapon := models.Weapon{
-				Name:      *weaponName,
-				Category:  *category,
-				Range:     *weaponRange,
-				TwoHanded: *twoHanded,
+			weapon, ok := commands.Weapons[strings.ToLower(*weaponName)]
+			if !ok {
+				fmt.Printf("Weapon '%s' not found in CSV\n", *weaponName)
+				os.Exit(1)
 			}
 			var hand string
 			var err error
 			if *slot == "" {
-				hand, err = commands.AddWeapon(*characterName, newWeapon)
+				hand, err = commands.AddWeapon(*characterName, weapon)
 			} else {
-				hand, err = commands.AddWeaponToSlot(*characterName, newWeapon, *slot)
+				hand, err = commands.AddWeaponToSlot(*characterName, weapon, *slot)
 			}
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			fmt.Printf("Equipped weapon %s to %s\n", *weaponName, hand)
+			fmt.Printf("Equipped weapon %s to %s\n", weapon.Name, hand)
 			return
 		}
 
+		// --- Equip armor ---
 		if *armorName != "" {
-			if err := commands.AddArmor(*characterName, *armorName); err != nil {
+			armor, ok := commands.Armors[strings.ToLower(*armorName)]
+			if !ok {
+				fmt.Printf("Armor '%s' not found in CSV\n", *armorName)
+				os.Exit(1)
+			}
+			if err := commands.AddArmor(*characterName, armor.Name); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			fmt.Printf("Equipped armor %s\n", *armorName)
 			return
 		}
 
+		// --- Equip shield ---
 		if *shieldName != "" {
-			if err := commands.AddShield(*characterName, *shieldName); err != nil {
+			shield, ok := commands.Shields[strings.ToLower(*shieldName)]
+			if !ok {
+				fmt.Printf("Shield '%s' not found in CSV\n", *shieldName)
+				os.Exit(1)
+			}
+			if err := commands.AddShield(*characterName, shield.Name); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-			fmt.Printf("Equipped shield %s\n", *shieldName)
+			fmt.Printf("Equipped shield %s\n", shield.Name)
 			return
 		}
 
@@ -188,12 +199,10 @@ func main() {
 		characterName := learnCmd.String("name", "", "Character Name")
 		spellName := learnCmd.String("spell", "", "Spell Name")
 		_ = learnCmd.Parse(os.Args[2:])
-
 		if *characterName == "" || *spellName == "" {
 			fmt.Println("character name and spell name are required")
 			os.Exit(2)
 		}
-
 		if err := commands.LearnSpell(*characterName, *spellName); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -206,12 +215,10 @@ func main() {
 		spellName := prepareCmd.String("spell", "", "Spell Name")
 		level := prepareCmd.Int("level", 1, "Spell Level")
 		_ = prepareCmd.Parse(os.Args[2:])
-
 		if *characterName == "" || *spellName == "" {
 			fmt.Println("character name and spell name are required")
 			os.Exit(2)
 		}
-
 		if err := commands.PrepareSpell(*characterName, *spellName, *level); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
