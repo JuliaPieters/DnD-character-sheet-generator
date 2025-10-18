@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -26,7 +27,10 @@ type APISpell struct {
 	School struct {
 		Name string `json:"name"`
 	} `json:"school"`
-	Range string `json:"range"`
+	Range   string `json:"range"`
+	Classes []struct {
+		Name string `json:"name"`
+	} `json:"classes"`
 }
 
 type EquipmentRange struct {
@@ -78,6 +82,8 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 	ticker := time.NewTicker(200 * time.Millisecond)
 	defer ticker.Stop()
 
+	classNameLower := strings.ToLower(className)
+
 	for _, res := range list.Results {
 		<-ticker.C
 		go func(res APIResource) {
@@ -87,6 +93,19 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 				results <- SpellResult{Err: fmt.Errorf("error fetching %s: %w", res.Name, err)}
 				return
 			}
+
+			isForClass := false
+			for _, c := range spell.Classes {
+				if strings.ToLower(c.Name) == classNameLower {
+					isForClass = true
+					break
+				}
+			}
+			if !isForClass {
+				results <- SpellResult{Err: nil}
+				return
+			}
+
 			results <- SpellResult{
 				Spell: models.Spell{
 					Name:   spell.Name,
@@ -103,6 +122,9 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 		result := <-results
 		if result.Err != nil {
 			log.Println(result.Err)
+			continue
+		}
+		if result.Spell.Name == "" {
 			continue
 		}
 		if _, ok := slots[result.Spell.Level]; ok {
@@ -156,7 +178,11 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 	var armor *models.Armor
 	var shield *models.Shield
 
+	ticker := time.NewTicker(200 * time.Millisecond)
+	defer ticker.Stop()
+
 	for _, res := range list.Results {
+		<-ticker.C
 		var eq APIEquipment
 		if err := getJSON("https://www.dnd5eapi.co"+res.URL, &eq); err != nil {
 			log.Println("Error fetching equipment:", res.Name, err)

@@ -55,55 +55,55 @@
               <li>
                 <div class="score">
                   <label for="Strengthscore">Strength</label>
-                  <input name="Strengthscore" placeholder="10" class="stat" />
+                  <input name="Strengthscore" placeholder="10" class="stat"  value="{{.Abilities.Strength}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Strengthmod" placeholder="+0" class="statmod" />
+                  <input name="Strengthmod" placeholder="+0" class="statmod"  value="{{.Skills.StrengthModifier}}" />
                 </div>
               </li>
               <li>
                 <div class="score">
                   <label for="Dexterityscore">Dexterity</label>
-                  <input name="Dexterityscore" placeholder="10" class="stat" />
+                  <input name="Dexterityscore" placeholder="10" class="stat"  value="{{.Abilities.Dexterity}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Dexteritymod" placeholder="+0" class="statmod" />
+                  <input name="Dexteritymod" placeholder="+0" class="statmod"  value="{{.Skills.DexterityModifier}}" />
                 </div>
               </li>
               <li>
                 <div class="score">
                   <label for="Constitutionscore">Constitution</label>
-                  <input name="Constitutionscore" placeholder="10" class="stat" />
+                  <input name="Constitutionscore" placeholder="10" class="stat"  value="{{.Abilities.Constitution}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Constitutionmod" placeholder="+0" class="statmod" />
+                  <input name="Constitutionmod" placeholder="+0" class="statmod"  value="{{.Skills.ConstitutionModifier}}" />
                 </div>
               </li>
               <li>
                 <div class="score">
                   <label for="Wisdomscore">Wisdom</label>
-                  <input name="Wisdomscore" placeholder="10" class="stat" />
+                  <input name="Wisdomscore" placeholder="10" class="stat"  value="{{.Abilities.Wisdom}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Wisdommod" placeholder="+0" />
+                  <input name="Wisdommod" placeholder="+0" class="statmod"  value="{{.Skills.WisdomModifier}}" />
                 </div>
               </li>
               <li>
                 <div class="score">
                   <label for="Intelligencescore">Intelligence</label>
-                  <input name="Intelligencescore" placeholder="10" class="stat" />
+                  <input name="Intelligencescore" placeholder="10" class="stat"  value="{{.Abilities.Intelligence}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Intelligencemod" placeholder="+0" class="statmod" />
+                  <input name="Intelligencemod" placeholder="+0" class="statmod"  value="{{.Skills.IntelligenceModifier}}" />
                 </div>
               </li>
               <li>
                 <div class="score">
                   <label for="Charismascore">Charisma</label>
-                  <input name="Charismascore" placeholder="10" class="stat" />
+                  <input name="Charismascore" placeholder="10" class="stat"  value="{{.Abilities.Charisma}}" />
                 </div>
                 <div class="modifier">
-                  <input name="Charismamod" placeholder="+0" class="statmod" />
+                  <input name="Charismamod" placeholder="+0" class="statmod"  value="{{.Skills.CharismaModifier}}" />
                 </div>
               </li>
             </ul>
@@ -271,7 +271,7 @@
         <section class="combat">
           <div class="armorclass">
             <div>
-              <label for="ac">Armor Class</label><input name="ac" placeholder="10" type="text" />
+              <label for="ac">Armor Class</label><input name="ac" placeholder="10" type="text"  value="{{.ArmorClass}}" />
             </div>
           </div>
           <div class="initiative">
@@ -281,7 +281,7 @@
           </div>
           <div class="speed">
             <div>
-              <label for="speed">Speed</label><input name="speed" placeholder="30" type="text" />
+              <label for="speed">Speed</label><input name="speed" placeholder="30" type="text"  value="{{.Speed}}" />
             </div>
           </div>
           <div class="hp">

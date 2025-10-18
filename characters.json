@@ -1,73 +1,19 @@
 {
-  "Anakin": {
+  "Jules": {
     "id": 0,
-    "name": "Anakin",
-    "race": "Half-Human",
-    "class": "Paladin 2",
-    "level": 0,
+    "name": "Jules",
+    "race": "dragonborn",
+    "class": "wizard",
+    "level": 10,
     "background": "Acolyte",
-    "proficiency_bonus": 0,
+    "proficiency_bonus": 4,
     "abilities": {
-      "strength": 10,
-      "dexterity": 5,
-      "constitution": 3,
-      "intelligence": 6,
-      "wisdom": 2,
-      "charisma": 2
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Aragorn": {
-    "id": 0,
-    "name": "Aragorn",
-    "race": "Human",
-    "class": "Ranger",
-    "level": 0,
-    "background": "Noble",
-    "proficiency_bonus": 0,
-    "abilities": {
-      "strength": 0,
-      "dexterity": 0,
-      "constitution": 0,
-      "intelligence": 0,
-      "wisdom": 0,
-      "charisma": 0
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {},
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Arthas": {
-    "id": 6,
-    "name": "Arthas",
-    "race": "Human",
-    "class": "Wizard",
-    "level": 5,
-    "background": "Sage",
-    "proficiency_bonus": 2,
-    "abilities": {
-      "strength": 8,
+      "strength": 17,
       "dexterity": 14,
-      "constitution": 12,
-      "intelligence": 16,
-      "wisdom": 10,
-      "charisma": 10
+      "constitution": 13,
+      "intelligence": 10,
+      "wisdom": 12,
+      "charisma": 9
     },
     "skill_proficiencies": [
       "Arcana",
@@ -75,600 +21,23 @@
     ],
     "skills": {
       "Acrobatics": 2,
-      "Animal Handling": 0,
-      "Arcana": 5,
-      "Athletics": -1,
-      "Deception": 0,
-      "History": 3,
-      "Insight": 0,
-      "Intimidation": 0,
-      "Investigation": 5,
-      "Medicine": 0,
-      "Nature": 3,
-      "Perception": 0,
-      "Performance": 0,
-      "Persuasion": 0,
-      "Religion": 3,
-      "Sleight of Hand": 2,
-      "Stealth": 2,
-      "Survival": 0
-    },
-    "equipment": {
-      "armor": {
-        "name": "Robes",
-        "armor_class": 11,
-        "dex_bonus": true
-      },
-      "shield": {
-        "name": "Magic Shield",
-        "armor_class": 2
-      }
-    },
-    "spells": [
-      {
-        "name": "Magic Missile",
-        "level": 1,
-        "prepared": false
-      },
-      {
-        "name": "Shield",
-        "level": 1,
-        "prepared": false
-      }
-    ],
-    "spell_slots": {
-      "1": 4,
-      "2": 2
-    },
-    "armor_class": 15,
-    "initiative": 2,
-    "passive_perception": 10,
-    "spellcasting_ability": "Intelligence",
-    "spell_save_dc": 13,
-    "spell_attack_bonus": 5,
-    "can_prepare_spells": false,
-    "speed": 30,
-    "max_hit_points": 10,
-    "current_hit_points": 10
-  },
-  "Asami": {
-    "id": 0,
-    "name": "Asami",
-    "race": "Human",
-    "class": "Paladin",
-    "level": 3,
-    "background": "Acolyte",
-    "proficiency_bonus": 0,
-    "abilities": {
-      "strength": 6,
-      "dexterity": 5,
-      "constitution": 4,
-      "intelligence": 9,
-      "wisdom": 10,
-      "charisma": 8
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Femmie": {
-    "id": 0,
-    "name": "Femmie",
-    "race": "half-orc",
-    "class": "monk",
-    "level": 6,
-    "background": "Acolyte",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 22,
-      "dexterity": 16,
-      "constitution": 15,
-      "intelligence": 17,
-      "wisdom": 19,
-      "charisma": 14
-    },
-    "skill_proficiencies": [
-      "Arcana",
-      "History",
-      "Investigation",
-      "Nature"
-    ],
-    "skills": {
-      "Acrobatics": 3,
-      "Animal Handling": 4,
-      "Arcana": 6,
-      "Athletics": 6,
-      "Deception": 2,
-      "History": 6,
-      "Insight": 4,
-      "Intimidation": 2,
-      "Investigation": 6,
-      "Medicine": 4,
-      "Nature": 6,
-      "Perception": 4,
-      "Performance": 2,
-      "Persuasion": 2,
-      "Religion": 3,
-      "Sleight of Hand": 3,
-      "Stealth": 3,
-      "Survival": 4
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 17,
-    "initiative": 3,
-    "passive_perception": 14,
-    "can_prepare_spells": false,
-    "experience_points": 5
-  },
-  "Gandalf": {
-    "id": 5,
-    "name": "Gandalf",
-    "race": "Human",
-    "class": "Wizard",
-    "level": 3,
-    "background": "Sage",
-    "proficiency_bonus": 2,
-    "abilities": {
-      "strength": 8,
-      "dexterity": 14,
-      "constitution": 12,
-      "intelligence": 16,
-      "wisdom": 10,
-      "charisma": 10
-    },
-    "skill_proficiencies": null,
-    "skills": {
-      "Acrobatics": 2,
-      "Animal Handling": 0,
-      "Arcana": 5,
-      "Athletics": -1,
-      "Deception": 0,
-      "History": 3,
-      "Insight": 0,
-      "Intimidation": 0,
-      "Investigation": 5,
-      "Medicine": 0,
-      "Nature": 3,
-      "Perception": 0,
-      "Performance": 0,
-      "Persuasion": 0,
-      "Religion": 3,
-      "Sleight of Hand": 2,
-      "Stealth": 2,
-      "Survival": 0
-    },
-    "equipment": {},
-    "spell_slots": {
-      "1": 4,
-      "2": 2
-    },
-    "armor_class": 12,
-    "initiative": 2,
-    "passive_perception": 10,
-    "spellcasting_ability": "Intelligence",
-    "spell_save_dc": 13,
-    "spell_attack_bonus": 5,
-    "can_prepare_spells": false,
-    "speed": 30,
-    "max_hit_points": 10,
-    "current_hit_points": 10
-  },
-  "Hobber": {
-    "id": 0,
-    "name": "Hobber",
-    "race": "Dwarf",
-    "class": "Wizard",
-    "level": 0,
-    "background": "",
-    "proficiency_bonus": 0,
-    "abilities": {
-      "strength": 0,
-      "dexterity": 0,
-      "constitution": 0,
-      "intelligence": 0,
-      "wisdom": 0,
-      "charisma": 0
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Jesse": {
-    "id": 0,
-    "name": "Jesse",
-    "race": "",
-    "class": "",
-    "level": 0,
-    "background": "",
-    "proficiency_bonus": 2,
-    "abilities": {
-      "strength": 10,
-      "dexterity": 0,
-      "constitution": 0,
-      "intelligence": 0,
-      "wisdom": 0,
-      "charisma": 0
-    },
-    "skill_proficiencies": null,
-    "skills": {
-      "Acrobatics": -5,
-      "Animal Handling": -5,
-      "Arcana": -5,
-      "Athletics": 0,
-      "Deception": -5,
-      "History": -5,
-      "Insight": -5,
-      "Intimidation": -5,
-      "Investigation": -5,
-      "Medicine": -5,
-      "Nature": -5,
-      "Perception": -5,
-      "Performance": -5,
-      "Persuasion": -5,
-      "Religion": -5,
-      "Sleight of Hand": -5,
-      "Stealth": -5,
-      "Survival": -5
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 5,
-    "initiative": -5,
-    "passive_perception": 5,
-    "can_prepare_spells": false
-  },
-  "Korra": {
-    "id": 0,
-    "name": "Korra",
-    "race": "Half-Human",
-    "class": "Wizard ",
-    "level": 0,
-    "background": "Acolyte",
-    "proficiency_bonus": 0,
-    "abilities": {
-      "strength": 0,
-      "dexterity": 0,
-      "constitution": 0,
-      "intelligence": 0,
-      "wisdom": 0,
-      "charisma": 0
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Mako": {
-    "id": 0,
-    "name": "Mako",
-    "race": "dragonborn",
-    "class": "Fighter",
-    "level": 8,
-    "background": "Sage",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 22,
-      "dexterity": 16,
-      "constitution": 15,
-      "intelligence": 15,
-      "wisdom": 19,
-      "charisma": 15
-    },
-    "skill_proficiencies": [
-      "Athletics",
-      "History",
-      "Insight",
-      "Investigation",
-      "Stealth",
-      "Survival"
-    ],
-    "skills": {
-      "Acrobatics": 3,
-      "Animal Handling": 4,
-      "Arcana": 2,
-      "Athletics": 9,
-      "Deception": 2,
-      "History": 5,
-      "Insight": 7,
-      "Intimidation": 2,
-      "Investigation": 5,
-      "Medicine": 4,
-      "Nature": 2,
-      "Perception": 4,
-      "Performance": 2,
-      "Persuasion": 2,
-      "Religion": 2,
-      "Sleight of Hand": 3,
-      "Stealth": 6,
-      "Survival": 7
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 13,
-    "initiative": 3,
-    "passive_perception": 14,
-    "can_prepare_spells": false,
-    "experience_points": 5
-  },
-  "Manon": {
-    "id": 0,
-    "name": "Manon",
-    "race": "Half-Human",
-    "class": "Wizard",
-    "level": 7,
-    "background": "Acolyte",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 10,
-      "dexterity": 12,
-      "constitution": 14,
-      "intelligence": 10,
-      "wisdom": 19,
-      "charisma": 14
-    },
-    "skill_proficiencies": [
-      "Animal Handling",
-      "History",
-      "Investigation",
-      "Nature",
-      "Performance"
-    ],
-    "skills": {
-      "Acrobatics": 1,
-      "Animal Handling": 7,
-      "Arcana": 0,
-      "Athletics": 0,
-      "Deception": 2,
-      "History": 3,
-      "Insight": 4,
-      "Intimidation": 2,
-      "Investigation": 3,
-      "Medicine": 4,
-      "Nature": 3,
-      "Perception": 4,
-      "Performance": 5,
-      "Persuasion": 2,
-      "Religion": 0,
-      "Sleight of Hand": 1,
-      "Stealth": 1,
-      "Survival": 4
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 11,
-    "initiative": 1,
-    "passive_perception": 14,
-    "can_prepare_spells": false
-  },
-  "Thoradin": {
-    "id": 0,
-    "name": "Thoradin",
-    "race": "Human",
-    "class": "Ranger",
-    "level": 6,
-    "background": "Acolyte",
-    "proficiency_bonus": 0,
-    "abilities": {
-      "strength": 10,
-      "dexterity": 7,
-      "constitution": 12,
-      "intelligence": 10,
-      "wisdom": 15,
-      "charisma": 15
-    },
-    "skill_proficiencies": null,
-    "skills": null,
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 0,
-    "initiative": 0,
-    "passive_perception": 0,
-    "can_prepare_spells": false
-  },
-  "Wesley": {
-    "id": 0,
-    "name": "Wesley",
-    "race": "Human",
-    "class": "Wizard",
-    "level": 6,
-    "background": "Acolyte",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 7,
-      "dexterity": 13,
-      "constitution": 15,
-      "intelligence": 18,
-      "wisdom": 16,
-      "charisma": 16
-    },
-    "skill_proficiencies": [
-      "Arcana",
-      "History",
-      "Investigation",
-      "Medicine",
-      "Performance",
-      "Sleight of Hand"
-    ],
-    "skills": {
-      "Acrobatics": 1,
-      "Animal Handling": 3,
-      "Arcana": 7,
-      "Athletics": -2,
-      "Deception": 3,
-      "History": 7,
-      "Insight": 3,
-      "Intimidation": 3,
-      "Investigation": 7,
-      "Medicine": 6,
-      "Nature": 4,
-      "Perception": 3,
-      "Performance": 6,
-      "Persuasion": 3,
-      "Religion": 4,
-      "Sleight of Hand": 4,
-      "Stealth": 1,
-      "Survival": 3
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 11,
-    "initiative": 1,
-    "passive_perception": 13,
-    "can_prepare_spells": false
-  },
-  "Wynnie": {
-    "id": 0,
-    "name": "Wynnie",
-    "race": "Human",
-    "class": "Wizard",
-    "level": 1,
-    "background": "moe",
-    "proficiency_bonus": 2,
-    "abilities": {
-      "strength": 1,
-      "dexterity": 1,
-      "constitution": 1,
-      "intelligence": 1,
-      "wisdom": 1,
-      "charisma": 1
-    },
-    "skill_proficiencies": [
-      "Deception",
-      "Medicine"
-    ],
-    "skills": {
-      "Acrobatics": -4,
-      "Animal Handling": -4,
-      "Arcana": -4,
-      "Athletics": -4,
-      "Deception": -2,
-      "History": -4,
-      "Insight": -4,
-      "Intimidation": -4,
-      "Investigation": -4,
-      "Medicine": -2,
-      "Nature": -4,
-      "Perception": -4,
-      "Performance": -4,
-      "Persuasion": -4,
-      "Religion": -4,
-      "Sleight of Hand": -4,
-      "Stealth": -4,
-      "Survival": -4
-    },
-    "equipment": {
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
-    },
-    "armor_class": 6,
-    "initiative": -4,
-    "passive_perception": 6,
-    "can_prepare_spells": false
-  },
-  "test": {
-    "id": 0,
-    "name": "test",
-    "race": "Half-Human",
-    "class": "Ranger",
-    "level": 6,
-    "background": "Acolyte",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 10,
-      "dexterity": 7,
-      "constitution": 3,
-      "intelligence": 10,
-      "wisdom": 15,
-      "charisma": 15
-    },
-    "skill_proficiencies": [
-      "Arcana",
-      "Intimidation",
-      "Medicine",
-      "Perception"
-    ],
-    "skills": {
-      "Acrobatics": -2,
-      "Animal Handling": 2,
-      "Arcana": 3,
-      "Athletics": 0,
-      "Deception": 2,
+      "Animal Handling": 1,
+      "Arcana": 4,
+      "Athletics": 3,
+      "Deception": -1,
       "History": 0,
-      "Insight": 2,
-      "Intimidation": 5,
-      "Investigation": 0,
-      "Medicine": 5,
+      "Insight": 1,
+      "Intimidation": -1,
+      "Investigation": 4,
+      "Medicine": 1,
       "Nature": 0,
-      "Perception": 5,
-      "Performance": 2,
-      "Persuasion": 2,
+      "Perception": 1,
+      "Performance": -1,
+      "Persuasion": -1,
       "Religion": 0,
-      "Sleight of Hand": -2,
-      "Stealth": -2,
-      "Survival": 2
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 1
     },
     "equipment": {
       "main_hand": {
@@ -677,7 +46,7 @@
       },
       "off_hand": {
         "name": "Blowgun",
-        "range": "25/100"
+        "range": "25"
       },
       "armor": {
         "name": "Studded Leather Armor",
@@ -685,9 +54,277 @@
         "dex_bonus": true
       }
     },
-    "armor_class": 8,
-    "initiative": -2,
-    "passive_perception": 15,
+    "spells": [
+      {
+        "name": "Magic Missile",
+        "level": 1,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "120 feet"
+      },
+      {
+        "name": "Color Spray",
+        "level": 1,
+        "prepared": false,
+        "school": "Illusion",
+        "range": "Self"
+      },
+      {
+        "name": "False Life",
+        "level": 1,
+        "prepared": false,
+        "school": "Necromancy",
+        "range": "Self"
+      },
+      {
+        "name": "Floating Disk",
+        "level": 1,
+        "prepared": false,
+        "school": "Conjuration",
+        "range": "30 feet"
+      },
+      {
+        "name": "Acid Arrow",
+        "level": 2,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "90 feet"
+      },
+      {
+        "name": "Darkness",
+        "level": 2,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "60 feet"
+      },
+      {
+        "name": "Spider Climb",
+        "level": 2,
+        "prepared": false,
+        "school": "Transmutation",
+        "range": "Touch"
+      },
+      {
+        "name": "Animate Dead",
+        "level": 3,
+        "prepared": false,
+        "school": "Necromancy",
+        "range": "10 feet"
+      },
+      {
+        "name": "Magic Circle",
+        "level": 3,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "10 feet"
+      },
+      {
+        "name": "Sending",
+        "level": 3,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "Unlimited"
+      },
+      {
+        "name": "Stoneskin",
+        "level": 4,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "Touch"
+      },
+      {
+        "name": "Phantasmal Killer",
+        "level": 4,
+        "prepared": false,
+        "school": "Illusion",
+        "range": "120 feet"
+      },
+      {
+        "name": "Banishment",
+        "level": 4,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "60 feet"
+      }
+    ],
+    "spell_slots": {
+      "1": 4,
+      "2": 3,
+      "3": 3,
+      "4": 3
+    },
+    "armor_class": 12,
+    "initiative": 2,
+    "passive_perception": 11,
+    "spellcasting_ability": "Intelligence",
+    "spell_save_dc": 12,
+    "spell_attack_bonus": 4,
+    "can_prepare_spells": true
+  },
+  "Thoradin": {
+    "id": 0,
+    "name": "Thoradin",
+    "race": "gnome",
+    "class": "sorcerer",
+    "level": 10,
+    "background": "Acolyte",
+    "proficiency_bonus": 4,
+    "abilities": {
+      "strength": 10,
+      "dexterity": 10,
+      "constitution": 10,
+      "intelligence": 14,
+      "wisdom": 10,
+      "charisma": 10
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "Deception",
+      "Insight",
+      "Intimidation",
+      "Persuasion",
+      "Religion"
+    ],
+    "skills": {
+      "Acrobatics": 0,
+      "Animal Handling": 0,
+      "Arcana": 6,
+      "Athletics": 0,
+      "Deception": 4,
+      "History": 2,
+      "Insight": 4,
+      "Intimidation": 4,
+      "Investigation": 2,
+      "Medicine": 0,
+      "Nature": 2,
+      "Perception": 0,
+      "Performance": 0,
+      "Persuasion": 4,
+      "Religion": 6,
+      "Sleight of Hand": 0,
+      "Stealth": 0,
+      "Survival": 0
+    },
+    "equipment": {
+      "main_hand": {
+        "name": "Battleaxe",
+        "range": "5"
+      },
+      "off_hand": {
+        "name": "Blowgun",
+        "range": "25"
+      },
+      "armor": {
+        "name": "Studded Leather Armor",
+        "armor_class": 12,
+        "dex_bonus": true
+      }
+    },
+    "spells": [
+      {
+        "name": "Charm Person",
+        "level": 1,
+        "prepared": false,
+        "school": "Enchantment",
+        "range": "30 feet"
+      },
+      {
+        "name": "Feather Fall",
+        "level": 1,
+        "prepared": false,
+        "school": "Transmutation",
+        "range": "60 feet"
+      },
+      {
+        "name": "Comprehend Languages",
+        "level": 1,
+        "prepared": false,
+        "school": "Divination",
+        "range": "Self"
+      },
+      {
+        "name": "Fog Cloud",
+        "level": 1,
+        "prepared": false,
+        "school": "Conjuration",
+        "range": "120 feet"
+      },
+      {
+        "name": "Web",
+        "level": 2,
+        "prepared": false,
+        "school": "Conjuration",
+        "range": "60 feet"
+      },
+      {
+        "name": "Shatter",
+        "level": 2,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "60 feet"
+      },
+      {
+        "name": "Hold Person",
+        "level": 2,
+        "prepared": false,
+        "school": "Enchantment",
+        "range": "60 feet"
+      },
+      {
+        "name": "Tongues",
+        "level": 3,
+        "prepared": false,
+        "school": "Divination",
+        "range": "Touch"
+      },
+      {
+        "name": "Protection From Energy",
+        "level": 3,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "Touch"
+      },
+      {
+        "name": "Dispel Magic",
+        "level": 3,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "120 feet"
+      },
+      {
+        "name": "Confusion",
+        "level": 4,
+        "prepared": false,
+        "school": "Enchantment",
+        "range": "90 feet"
+      },
+      {
+        "name": "Banishment",
+        "level": 4,
+        "prepared": false,
+        "school": "Abjuration",
+        "range": "60 feet"
+      },
+      {
+        "name": "Ice Storm",
+        "level": 4,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "300 feet"
+      }
+    ],
+    "spell_slots": {
+      "1": 4,
+      "2": 3,
+      "3": 3,
+      "4": 3
+    },
+    "armor_class": 12,
+    "initiative": 0,
+    "passive_perception": 10,
+    "spellcasting_ability": "Charisma",
+    "spell_save_dc": 12,
+    "spell_attack_bonus": 4,
     "can_prepare_spells": false
   }
 }
