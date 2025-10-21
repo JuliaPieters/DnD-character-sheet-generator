@@ -12,12 +12,8 @@ import (
 	"dnd-character-sheet/storage"
 )
 
-
 var templates = template.Must(template.ParseGlob("../templates/*.html"))
 
-// ------------------------
-// Handlers
-// ------------------------
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
@@ -71,6 +67,7 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		intelligence, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
 		wisdom, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
 		charisma, _ := strconv.Atoi(r.FormValue("Charismascore"))
+		speed, _ := strconv.Atoi(r.FormValue("Speed"))
 
 		raceKey := strings.ToLower(race)
 		modifiers := models.RaceModifiers[raceKey]
@@ -113,6 +110,7 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 				ProficiencyBonus:   models.CalculateProfBonus(level),
 				Abilities:          abilities,
 				SkillProficiencies: skillProficiencies,
+				Speed:              speed,
 			}
 		} else {
 			character.PlayerName = playerName
@@ -124,7 +122,15 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			character.ProficiencyBonus = models.CalculateProfBonus(level)
 			character.Abilities = abilities
 			character.SkillProficiencies = skillProficiencies
+			character.Speed = speed
 		}
+
+		character.StrengthMod = character.Abilities.Modifier("Strength")
+		character.DexterityMod = character.Abilities.Modifier("Dexterity")
+		character.ConstitutionMod = character.Abilities.Modifier("Constitution")
+		character.IntelligenceMod = character.Abilities.Modifier("Intelligence")
+		character.WisdomMod = character.Abilities.Modifier("Wisdom")
+		character.CharismaMod = character.Abilities.Modifier("Charisma")
 
 		character.CalculateAllSkills()
 		character.CalculateCombatStats()
@@ -142,7 +148,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Fetch spells for class
 		spells, err := api.GetSpellsForClass(class, character.SpellSlots)
 		if err != nil {
 			log.Println("Error fetching spells:", err)
@@ -150,7 +155,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			character.Spells = spells
 		}
 
-		// Save character
 		if err := storage.SaveCharacter(character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -164,9 +168,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ------------------------
-// Main
-// ------------------------
 func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../static"))))
 	http.HandleFunc("/", listHandler)
