@@ -12,7 +12,7 @@ func ListCharacters() error {
 	}
 
 	if len(allCharacters) == 0 {
-		fmt.Println("📜 No characters found.")
+		fmt.Println(" No characters found.")
 		return nil
 	}
 
