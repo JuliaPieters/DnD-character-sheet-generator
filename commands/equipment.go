@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/application"
+	"dnd-character-sheet/domain"
 	"dnd-character-sheet/storage"
 	"encoding/csv"
 	"fmt"
@@ -9,14 +10,11 @@ import (
 	"strings"
 )
 
-// ------------------------
-// Maps
-// ------------------------
-var Armors = map[string]models.Armor{}
-var Shields = map[string]models.Shield{}
-var Weapons = map[string]models.Weapon{}
+var Armors = map[string]domain.Armor{}
+var Shields = map[string]domain.Shield{}
+var Weapons = map[string]domain.Weapon{}
 
-var DefaultArmorStats = map[string]models.Armor{
+var DefaultArmorStats = map[string]domain.Armor{
 	// Light
 	"padded":          {ArmorClass: 11, DexBonus: true, MaxDexBonus: 0},
 	"leather":         {ArmorClass: 11, DexBonus: true, MaxDexBonus: 0},
@@ -39,9 +37,6 @@ var DefaultArmorStats = map[string]models.Armor{
 	"shield": {ArmorClass: 2, DexBonus: false},
 }
 
-// ------------------------
-// Helpers
-// ------------------------
 func normalizeName(name string) string {
 	name = strings.ToLower(strings.TrimSpace(name))
 	name = strings.TrimSuffix(name, " armor")
@@ -50,7 +45,7 @@ func normalizeName(name string) string {
 }
 
 // ------------------------
-// CSV Loader
+// CSV Loading
 // ------------------------
 func LoadEquipmentCSV(filePath string) error {
 	file, err := os.Open(filePath)
@@ -78,7 +73,7 @@ func LoadEquipmentCSV(filePath string) error {
 		case "armor":
 			if key == "shield" {
 				stats := DefaultArmorStats["shield"]
-				shield := models.Shield{
+				shield := domain.Shield{
 					Name:       strings.ToLower(originalName),
 					ArmorClass: stats.ArmorClass,
 				}
@@ -87,10 +82,10 @@ func LoadEquipmentCSV(filePath string) error {
 			} else {
 				stats, ok := DefaultArmorStats[key]
 				if !ok {
-					stats = models.Armor{ArmorClass: 10, DexBonus: true}
+					stats = domain.Armor{ArmorClass: 10, DexBonus: true}
 				}
-				armor := models.Armor{
-					Name:        key, 
+				armor := domain.Armor{
+					Name:        key,
 					ArmorClass:  stats.ArmorClass,
 					DexBonus:    stats.DexBonus,
 					MaxDexBonus: stats.MaxDexBonus,
@@ -99,7 +94,7 @@ func LoadEquipmentCSV(filePath string) error {
 				Armors[strings.ToLower(originalName)] = armor
 			}
 		case "weapon":
-			weapon := models.Weapon{Name: strings.ToLower(originalName)}
+			weapon := domain.Weapon{Name: strings.ToLower(originalName)}
 			Weapons[key] = weapon
 			Weapons[strings.ToLower(originalName)] = weapon
 		}
@@ -109,13 +104,13 @@ func LoadEquipmentCSV(filePath string) error {
 }
 
 // ------------------------
-// Weapon functions
+// Weapons
 // ------------------------
-func AddWeapon(characterName string, newWeapon models.Weapon) (string, error) {
+func AddWeapon(characterName string, newWeapon domain.Weapon) (string, error) {
 	return AddWeaponToSlot(characterName, newWeapon, "")
 }
 
-func AddWeaponToSlot(characterName string, newWeapon models.Weapon, slot string) (string, error) {
+func AddWeaponToSlot(characterName string, newWeapon domain.Weapon, slot string) (string, error) {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
 		return "", fmt.Errorf("could not load characters: %w", err)
@@ -125,38 +120,42 @@ func AddWeaponToSlot(characterName string, newWeapon models.Weapon, slot string)
 	if !exists {
 		return "", fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
-	newWeapon.Name = strings.ToLower(strings.TrimSpace(newWeapon.Name)) // lowercase
+	newWeapon.Name = strings.ToLower(strings.TrimSpace(newWeapon.Name))
 	var hand string
 
 	switch slot {
 	case "":
-		if character.Equipment.MainHand == nil {
-			character.Equipment.MainHand = &newWeapon
+		if characterPtr.Equipment.MainHand == nil {
+			characterPtr.Equipment.MainHand = &newWeapon
 			hand = "main hand"
-		} else if character.Equipment.OffHand == nil {
-			character.Equipment.OffHand = &newWeapon
+		} else if characterPtr.Equipment.OffHand == nil {
+			characterPtr.Equipment.OffHand = &newWeapon
 			hand = "off hand"
 		} else {
 			return "", fmt.Errorf("both hands already occupied")
 		}
 	case "main hand":
-		if character.Equipment.MainHand != nil {
+		if characterPtr.Equipment.MainHand != nil {
 			return "", fmt.Errorf("main hand already occupied")
 		}
-		character.Equipment.MainHand = &newWeapon
+		characterPtr.Equipment.MainHand = &newWeapon
 		hand = "main hand"
 	case "off hand":
-		if character.Equipment.OffHand != nil {
+		if characterPtr.Equipment.OffHand != nil {
 			return "", fmt.Errorf("off hand already occupied")
 		}
-		character.Equipment.OffHand = &newWeapon
+		characterPtr.Equipment.OffHand = &newWeapon
 		hand = "off hand"
 	default:
 		return "", fmt.Errorf("invalid slot: must be 'main hand' or 'off hand'")
 	}
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return "", fmt.Errorf("could not save character: %w", err)
 	}
 
@@ -173,15 +172,16 @@ func RemoveWeapon(characterName, weaponName string) error {
 	if !exists {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
 	weaponName = normalizeName(weaponName)
 	removed := false
-	if character.Equipment.MainHand != nil && normalizeName(character.Equipment.MainHand.Name) == weaponName {
-		character.Equipment.MainHand = nil
+	if characterPtr.Equipment.MainHand != nil && normalizeName(characterPtr.Equipment.MainHand.Name) == weaponName {
+		characterPtr.Equipment.MainHand = nil
 		removed = true
 	}
-	if character.Equipment.OffHand != nil && normalizeName(character.Equipment.OffHand.Name) == weaponName {
-		character.Equipment.OffHand = nil
+	if characterPtr.Equipment.OffHand != nil && normalizeName(characterPtr.Equipment.OffHand.Name) == weaponName {
+		characterPtr.Equipment.OffHand = nil
 		removed = true
 	}
 
@@ -189,7 +189,10 @@ func RemoveWeapon(characterName, weaponName string) error {
 		return fmt.Errorf("weapon '%s' not found on character '%s'", weaponName, characterName)
 	}
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
 	}
 
@@ -197,7 +200,7 @@ func RemoveWeapon(characterName, weaponName string) error {
 }
 
 // ------------------------
-// Armor & Shield functions
+// Armor
 // ------------------------
 func AddArmor(characterName, armorName string) error {
 	characters, err := storage.LoadCharacters()
@@ -209,6 +212,7 @@ func AddArmor(characterName, armorName string) error {
 	if !exists {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
 	key := strings.ToLower(strings.TrimSpace(armorName))
 	armor, ok := Armors[key]
@@ -216,21 +220,24 @@ func AddArmor(characterName, armorName string) error {
 		return fmt.Errorf("armor '%s' not found", armorName)
 	}
 
-	displayName := key
-	if key == "padded" || key == "leather" || key == "studded leather" || key == "plate" {
-		displayName += " armor"
+	displayArmor := armor
+	switch key {
+	case "padded", "leather", "studded leather", "plate":
+		displayArmor.Name = key + " armor"
+	default:
+		displayArmor.Name = key
 	}
 
-	displayArmor := armor
-	displayArmor.Name = displayName
-	character.Equipment.Armor = &displayArmor
-	character.CalculateCombatStats()
+	characterPtr.Equipment.Armor = &displayArmor
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
 	}
 
-	fmt.Printf("Equipped armor %s\n", displayName)
+	fmt.Printf("Equipped armor %s\n", displayArmor.Name)
 	return nil
 }
 
@@ -244,17 +251,23 @@ func RemoveArmor(characterName string) error {
 	if !exists {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
-	character.Equipment.Armor = nil
-	character.CalculateCombatStats()
+	characterPtr.Equipment.Armor = nil
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
 	}
 
 	return nil
 }
 
+// ------------------------
+// Shield
+// ------------------------
 func AddShield(characterName, shieldName string) error {
 	characters, err := storage.LoadCharacters()
 	if err != nil {
@@ -265,6 +278,7 @@ func AddShield(characterName, shieldName string) error {
 	if !exists {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
 	key := normalizeName(shieldName)
 	shield, ok := Shields[key]
@@ -277,10 +291,12 @@ func AddShield(characterName, shieldName string) error {
 
 	displayShield := shield
 	displayShield.Name = key
-	character.Equipment.Shield = &displayShield
-	character.CalculateCombatStats()
+	characterPtr.Equipment.Shield = &displayShield
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
 	}
 
@@ -297,11 +313,14 @@ func RemoveShield(characterName string) error {
 	if !exists {
 		return fmt.Errorf("character '%s' not found", characterName)
 	}
+	characterPtr := &character
 
-	character.Equipment.Shield = nil
-	character.CalculateCombatStats()
+	characterPtr.Equipment.Shield = nil
 
-	if err := storage.SaveCharacter(character); err != nil {
+	cs := application.CharacterService{}
+	cs.CalculateCombatStats(characterPtr)
+
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return fmt.Errorf("could not save character: %w", err)
 	}
 

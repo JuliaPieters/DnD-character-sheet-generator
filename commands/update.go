@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"dnd-character-sheet/application"
 	"dnd-character-sheet/storage"
 	"fmt"
 )
@@ -16,9 +17,14 @@ func UpdateCharacterLevel(characterName string, newLevel int) error {
 		return fmt.Errorf("character '%s' does not exist", characterName)
 	}
 
-	character.UpdateLevel(newLevel)
+	characterPtr := &character
 
-	if err := storage.SaveCharacter(character); err != nil {
+	charService := application.CharacterService{}
+	charService.LevelUp(characterPtr, newLevel, nil)
+
+	characters[characterName] = *characterPtr
+
+	if err := storage.SaveAllCharacters(characters); err != nil {
 		return fmt.Errorf("cannot save character: %w", err)
 	}
 

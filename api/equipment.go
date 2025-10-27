@@ -1,15 +1,13 @@
 package api
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/domain"
 	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
 	"time"
 )
-
-// ---------- Structs ----------
 
 type EquipmentRange struct {
 	Normal int `json:"normal,omitempty"`
@@ -30,8 +28,6 @@ type APIEquipment struct {
 	Range     json.RawMessage `json:"range,omitempty"`
 }
 
-// ---------- Helpers ----------
-
 func parseRange(raw json.RawMessage) string {
 	var s string
 	if err := json.Unmarshal(raw, &s); err == nil {
@@ -47,18 +43,16 @@ func parseRange(raw json.RawMessage) string {
 	return ""
 }
 
-// ---------- Logic ----------
-
-func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shield, error) {
+func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shield, error) {
 	var list APIListResponse
 	if err := getJSON("https://www.dnd5eapi.co/api/equipment", &list); err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	var mainHand *models.Weapon
-	var offHand *models.Weapon
-	var armor *models.Armor
-	var shield *models.Shield
+	var mainHand *domain.Weapon
+	var offHand *domain.Weapon
+	var armor *domain.Armor
+	var shield *domain.Shield
 
 	ticker := time.NewTicker(200 * time.Millisecond)
 	defer ticker.Stop()
@@ -74,7 +68,7 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 
 		switch eq.EquipmentCategory.Name {
 		case "Weapon":
-			weapon := &models.Weapon{
+			weapon := &domain.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
 				Range:     parseRange(eq.Range),
@@ -85,14 +79,14 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 				offHand = weapon
 			}
 		case "Armor":
-			armor = &models.Armor{
+			armor = &domain.Armor{
 				Name:        eq.Name,
 				ArmorClass:  eq.ArmorClass.Base,
 				DexBonus:    eq.ArmorClass.DexBonus,
 				MaxDexBonus: eq.ArmorClass.MaxDex,
 			}
 		case "Shield":
-			shield = &models.Shield{
+			shield = &domain.Shield{
 				Name:       eq.Name,
 				ArmorClass: eq.ArmorClass.Base,
 			}

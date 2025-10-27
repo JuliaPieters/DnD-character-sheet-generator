@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/domain"
 	"encoding/json"
 	"errors"
 	"os"
@@ -9,20 +9,14 @@ import (
 
 var CharactersFilePath = "characters.json"
 
-func SaveCharacter(character models.Character) error {
+func SaveCharacter(character *domain.Character) error {
 	allCharacters, _ := LoadCharacters()
-	allCharacters[character.Name] = character
-
-	data, err := json.MarshalIndent(allCharacters, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	return os.WriteFile(CharactersFilePath, data, 0644)
+	allCharacters[character.Name] = *character
+	return SaveAllCharacters(allCharacters)
 }
 
-func LoadCharacters() (map[string]models.Character, error) {
-	characters := make(map[string]models.Character)
+func LoadCharacters() (map[string]domain.Character, error) {
+	characters := make(map[string]domain.Character)
 
 	if _, err := os.Stat(CharactersFilePath); errors.Is(err, os.ErrNotExist) {
 		return characters, nil
@@ -40,13 +34,12 @@ func LoadCharacters() (map[string]models.Character, error) {
 	return characters, nil
 }
 
-func SaveAllCharacters(allCharacters map[string]models.Character) error {
-	fileData, err := json.MarshalIndent(allCharacters, "", "  ")
+func SaveAllCharacters(allCharacters map[string]domain.Character) error {
+	data, err := json.MarshalIndent(allCharacters, "", "  ")
 	if err != nil {
 		return err
 	}
-
-	return os.WriteFile(CharactersFilePath, fileData, 0644)
+	return os.WriteFile(CharactersFilePath, data, 0644)
 }
 
 func GetNextCharacterID() (int, error) {
@@ -56,9 +49,9 @@ func GetNextCharacterID() (int, error) {
 	}
 
 	highestID := 0
-	for _, character := range allCharacters {
-		if character.ID > highestID {
-			highestID = character.ID
+	for _, c := range allCharacters {
+		if c.ID > highestID {
+			highestID = c.ID
 		}
 	}
 
@@ -79,16 +72,16 @@ func DeleteCharacter(characterName string) error {
 	return SaveAllCharacters(allCharacters)
 }
 
-func GetCharacterByName(characterName string) (models.Character, error) {
+func GetCharacterByName(characterName string) (*domain.Character, error) {
 	allCharacters, err := LoadCharacters()
 	if err != nil {
-		return models.Character{}, err
+		return nil, err
 	}
 
-	character, exists := allCharacters[characterName]
+	c, exists := allCharacters[characterName]
 	if !exists {
-		return models.Character{}, errors.New("character not found")
+		return nil, errors.New("character not found")
 	}
 
-	return character, nil
+	return &c, nil
 }

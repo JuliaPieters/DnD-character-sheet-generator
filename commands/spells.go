@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/domain"
 	"dnd-character-sheet/storage"
 	"encoding/csv"
 	"fmt"
@@ -27,8 +27,7 @@ var PreparedCasters = map[string]bool{
 	"wizard":  true,
 }
 
-var SpellList []models.Spell
-
+var SpellList []domain.Spell
 var SpellClasses = map[string][]string{}
 
 func LoadSpellsFromCSV(filePath string) error {
@@ -45,7 +44,7 @@ func LoadSpellsFromCSV(filePath string) error {
 		return fmt.Errorf("failed to read spells file: %v", err)
 	}
 
-	SpellList = []models.Spell{}
+	SpellList = []domain.Spell{}
 	SpellClasses = map[string][]string{}
 	for i, row := range rows {
 		if i == 0 {
@@ -54,11 +53,11 @@ func LoadSpellsFromCSV(filePath string) error {
 		name := strings.ToLower(strings.TrimSpace(row[0]))
 		level, _ := strconv.Atoi(row[1])
 		classes := strings.Split(strings.ToLower(row[2]), ",")
-		for i := range classes {
-			classes[i] = strings.TrimSpace(classes[i])
+		for j := range classes {
+			classes[j] = strings.TrimSpace(classes[j])
 		}
 
-		SpellList = append(SpellList, models.Spell{
+		SpellList = append(SpellList, domain.Spell{
 			Name:  name,
 			Level: level,
 		})
@@ -67,19 +66,19 @@ func LoadSpellsFromCSV(filePath string) error {
 	return nil
 }
 
-func FindSpellByName(name string) *models.Spell {
+func FindSpellByName(name string) *domain.Spell {
 	name = strings.ToLower(name)
-	for _, s := range SpellList {
-		if s.Name == name {
-			return &s
+	for i := range SpellList {
+		if SpellList[i].Name == name {
+			return &SpellList[i]
 		}
 	}
 	return nil
 }
 
-func FindSpellsForClass(class string) []models.Spell {
+func FindSpellsForClass(class string) []domain.Spell {
 	class = strings.ToLower(class)
-	var spells []models.Spell
+	var spells []domain.Spell
 	for _, s := range SpellList {
 		for _, c := range SpellClasses[s.Name] {
 			if c == class {
@@ -91,12 +90,12 @@ func FindSpellsForClass(class string) []models.Spell {
 	return spells
 }
 
-func GiveStartingSpells(character *models.Character) error {
+func GiveStartingSpells(character *domain.Character) error {
 	if character.CanPrepareSpells {
 		spells := FindSpellsForClass(character.Class)
 		for _, s := range spells {
 			if s.Level == 0 {
-				character.Spells = append(character.Spells, models.Spell{
+				character.Spells = append(character.Spells, domain.Spell{
 					Name:     s.Name,
 					Level:    s.Level,
 					Prepared: false,
@@ -105,7 +104,7 @@ func GiveStartingSpells(character *models.Character) error {
 		}
 	}
 	SetupSpellcasting(character)
-	return storage.SaveCharacter(*character)
+	return storage.SaveCharacter(character)
 }
 
 func LearnSpell(characterName, spellName string) error {
@@ -117,10 +116,12 @@ func LearnSpell(characterName, spellName string) error {
 	if !exists {
 		return fmt.Errorf("character \"%s\" not found", characterName)
 	}
-	if !SpellcastingClasses[character.Class] {
+	characterPtr := &character
+
+	if !SpellcastingClasses[characterPtr.Class] {
 		return fmt.Errorf("this class can't cast spells")
 	}
-	if character.CanPrepareSpells {
+	if characterPtr.CanPrepareSpells {
 		return fmt.Errorf("this class prepares spells and can't learn them")
 	}
 
@@ -131,27 +132,27 @@ func LearnSpell(characterName, spellName string) error {
 
 	valid := false
 	for _, c := range SpellClasses[spell.Name] {
-		if c == strings.ToLower(character.Class) {
+		if c == strings.ToLower(characterPtr.Class) {
 			valid = true
 			break
 		}
 	}
 	if !valid {
-		return fmt.Errorf("%s cannot learn %s", character.Class, spellName)
+		return fmt.Errorf("%s cannot learn %s", characterPtr.Class, spellName)
 	}
 
-	for _, s := range character.Spells {
+	for _, s := range characterPtr.Spells {
 		if s.Name == spell.Name {
 			return fmt.Errorf("character '%s' already knows spell '%s'", characterName, spell.Name)
 		}
 	}
 
-	character.Spells = append(character.Spells, models.Spell{
+	characterPtr.Spells = append(characterPtr.Spells, domain.Spell{
 		Name:     spell.Name,
 		Level:    spell.Level,
 		Prepared: false,
 	})
-	if err := storage.SaveCharacter(character); err != nil {
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return err
 	}
 	fmt.Printf("Learned spell %s\n", spell.Name)
@@ -167,23 +168,25 @@ func PrepareSpell(characterName, spellName string, spellLevel int) error {
 	if !exists {
 		return fmt.Errorf(`character "%s" not found`, characterName)
 	}
-	if !SpellcastingClasses[character.Class] {
+	characterPtr := &character
+
+	if !SpellcastingClasses[characterPtr.Class] {
 		return fmt.Errorf("this class can't cast spells")
 	}
-	if !character.CanPrepareSpells {
+	if !characterPtr.CanPrepareSpells {
 		return fmt.Errorf("this class learns spells and can't prepare them")
 	}
 
 	spellIndex := -1
-	for i, s := range character.Spells {
+	for i, s := range characterPtr.Spells {
 		if s.Name == spellName {
 			spellIndex = i
 			break
 		}
 	}
 
-	if spellIndex == -1 && character.CanPrepareSpells {
-		classSpells := FindSpellsForClass(character.Class)
+	if spellIndex == -1 && characterPtr.CanPrepareSpells {
+		classSpells := FindSpellsForClass(characterPtr.Class)
 		for _, s := range classSpells {
 			if s.Name == spellName {
 				spellIndex = -2
@@ -191,7 +194,7 @@ func PrepareSpell(characterName, spellName string, spellLevel int) error {
 			}
 		}
 		if spellIndex == -1 {
-			return fmt.Errorf("spell '%s' not available for class '%s'", spellName, character.Class)
+			return fmt.Errorf("spell '%s' not available for class '%s'", spellName, characterPtr.Class)
 		}
 	}
 
@@ -203,29 +206,29 @@ func PrepareSpell(characterName, spellName string, spellLevel int) error {
 	if spellLevel < spell.Level {
 		return fmt.Errorf("the spell has higher level than the available spell slots")
 	}
-	if slots, ok := character.SpellSlots[spellLevel]; !ok || slots == 0 {
+	if slots, ok := characterPtr.SpellSlots[spellLevel]; !ok || slots == 0 {
 		return fmt.Errorf("no available spell slots of level %d", spellLevel)
 	}
 
 	if spellIndex == -2 {
-		character.Spells = append(character.Spells, models.Spell{
+		characterPtr.Spells = append(characterPtr.Spells, domain.Spell{
 			Name:     spell.Name,
 			Level:    spellLevel,
 			Prepared: true,
 		})
 	} else {
-		character.Spells[spellIndex].Prepared = true
-		character.Spells[spellIndex].Level = spellLevel
+		characterPtr.Spells[spellIndex].Prepared = true
+		characterPtr.Spells[spellIndex].Level = spellLevel
 	}
 
-	if err := storage.SaveCharacter(character); err != nil {
+	if err := storage.SaveCharacter(characterPtr); err != nil {
 		return err
 	}
 	fmt.Printf("Prepared spell %s\n", spellName)
 	return nil
 }
 
-func SetupSpellcasting(c *models.Character) {
+func SetupSpellcasting(c *domain.Character) {
 	class := strings.ToLower(c.Class)
 	if !SpellcastingClasses[class] {
 		c.SpellSlots = nil

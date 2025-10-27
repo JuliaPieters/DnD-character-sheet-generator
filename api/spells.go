@@ -1,15 +1,13 @@
 package api
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/domain"
 	"fmt"
 	"log"
 	"math/rand"
 	"strings"
 	"time"
 )
-
-// ---------- Structs ----------
 
 type APISpell struct {
 	Name   string `json:"name"`
@@ -23,16 +21,14 @@ type APISpell struct {
 	} `json:"classes"`
 }
 
-// ---------- Logic ----------
-
-func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, error) {
+func GetSpellsForClass(className string, slots map[int]int) ([]domain.Spell, error) {
 	var list APIListResponse
 	if err := getJSON("https://www.dnd5eapi.co/api/spells", &list); err != nil {
 		return nil, err
 	}
 
 	type SpellResult struct {
-		Spell models.Spell
+		Spell domain.Spell
 		Err   error
 	}
 
@@ -66,7 +62,7 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 			}
 
 			results <- SpellResult{
-				Spell: models.Spell{
+				Spell: domain.Spell{
 					Name:   spell.Name,
 					Level:  spell.Level,
 					School: spell.School.Name,
@@ -76,7 +72,7 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 		}(res)
 	}
 
-	selected := []models.Spell{}
+	selected := []domain.Spell{}
 	for i := 0; i < len(list.Results); i++ {
 		result := <-results
 		if result.Err != nil {
@@ -92,9 +88,9 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	final := []models.Spell{}
+	final := []domain.Spell{}
 	for lvl, count := range slots {
-		lvlSpells := []models.Spell{}
+		lvlSpells := []domain.Spell{}
 		for _, s := range selected {
 			if s.Level == lvl {
 				lvlSpells = append(lvlSpells, s)

@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"dnd-character-sheet/api"
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/application"
+	"dnd-character-sheet/commands"
+	"dnd-character-sheet/domain"
 	"dnd-character-sheet/storage"
 )
 
@@ -22,21 +23,23 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Loaded characters:")
-	for characterName, characterData := range characters {
-		log.Printf("%s -> %+v\n", characterName, characterData)
+	for name, c := range characters {
+		log.Printf("%s -> %+v\n", name, c)
 	}
 
-	err = templates.ExecuteTemplate(w, "characterList.html", characters)
-	if err != nil {
+	if err := templates.ExecuteTemplate(w, "characterList.html", characters); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func characterHandler(w http.ResponseWriter, r *http.Request) {
+	characterService := application.CharacterService{}
+	spellService := application.SpellService{}
+
 	switch r.Method {
 	case http.MethodGet:
 		characterID := r.URL.Query().Get("id")
-		var character models.Character
+		var character *domain.Character
 		if characterID != "" {
 			foundCharacter, err := storage.GetCharacterByName(characterID)
 			if err == nil {
@@ -44,8 +47,7 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		err := templates.ExecuteTemplate(w, "charactersheet.html", character)
-		if err != nil {
+		if err := templates.ExecuteTemplate(w, "charactersheet.html", character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -69,16 +71,7 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		charisma, _ := strconv.Atoi(r.FormValue("Charismascore"))
 		speed, _ := strconv.Atoi(r.FormValue("Speed"))
 
-		raceKey := strings.ToLower(race)
-		modifiers := models.RaceModifiers[raceKey]
-		abilities := models.AbilityScores{
-			Strength:     strength + modifiers["Strength"],
-			Dexterity:    dexterity + modifiers["Dexterity"],
-			Constitution: constitution + modifiers["Constitution"],
-			Intelligence: intelligence + modifiers["Intelligence"],
-			Wisdom:       wisdom + modifiers["Wisdom"],
-			Charisma:     charisma + modifiers["Charisma"],
-		}
+		abilityScores := []int{strength, dexterity, constitution, intelligence, wisdom, charisma}
 
 		var skillProficiencies []string
 		for _, skill := range []string{
@@ -94,58 +87,69 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if len(skillProficiencies) == 0 {
-			skillProficiencies = append([]string{}, models.ClassSkills[strings.ToLower(class)]...)
+			skillProficiencies = characterService.GetAvailableSkills(class)
 		}
 
-		character, err := storage.GetCharacterByName(charName)
-		if err != nil {
-			character = models.Character{
-				Name:               charName,
-				PlayerName:         playerName,
-				Race:               race,
-				Class:              class,
-				Level:              level,
-				Background:         background,
-				ExperiencePoints:   expPoints,
-				ProficiencyBonus:   models.CalculateProfBonus(level),
-				Abilities:          abilities,
-				SkillProficiencies: skillProficiencies,
-				Speed:              speed,
-			}
+		existingChar, err := storage.GetCharacterByName(charName)
+		var character *domain.Character
+		if err != nil || existingChar == nil {
+			allChars, _ := storage.LoadCharacters()
+			newID := len(allChars) + 1
+
+			character = characterService.NewCharacter(
+				newID,
+				charName,
+				race,
+				class,
+				background,
+				level,
+				abilityScores,
+				skillProficiencies,
+				&spellService, 
+			)
+			character.PlayerName = playerName
+			character.Speed = speed
+			character.ExperiencePoints = expPoints
 		} else {
+			character = existingChar
 			character.PlayerName = playerName
 			character.Race = race
 			character.Class = class
 			character.Level = level
 			character.Background = background
 			character.ExperiencePoints = expPoints
-			character.ProficiencyBonus = models.CalculateProfBonus(level)
-			character.Abilities = abilities
+			character.Abilities = domain.AbilityScores{
+				Strength:     strength,
+				Dexterity:    dexterity,
+				Constitution: constitution,
+				Intelligence: intelligence,
+				Wisdom:       wisdom,
+				Charisma:     charisma,
+			}
 			character.SkillProficiencies = skillProficiencies
 			character.Speed = speed
+
+			characterService.UpdateModifiers(character)
+			characterService.CalculateAllSkills(character)
+			characterService.CalculateCombatStats(character)
 		}
 
-		character.StrengthMod = character.Abilities.Modifier("Strength")
-		character.DexterityMod = character.Abilities.Modifier("Dexterity")
-		character.ConstitutionMod = character.Abilities.Modifier("Constitution")
-		character.IntelligenceMod = character.Abilities.Modifier("Intelligence")
-		character.WisdomMod = character.Abilities.Modifier("Wisdom")
-		character.CharismaMod = character.Abilities.Modifier("Charisma")
-
-		character.CalculateAllSkills()
-		character.CalculateCombatStats()
-		character.SetupSpellcasting()
+		spellService.SetupSpellcasting(character)
+		if err := commands.GiveStartingSpells(character); err != nil {
+			log.Println("Failed to give starting spells:", err)
+		}
 
 		mainHand, offHand, armor, shield, err := api.GetEquipment()
 		if err != nil {
 			log.Println("Error fetching equipment:", err)
 		} else {
-			character.Equipment = models.Equipment{
+			character.Equipment = domain.Equipment{
 				MainHand: mainHand,
 				OffHand:  offHand,
 				Armor:    armor,
 				Shield:   shield,
 			}
+			characterService.CalculateCombatStats(character)
 		}
 
 		spells, err := api.GetSpellsForClass(class, character.SpellSlots)

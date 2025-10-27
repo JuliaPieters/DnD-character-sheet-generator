@@ -2,7 +2,7 @@ package main
 
 import (
 	"dnd-character-sheet/commands"
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/domain"
 	"flag"
 	"fmt"
 	"os"
@@ -21,7 +21,7 @@ func printUsage() {
 		 %s learn-spell -name CHARACTER_NAME -spell SPELL_NAME
 		 %s prepare-spell -name CHARACTER_NAME -spell SPELL_NAME
 		 %s enrich -name CHARACTER_NAME
-`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0],  os.Args[0])
+`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0])
 }
 
 func main() {
@@ -76,7 +76,7 @@ func main() {
 			}
 		} else {
 			classKey := strings.ToLower(*characterClass)
-			if skills, ok := models.ClassSkills[classKey]; ok {
+			if skills, ok := domain.ClassSkills[classKey]; ok {
 				skillProficiencies = append(skillProficiencies, skills...)
 			}
 		}

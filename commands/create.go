@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"dnd-character-sheet/models"
+	"dnd-character-sheet/application"
 	"dnd-character-sheet/storage"
 	"errors"
 	"fmt"
@@ -17,6 +17,7 @@ func CreateCharacter(
 	abilityScores []int,
 	skillProficiencies []string,
 ) error {
+
 	existingCharacters, err := storage.LoadCharacters()
 	if err != nil {
 		return fmt.Errorf("failed to load characters: %w", err)
@@ -30,27 +31,27 @@ func CreateCharacter(
 		abilityScores = nil
 	}
 
+	characterService := &application.CharacterService{}
+	spellService := &application.SpellService{}
 
 	if len(skillProficiencies) == 0 {
-		availableSkills := models.GetAvailableSkills(characterClass)
-		skillSet := map[string]bool{}
+		availableSkills := characterService.GetAvailableSkills(characterClass)
 		uniqueSkills := []string{}
+		skillSet := map[string]bool{}
 		for _, s := range availableSkills {
 			if !skillSet[s] {
 				skillSet[s] = true
 				uniqueSkills = append(uniqueSkills, s)
 			}
-			if len(uniqueSkills) == 4 { 
+			if len(uniqueSkills) == 4 {
 				break
 			}
 		}
 		skillProficiencies = uniqueSkills
 	}
 
-	newCharacterID := len(existingCharacters) + 1
-
-	newCharacter := models.NewCharacter(
-		newCharacterID,
+	newCharacter := characterService.NewCharacter(
+		len(existingCharacters)+1,
 		characterName,
 		characterRace,
 		characterClass,
@@ -58,15 +59,14 @@ func CreateCharacter(
 		characterLevel,
 		abilityScores,
 		skillProficiencies,
+		spellService, 
 	)
-
-	newCharacter.CanPrepareSpells = PreparedCasters[characterClass]
 
 	if err := GiveStartingSpells(newCharacter); err != nil {
 		return fmt.Errorf("failed to give starting spells: %w", err)
 	}
 
-	if err := storage.SaveCharacter(*newCharacter); err != nil {
+	if err := storage.SaveCharacter(newCharacter); err != nil {
 		return fmt.Errorf("failed to save character: %w", err)
 	}
 
