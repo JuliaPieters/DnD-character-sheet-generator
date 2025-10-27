@@ -76,39 +76,39 @@
     },
     "Spells": [
       {
-        "Name": "False Life",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Necromancy",
-        "Range": "Self"
-      },
-      {
-        "Name": "Thunderwave",
-        "Level": 1,
+        "Name": "Ray of Frost",
+        "Level": 0,
         "Prepared": false,
         "School": "Evocation",
-        "Range": "Self"
+        "Range": "60 feet"
       },
       {
-        "Name": "Mage Hand",
+        "Name": "Fire Bolt",
         "Level": 0,
         "Prepared": false,
-        "School": "Conjuration",
-        "Range": "30 feet"
+        "School": "Evocation",
+        "Range": "120 feet"
       },
       {
-        "Name": "True Strike",
+        "Name": "Shocking Grasp",
         "Level": 0,
         "Prepared": false,
-        "School": "Divination",
-        "Range": "30 feet"
+        "School": "Evocation",
+        "Range": "Touch"
       },
       {
-        "Name": "Prestidigitation",
-        "Level": 0,
+        "Name": "Longstrider",
+        "Level": 1,
         "Prepared": false,
         "School": "Transmutation",
-        "Range": "10 feet"
+        "Range": "Touch"
+      },
+      {
+        "Name": "Mage Armor",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Abjuration",
+        "Range": "Touch"
       }
     ],
     "SpellSlots": {

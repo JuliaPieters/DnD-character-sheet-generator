@@ -25,8 +25,6 @@ func ViewCharacter(name string) error {
 	charService := application.CharacterService{}
 	charService.CalculateCombatStats(charPtr)
 
-	equipService := application.EquipmentService{}
-
 	fmt.Printf("Name: %s\n", charPtr.Name)
 	fmt.Printf("Class: %s\n", strings.ToLower(charPtr.Class))
 	fmt.Printf("Race: %s\n", strings.ToLower(charPtr.Race))
@@ -45,14 +43,10 @@ func ViewCharacter(name string) error {
 	fmt.Printf("Skill proficiencies: %s\n", formatSkillProficiencies(charPtr.SkillProficiencies))
 
 	if charPtr.Equipment.MainHand != nil {
-		fmt.Printf("Main hand: %s (%s)\n",
-			charPtr.Equipment.MainHand.Name,
-			formatDamage(equipService.CalculateWeaponDamage(charPtr, charPtr.Equipment.MainHand)))
+		fmt.Printf("Main hand: %s\n", charPtr.Equipment.MainHand.Name)
 	}
 	if charPtr.Equipment.OffHand != nil {
-		fmt.Printf("Off hand: %s (%s)\n",
-			charPtr.Equipment.OffHand.Name,
-			formatDamage(equipService.CalculateWeaponDamage(charPtr, charPtr.Equipment.OffHand)))
+		fmt.Printf("Off hand: %s\n", charPtr.Equipment.OffHand.Name)
 	}
 	if charPtr.Equipment.Armor != nil {
 		fmt.Printf("Armor: %s\n", charPtr.Equipment.Armor.Name)
@@ -86,10 +80,6 @@ func ViewCharacter(name string) error {
 	fmt.Printf("Passive perception: %d\n", charPtr.PassivePerception)
 
 	return nil
-}
-
-func formatDamage(damage string) string {
-	return strings.TrimSpace(damage)
 }
 
 func formatSkillProficiencies(skills []string) string {
