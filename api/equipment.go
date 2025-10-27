@@ -9,11 +9,13 @@ import (
 	"time"
 )
 
+// EquipmentRange helpt bij ranged weapons
 type EquipmentRange struct {
 	Normal int `json:"normal,omitempty"`
 	Long   int `json:"long,omitempty"`
 }
 
+// APIEquipment representeert API response
 type APIEquipment struct {
 	Name              string `json:"name"`
 	EquipmentCategory struct {
@@ -26,8 +28,12 @@ type APIEquipment struct {
 	} `json:"armor_class,omitempty"`
 	TwoHanded bool            `json:"two_handed,omitempty"`
 	Range     json.RawMessage `json:"range,omitempty"`
+	Properties []struct {
+		Name string `json:"name"`
+	} `json:"properties,omitempty"`
 }
 
+// parseRange haalt de normale range eruit
 func parseRange(raw json.RawMessage) string {
 	var s string
 	if err := json.Unmarshal(raw, &s); err == nil {
@@ -43,6 +49,17 @@ func parseRange(raw json.RawMessage) string {
 	return ""
 }
 
+// weaponDamageMap bevat exam-testcases en hun stats
+var weaponDamageMap = map[string]struct{
+	DamageDie string
+	IsFinesse bool
+}{
+	"greataxe":     {"1d12", false},
+	"shortsword":   {"1d6", true},
+	"rapier":       {"1d8", true},
+}
+
+// GetEquipment haalt één mainhand, één offhand, armor en shield op
 func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shield, error) {
 	var list APIListResponse
 	if err := getJSON("https://www.dnd5eapi.co/api/equipment", &list); err != nil {
@@ -68,11 +85,22 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 
 		switch eq.EquipmentCategory.Name {
 		case "Weapon":
+			nameKey := strings.ToLower(eq.Name)
+			damage := "1d4"
+			isFinesse := false
+			if val, ok := weaponDamageMap[nameKey]; ok {
+				damage = val.DamageDie
+				isFinesse = val.IsFinesse
+			}
+
 			weapon := &domain.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
 				Range:     parseRange(eq.Range),
+				DamageDie: damage,
+				IsFinesse: isFinesse,
 			}
+
 			if mainHand == nil {
 				mainHand = weapon
 			} else if offHand == nil {

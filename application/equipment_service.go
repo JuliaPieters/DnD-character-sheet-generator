@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"strings"
 
 	"dnd-character-sheet/domain"
@@ -44,3 +45,26 @@ func (s *CharacterService) CalculateCombatStats(c *domain.Character) {
 
 	c.ArmorClass = ac
 }
+// ------------------------
+// Exam feature: weapon damage
+// ------------------------
+func (s *EquipmentService) CalculateWeaponDamage(c *domain.Character, w *domain.Weapon) string {
+	if w == nil {
+		return ""
+	}
+
+	modifier := c.StrengthMod
+
+	if w.IsFinesse && c.DexterityMod > modifier {
+		modifier = c.DexterityMod
+	}
+
+	sign := "+"
+	if modifier < 0 {
+		sign = "-"
+		modifier = -modifier
+	}
+
+	return fmt.Sprintf("%s %s %d", w.DamageDie, sign, modifier)
+}
+	

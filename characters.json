@@ -1,3 +1,146 @@
 {
-  
+  "Aria": {
+    "ID": 1,
+    "Name": "Aria",
+    "PlayerName": "",
+    "Race": "elf",
+    "Class": "wizard",
+    "Level": 1,
+    "Background": "acolyte",
+    "Alignment": "",
+    "ProficiencyBonus": 2,
+    "Abilities": {
+      "Strength": 8,
+      "Dexterity": 16,
+      "Constitution": 12,
+      "Intelligence": 16,
+      "Wisdom": 10,
+      "Charisma": 12
+    },
+    "SkillProficiencies": [
+      "Arcana",
+      "History",
+      "Insight",
+      "Religion"
+    ],
+    "Skills": {
+      "Acrobatics": 3,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 1,
+      "History": 5,
+      "Insight": 2,
+      "Intimidation": 1,
+      "Investigation": 3,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 1,
+      "Persuasion": 1,
+      "Religion": 5,
+      "Sleight of Hand": 3,
+      "Stealth": 3,
+      "Survival": 0
+    },
+    "StrengthMod": -1,
+    "DexterityMod": 3,
+    "ConstitutionMod": 1,
+    "IntelligenceMod": 3,
+    "WisdomMod": 0,
+    "CharismaMod": 1,
+    "Equipment": {
+      "MainHand": {
+        "Name": "Battleaxe",
+        "Category": "",
+        "Range": "5",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false
+      },
+      "OffHand": {
+        "Name": "Blowgun",
+        "Category": "",
+        "Range": "25",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false
+      },
+      "Armor": {
+        "Name": "Studded Leather Armor",
+        "ArmorClass": 12,
+        "DexBonus": true,
+        "MaxDexBonus": 0
+      },
+      "Shield": null
+    },
+    "Spells": [
+      {
+        "Name": "False Life",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Necromancy",
+        "Range": "Self"
+      },
+      {
+        "Name": "Thunderwave",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Evocation",
+        "Range": "Self"
+      },
+      {
+        "Name": "Mage Hand",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Conjuration",
+        "Range": "30 feet"
+      },
+      {
+        "Name": "True Strike",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Divination",
+        "Range": "30 feet"
+      },
+      {
+        "Name": "Prestidigitation",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Transmutation",
+        "Range": "10 feet"
+      }
+    ],
+    "SpellSlots": {
+      "0": 3,
+      "1": 2
+    },
+    "ArmorClass": 13,
+    "Initiative": 3,
+    "PassivePerception": 10,
+    "SpellcastingAbility": "Intelligence",
+    "SpellSaveDC": 13,
+    "SpellAttackBonus": 5,
+    "CanPrepareSpells": true,
+    "ExperiencePoints": 0,
+    "Speed": 30,
+    "MaxHitPoints": 10,
+    "CurrentHitPoints": 10,
+    "TemporaryHitPoints": 0,
+    "HitDiceTotal": "",
+    "HitDiceRemaining": "",
+    "DeathSaveSuccesses": 0,
+    "DeathSaveFailures": 0,
+    "CopperPieces": 0,
+    "SilverPieces": 0,
+    "ElectrumPieces": 0,
+    "GoldPieces": 0,
+    "PlatinumPieces": 0,
+    "EquipmentText": "",
+    "Personality": "",
+    "Ideals": "",
+    "Bonds": "",
+    "Flaws": "",
+    "Features": ""
+  }
 }
