@@ -7,9 +7,8 @@ import (
 	"os"
 )
 
-const charactersFilePath = "../characters.json"
+var CharactersFilePath = "characters.json"
 
-// SaveCharacter voegt een nieuw character toe of update een bestaand character
 func SaveCharacter(character models.Character) error {
 	allCharacters, _ := LoadCharacters()
 	allCharacters[character.Name] = character
@@ -19,18 +18,17 @@ func SaveCharacter(character models.Character) error {
 		return err
 	}
 
-	return os.WriteFile(charactersFilePath, data, 0644)
+	return os.WriteFile(CharactersFilePath, data, 0644)
 }
 
-// LoadCharacters leest alle characters uit het JSON bestand
 func LoadCharacters() (map[string]models.Character, error) {
 	characters := make(map[string]models.Character)
 
-	if _, err := os.Stat(charactersFilePath); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(CharactersFilePath); errors.Is(err, os.ErrNotExist) {
 		return characters, nil
 	}
 
-	fileData, err := os.ReadFile(charactersFilePath)
+	fileData, err := os.ReadFile(CharactersFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -42,17 +40,15 @@ func LoadCharacters() (map[string]models.Character, error) {
 	return characters, nil
 }
 
-// SaveAllCharacters overschrijft alle characters in het JSON bestand
 func SaveAllCharacters(allCharacters map[string]models.Character) error {
 	fileData, err := json.MarshalIndent(allCharacters, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(charactersFilePath, fileData, 0644)
+	return os.WriteFile(CharactersFilePath, fileData, 0644)
 }
 
-// GetNextCharacterID geeft het volgende beschikbare ID terug
 func GetNextCharacterID() (int, error) {
 	allCharacters, err := LoadCharacters()
 	if err != nil {
@@ -69,7 +65,6 @@ func GetNextCharacterID() (int, error) {
 	return highestID + 1, nil
 }
 
-// DeleteCharacter verwijdert een character op basis van naam
 func DeleteCharacter(characterName string) error {
 	allCharacters, err := LoadCharacters()
 	if err != nil {
@@ -84,7 +79,6 @@ func DeleteCharacter(characterName string) error {
 	return SaveAllCharacters(allCharacters)
 }
 
-// GetCharacterByName haalt een character op basis van naam
 func GetCharacterByName(characterName string) (models.Character, error) {
 	allCharacters, err := LoadCharacters()
 	if err != nil {

@@ -1,44 +1,52 @@
 {
-  "Jules": {
-    "id": 0,
-    "name": "Jules",
-    "race": "dragonborn",
+  "Aria": {
+    "id": 3,
+    "name": "Aria",
+    "race": "elf",
     "class": "wizard",
-    "level": 10,
-    "background": "Acolyte",
-    "proficiency_bonus": 4,
+    "level": 1,
+    "background": "acolyte",
+    "proficiency_bonus": 2,
     "abilities": {
-      "strength": 17,
-      "dexterity": 14,
-      "constitution": 13,
-      "intelligence": 10,
-      "wisdom": 12,
-      "charisma": 9
+      "strength": 8,
+      "dexterity": 16,
+      "constitution": 12,
+      "intelligence": 16,
+      "wisdom": 10,
+      "charisma": 12
     },
     "skill_proficiencies": [
       "Arcana",
-      "Investigation"
+      "History",
+      "Insight",
+      "Religion"
     ],
     "skills": {
-      "Acrobatics": 2,
-      "Animal Handling": 1,
-      "Arcana": 4,
-      "Athletics": 3,
-      "Deception": -1,
-      "History": 0,
-      "Insight": 1,
-      "Intimidation": -1,
-      "Investigation": 4,
-      "Medicine": 1,
-      "Nature": 0,
-      "Perception": 1,
-      "Performance": -1,
-      "Persuasion": -1,
-      "Religion": 0,
-      "Sleight of Hand": 2,
-      "Stealth": 2,
-      "Survival": 1
+      "Acrobatics": 3,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 1,
+      "History": 5,
+      "Insight": 2,
+      "Intimidation": 1,
+      "Investigation": 3,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 1,
+      "Persuasion": 1,
+      "Religion": 5,
+      "Sleight of Hand": 3,
+      "Stealth": 3,
+      "Survival": 0
     },
+    "strength_mod": -1,
+    "dexterity_mod": 3,
+    "constitution_mod": 1,
+    "intelligence_mod": 3,
+    "wisdom_mod": 0,
+    "charisma_mod": 1,
     "equipment": {
       "main_hand": {
         "name": "Battleaxe",
@@ -56,11 +64,147 @@
     },
     "spells": [
       {
-        "name": "Magic Missile",
+        "name": "Prestidigitation",
+        "level": 0,
+        "prepared": false,
+        "school": "Transmutation",
+        "range": "10 feet"
+      },
+      {
+        "name": "Chill Touch",
+        "level": 0,
+        "prepared": false,
+        "school": "Necromancy",
+        "range": "120 feet"
+      },
+      {
+        "name": "Poison Spray",
+        "level": 0,
+        "prepared": false,
+        "school": "Conjuration",
+        "range": "10 feet"
+      },
+      {
+        "name": "Thunderwave",
         "level": 1,
         "prepared": false,
         "school": "Evocation",
+        "range": "Self"
+      },
+      {
+        "name": "Jump",
+        "level": 1,
+        "prepared": false,
+        "school": "Transmutation",
+        "range": "Touch"
+      }
+    ],
+    "spell_slots": {
+      "0": 3,
+      "1": 2
+    },
+    "armor_class": 13,
+    "initiative": 3,
+    "passive_perception": 10,
+    "spellcasting_ability": "Intelligence",
+    "spell_save_dc": 13,
+    "spell_attack_bonus": 5,
+    "can_prepare_spells": true,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
+  },
+  "Jules": {
+    "id": 4,
+    "name": "Jules",
+    "race": "elf",
+    "class": "wizard",
+    "level": 1,
+    "background": "acolyte",
+    "proficiency_bonus": 2,
+    "abilities": {
+      "strength": 8,
+      "dexterity": 16,
+      "constitution": 12,
+      "intelligence": 16,
+      "wisdom": 10,
+      "charisma": 12
+    },
+    "skill_proficiencies": [
+      "Arcana",
+      "History",
+      "Insight",
+      "Religion"
+    ],
+    "skills": {
+      "Acrobatics": 3,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 1,
+      "History": 5,
+      "Insight": 2,
+      "Intimidation": 1,
+      "Investigation": 3,
+      "Medicine": 0,
+      "Nature": 3,
+      "Perception": 0,
+      "Performance": 1,
+      "Persuasion": 1,
+      "Religion": 5,
+      "Sleight of Hand": 3,
+      "Stealth": 3,
+      "Survival": 0
+    },
+    "strength_mod": -1,
+    "dexterity_mod": 3,
+    "constitution_mod": 1,
+    "intelligence_mod": 3,
+    "wisdom_mod": 0,
+    "charisma_mod": 1,
+    "equipment": {
+      "main_hand": {
+        "name": "Battleaxe",
+        "range": "5"
+      },
+      "off_hand": {
+        "name": "Blowgun",
+        "range": "25"
+      },
+      "armor": {
+        "name": "Studded Leather Armor",
+        "armor_class": 12,
+        "dex_bonus": true
+      }
+    },
+    "spells": [
+      {
+        "name": "Acid Splash",
+        "level": 0,
+        "prepared": false,
+        "school": "Conjuration",
+        "range": "60 feet"
+      },
+      {
+        "name": "Chill Touch",
+        "level": 0,
+        "prepared": false,
+        "school": "Necromancy",
         "range": "120 feet"
+      },
+      {
+        "name": "Shocking Grasp",
+        "level": 0,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "Touch"
+      },
+      {
+        "name": "Burning Hands",
+        "level": 1,
+        "prepared": false,
+        "school": "Evocation",
+        "range": "Self"
       },
       {
         "name": "Color Spray",
@@ -68,98 +212,90 @@
         "prepared": false,
         "school": "Illusion",
         "range": "Self"
-      },
-      {
-        "name": "False Life",
-        "level": 1,
-        "prepared": false,
-        "school": "Necromancy",
-        "range": "Self"
-      },
-      {
-        "name": "Floating Disk",
-        "level": 1,
-        "prepared": false,
-        "school": "Conjuration",
-        "range": "30 feet"
-      },
-      {
-        "name": "Acid Arrow",
-        "level": 2,
-        "prepared": false,
-        "school": "Evocation",
-        "range": "90 feet"
-      },
-      {
-        "name": "Darkness",
-        "level": 2,
-        "prepared": false,
-        "school": "Evocation",
-        "range": "60 feet"
-      },
-      {
-        "name": "Spider Climb",
-        "level": 2,
-        "prepared": false,
-        "school": "Transmutation",
-        "range": "Touch"
-      },
-      {
-        "name": "Animate Dead",
-        "level": 3,
-        "prepared": false,
-        "school": "Necromancy",
-        "range": "10 feet"
-      },
-      {
-        "name": "Magic Circle",
-        "level": 3,
-        "prepared": false,
-        "school": "Abjuration",
-        "range": "10 feet"
-      },
-      {
-        "name": "Sending",
-        "level": 3,
-        "prepared": false,
-        "school": "Evocation",
-        "range": "Unlimited"
-      },
-      {
-        "name": "Stoneskin",
-        "level": 4,
-        "prepared": false,
-        "school": "Abjuration",
-        "range": "Touch"
-      },
-      {
-        "name": "Phantasmal Killer",
-        "level": 4,
-        "prepared": false,
-        "school": "Illusion",
-        "range": "120 feet"
-      },
-      {
-        "name": "Banishment",
-        "level": 4,
-        "prepared": false,
-        "school": "Abjuration",
-        "range": "60 feet"
       }
     ],
     "spell_slots": {
-      "1": 4,
-      "2": 3,
-      "3": 3,
-      "4": 3
+      "0": 3,
+      "1": 2
     },
-    "armor_class": 12,
-    "initiative": 2,
-    "passive_perception": 11,
+    "armor_class": 13,
+    "initiative": 3,
+    "passive_perception": 10,
     "spellcasting_ability": "Intelligence",
-    "spell_save_dc": 12,
-    "spell_attack_bonus": 4,
-    "can_prepare_spells": true
+    "spell_save_dc": 13,
+    "spell_attack_bonus": 5,
+    "can_prepare_spells": true,
+    "speed": 30,
+    "max_hit_points": 10,
+    "current_hit_points": 10
+  },
+  "Thalion Swiftblade": {
+    "id": 0,
+    "name": "Thalion Swiftblade",
+    "race": "elf",
+    "class": "rogue",
+    "level": 3,
+    "background": "Acolyte",
+    "proficiency_bonus": 2,
+    "abilities": {
+      "strength": 10,
+      "dexterity": 18,
+      "constitution": 12,
+      "intelligence": 14,
+      "wisdom": 11,
+      "charisma": 13
+    },
+    "skill_proficiencies": [
+      "Acrobatics",
+      "Sleight of Hand",
+      "Stealth"
+    ],
+    "skills": {
+      "Acrobatics": 6,
+      "Animal Handling": 0,
+      "Arcana": 2,
+      "Athletics": 0,
+      "Deception": 1,
+      "History": 2,
+      "Insight": 0,
+      "Intimidation": 1,
+      "Investigation": 2,
+      "Medicine": 0,
+      "Nature": 2,
+      "Perception": 0,
+      "Performance": 1,
+      "Persuasion": 1,
+      "Religion": 2,
+      "Sleight of Hand": 6,
+      "Stealth": 6,
+      "Survival": 0
+    },
+    "strength_mod": 0,
+    "dexterity_mod": 4,
+    "constitution_mod": 1,
+    "intelligence_mod": 2,
+    "wisdom_mod": 0,
+    "charisma_mod": 1,
+    "equipment": {
+      "main_hand": {
+        "name": "Battleaxe",
+        "range": "5"
+      },
+      "off_hand": {
+        "name": "Blowgun",
+        "range": "25"
+      },
+      "armor": {
+        "name": "Studded Leather Armor",
+        "armor_class": 12,
+        "dex_bonus": true
+      }
+    },
+    "armor_class": 14,
+    "initiative": 4,
+    "passive_perception": 10,
+    "can_prepare_spells": false,
+    "experience_points": 900
   },
   "Thoradin": {
     "id": 0,
@@ -205,6 +341,12 @@
       "Stealth": 0,
       "Survival": 0
     },
+    "strength_mod": 0,
+    "dexterity_mod": 0,
+    "constitution_mod": 0,
+    "intelligence_mod": 2,
+    "wisdom_mod": 0,
+    "charisma_mod": 0,
     "equipment": {
       "main_hand": {
         "name": "Battleaxe",

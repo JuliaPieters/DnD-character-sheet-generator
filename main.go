@@ -11,16 +11,17 @@ import (
 
 func printUsage() {
 	fmt.Printf(`Usage:
-         %s create -name CHARACTER_NAME -race RACE -class CLASS -level N -str N -dex N -con N -int N -wis N -cha N
-         %s view -name CHARACTER_NAME
-         %s list
-         %s delete -name CHARACTER_NAME
-         %s equip -name CHARACTER_NAME -weapon WEAPON_NAME -slot SLOT
-         %s equip -name CHARACTER_NAME -armor ARMOR_NAME
-         %s equip -name CHARACTER_NAME -shield SHIELD_NAME
-         %s learn-spell -name CHARACTER_NAME -spell SPELL_NAME
-         %s prepare-spell -name CHARACTER_NAME -spell SPELL_NAME
-`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0])
+		 %s create -name CHARACTER_NAME -race RACE -class CLASS -level N -str N -dex N -con N -int N -wis N -cha N
+		 %s view -name CHARACTER_NAME
+		 %s list
+		 %s delete -name CHARACTER_NAME
+		 %s equip -name CHARACTER_NAME -weapon WEAPON_NAME -slot SLOT
+		 %s equip -name CHARACTER_NAME -armor ARMOR_NAME
+		 %s equip -name CHARACTER_NAME -shield SHIELD_NAME
+		 %s learn-spell -name CHARACTER_NAME -spell SPELL_NAME
+		 %s prepare-spell -name CHARACTER_NAME -spell SPELL_NAME
+		 %s enrich -name CHARACTER_NAME
+`, os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0], os.Args[0],  os.Args[0])
 }
 
 func main() {
@@ -139,7 +140,6 @@ func main() {
 			os.Exit(2)
 		}
 
-		// --- Equip weapon ---
 		if *weaponName != "" {
 			weapon, ok := commands.Weapons[strings.ToLower(*weaponName)]
 			if !ok {
@@ -161,7 +161,6 @@ func main() {
 			return
 		}
 
-		// --- Equip armor ---
 		if *armorName != "" {
 			armor, ok := commands.Armors[strings.ToLower(*armorName)]
 			if !ok {
@@ -175,7 +174,6 @@ func main() {
 			return
 		}
 
-		// --- Equip shield ---
 		if *shieldName != "" {
 			shield, ok := commands.Shields[strings.ToLower(*shieldName)]
 			if !ok {
@@ -223,6 +221,25 @@ func main() {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+	// ---------------- ENRICH CHARACTER ----------------
+	case "enrich":
+		enrichCmd := flag.NewFlagSet("enrich", flag.ExitOnError)
+		characterName := enrichCmd.String("name", "", "Character Name (required)")
+		_ = enrichCmd.Parse(os.Args[2:])
+
+		if *characterName == "" {
+			fmt.Println("character name is required")
+			enrichCmd.Usage()
+			os.Exit(2)
+		}
+
+		if err := commands.EnrichCharacter(*characterName); err != nil {
+			fmt.Println("failed to enrich character:", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("Enriched character %s with API data\n", *characterName)
 
 	// ---------------- DEFAULT ----------------
 	default:

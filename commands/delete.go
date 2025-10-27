@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-// DeleteCharacter verwijdert een character op basis van naam
 func DeleteCharacter(characterName string) error {
 	allCharacters, err := storage.LoadCharacters()
 	if err != nil {

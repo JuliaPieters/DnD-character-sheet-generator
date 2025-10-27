@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-// ListCharacters toont alle characters kort
 func ListCharacters() error {
 	allCharacters, err := storage.LoadCharacters()
 	if err != nil {

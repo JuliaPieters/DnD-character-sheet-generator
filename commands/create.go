@@ -7,7 +7,6 @@ import (
 	"fmt"
 )
 
-// CreateCharacter maakt een nieuw character aan en slaat deze op
 func CreateCharacter(
 	characterName string,
 	playerName string,
@@ -18,7 +17,6 @@ func CreateCharacter(
 	abilityScores []int,
 	skillProficiencies []string,
 ) error {
-	// Laad bestaande characters
 	existingCharacters, err := storage.LoadCharacters()
 	if err != nil {
 		return fmt.Errorf("failed to load characters: %w", err)
@@ -28,12 +26,11 @@ func CreateCharacter(
 		return errors.New("character met deze naam bestaat al")
 	}
 
-	// Als geen scores meegegeven, gebruik standaard array
 	if len(abilityScores) != 6 {
 		abilityScores = nil
 	}
 
-	// Skill proficiencies beperken en uniek maken
+
 	if len(skillProficiencies) == 0 {
 		availableSkills := models.GetAvailableSkills(characterClass)
 		skillSet := map[string]bool{}
@@ -43,7 +40,7 @@ func CreateCharacter(
 				skillSet[s] = true
 				uniqueSkills = append(uniqueSkills, s)
 			}
-			if len(uniqueSkills) == 4 { // maximaal 4 skills
+			if len(uniqueSkills) == 4 { 
 				break
 			}
 		}
@@ -52,7 +49,6 @@ func CreateCharacter(
 
 	newCharacterID := len(existingCharacters) + 1
 
-	// Maak nieuw character aan met de juiste abilityScores en skills
 	newCharacter := models.NewCharacter(
 		newCharacterID,
 		characterName,
@@ -64,15 +60,12 @@ func CreateCharacter(
 		skillProficiencies,
 	)
 
-	// **Zet of de class prepared spells kan gebruiken**
 	newCharacter.CanPrepareSpells = PreparedCasters[characterClass]
 
-	// **Voeg de startspells toe**
 	if err := GiveStartingSpells(newCharacter); err != nil {
 		return fmt.Errorf("failed to give starting spells: %w", err)
 	}
 
-	// Sla character op
 	if err := storage.SaveCharacter(*newCharacter); err != nil {
 		return fmt.Errorf("failed to save character: %w", err)
 	}

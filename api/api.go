@@ -53,18 +53,36 @@ type APIEquipment struct {
 }
 
 func getJSON(url string, target interface{}) error {
+	url = strings.ToLower(strings.ReplaceAll(url, " ", "-"))
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("fout %d bij ophalen van %s: %s", resp.StatusCode, url, string(body))
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
+	if !json.Valid(body) {
+		return fmt.Errorf("ongeldige JSON van %s: %s", url, string(body[:min(100, len(body))]))
+	}
+
 	return json.Unmarshal(body, target)
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, error) {
@@ -87,8 +105,9 @@ func GetSpellsForClass(className string, slots map[int]int) ([]models.Spell, err
 	for _, res := range list.Results {
 		<-ticker.C
 		go func(res APIResource) {
+			url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
 			var spell APISpell
-			err := getJSON("https://www.dnd5eapi.co"+res.URL, &spell)
+			err := getJSON(url, &spell)
 			if err != nil {
 				results <- SpellResult{Err: fmt.Errorf("error fetching %s: %w", res.Name, err)}
 				return
@@ -184,7 +203,8 @@ func GetEquipment() (*models.Weapon, *models.Weapon, *models.Armor, *models.Shie
 	for _, res := range list.Results {
 		<-ticker.C
 		var eq APIEquipment
-		if err := getJSON("https://www.dnd5eapi.co"+res.URL, &eq); err != nil {
+		url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
+		if err := getJSON(url, &eq); err != nil {
 			log.Println("Error fetching equipment:", res.Name, err)
 			continue
 		}

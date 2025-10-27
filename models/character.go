@@ -96,6 +96,13 @@ type Character struct {
 	SkillProficiencies []string       `json:"skill_proficiencies"`
 	Skills             map[string]int `json:"skills"`
 
+	StrengthMod     int `json:"strength_mod"`
+	DexterityMod    int `json:"dexterity_mod"`
+	ConstitutionMod int `json:"constitution_mod"`
+	IntelligenceMod int `json:"intelligence_mod"`
+	WisdomMod       int `json:"wisdom_mod"`
+	CharismaMod     int `json:"charisma_mod"`
+
 	Equipment Equipment `json:"equipment"`
 
 	Spells     []Spell     `json:"spells,omitempty"`
@@ -247,6 +254,13 @@ func NewCharacter(id int, name, race, class, background string, level int, abili
 		MaxHitPoints:       10,
 		CurrentHitPoints:   10,
 	}
+
+		char.StrengthMod = abilities.Modifier("Strength")
+	char.DexterityMod = abilities.Modifier("Dexterity")
+	char.ConstitutionMod = abilities.Modifier("Constitution")
+	char.IntelligenceMod = abilities.Modifier("Intelligence")
+	char.WisdomMod = abilities.Modifier("Wisdom")
+	char.CharismaMod = abilities.Modifier("Charisma")
 
 	char.CalculateAllSkills()
 	char.CalculateCombatStats()
@@ -446,10 +460,8 @@ func calculateRangerSlots(level int) map[int]int {
 func calculateWarlockSlots(level int) map[int]int {
 	slots := map[int]int{}
 
-	// Cantrips (Level 0)
 	slots[0] = 4
 
-	// Pact slots
 	var pactLevel, numSlots int
 	switch {
 	case level >= 1 && level <= 1:
