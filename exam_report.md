@@ -196,7 +196,6 @@ Edge cases zijn getest:
 - Negatieve modifiers (bijv. DEX/STR < 0) → correcte berekening (`-1`)  
 - Zero modifiers → correcte berekening (`+0`)  
 
-Alle tests zijn volledig geautomatiseerd, wat robuustheid en betrouwbaarheid aantoont.
 
 **Conclusie**  
 - De tests dekken zowel **happy path** als belangrijke randgevallen.  

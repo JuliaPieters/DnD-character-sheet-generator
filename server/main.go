@@ -31,6 +31,66 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func characterHandler(w http.ResponseWriter, r *http.Request) {
+	characterService := &application.CharacterService{}
+	spellService := &application.SpellService{}
+
+	switch r.Method {
+	case http.MethodGet:
+		characterID := r.URL.Query().Get("id")
+		var character *domain.Character
+
+		if characterID != "" {
+			character, _ = storage.GetCharacterByName(characterID)
+			if character == nil {
+				http.Error(w, "Character not found", http.StatusNotFound)
+				return
+			}
+		} else {
+			character = &domain.Character{
+				Abilities: domain.AbilityScores{},
+				Equipment: domain.Equipment{},
+				Skills:    make(map[string]int),
+				Spells:    []domain.Spell{},
+			}
+		}
+
+		if err := templates.ExecuteTemplate(w, "charactersheet.html", character); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
+		}
+
+		character, err := setupCharacterFromForm(r, spellService, characterService)
+		if err != nil {
+			http.Error(w, "Failed to setup character", http.StatusInternalServerError)
+			return
+		}
+
+		spellService.SetupSpellcasting(character)
+		if err := commands.GiveStartingSpells(character); err != nil {
+			log.Println("Failed to give starting spells:", err)
+		}
+
+		handleEquipmentAndCombat(character, characterService)
+		handleSpells(character)
+
+		if err := storage.SaveCharacter(character); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
 func parseSkillProficiencies(r *http.Request) []string {
 	var skillProficiencies []string
 	for _, skill := range []string{
@@ -135,18 +195,53 @@ func setupCharacterFromForm(r *http.Request, spellService *application.SpellServ
 }
 
 func handleEquipmentAndCombat(character *domain.Character, service *application.CharacterService) {
-	mainHand, offHand, armor, shield, err := api.GetEquipment()
+	allWeapons, armor, shield, err := api.GetAllEquipment()
 	if err != nil {
 		log.Println("Error fetching equipment:", err)
 		return
 	}
-	character.Equipment = domain.Equipment{
-		MainHand: mainHand,
-		OffHand:  offHand,
-		Armor:    armor,
-		Shield:   shield,
+
+	if character.Equipment.MainHand == nil && len(allWeapons) > 0 {
+		character.Equipment.MainHand = allWeapons[0]
+	} else if character.Equipment.MainHand != nil {
+		fillWeaponData(character.Equipment.MainHand, allWeapons)
 	}
+
+	if character.Equipment.OffHand == nil && len(allWeapons) > 1 {
+		character.Equipment.OffHand = allWeapons[1]
+	} else if character.Equipment.OffHand != nil {
+		fillWeaponData(character.Equipment.OffHand, allWeapons)
+	}
+
+	if character.Equipment.Armor == nil && armor != nil {
+		character.Equipment.Armor = armor
+	}
+
+	if character.Equipment.Shield == nil && shield != nil {
+		character.Equipment.Shield = shield
+	}
+
 	service.CalculateCombatStats(character)
+}
+
+func fillWeaponData(existing *domain.Weapon, allWeapons []*domain.Weapon) {
+	for _, w := range allWeapons {
+		if w.Name == existing.Name {
+			if existing.DamageDie == "" {
+				existing.DamageDie = w.DamageDie
+			}
+			if existing.Range == "" {
+				existing.Range = w.Range
+			}
+			if !existing.TwoHanded && w.TwoHanded {
+				existing.TwoHanded = true
+			}
+			if !existing.IsFinesse && w.IsFinesse {
+				existing.IsFinesse = true
+			}
+			break
+		}
+	}
 }
 
 func handleSpells(character *domain.Character) {
@@ -156,66 +251,6 @@ func handleSpells(character *domain.Character) {
 		return
 	}
 	character.Spells = spells
-}
-
-func characterHandler(w http.ResponseWriter, r *http.Request) {
-	characterService := &application.CharacterService{}
-	spellService := &application.SpellService{}
-
-	switch r.Method {
-	case http.MethodGet:
-		characterID := r.URL.Query().Get("id")
-		var character *domain.Character
-
-		if characterID != "" {
-			character, _ = storage.GetCharacterByName(characterID)
-			if character == nil {
-				http.Error(w, "Character not found", http.StatusNotFound)
-				return
-			}
-		} else {
-			character = &domain.Character{
-				Abilities: domain.AbilityScores{},
-				Equipment: domain.Equipment{},
-				Skills:    make(map[string]int),
-				Spells:    []domain.Spell{},
-			}
-		}
-
-		if err := templates.ExecuteTemplate(w, "charactersheet.html", character); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-	case http.MethodPost:
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Failed to parse form", http.StatusBadRequest)
-			return
-		}
-
-		character, err := setupCharacterFromForm(r, spellService, characterService)
-		if err != nil {
-			http.Error(w, "Failed to setup character", http.StatusInternalServerError)
-			return
-		}
-
-		spellService.SetupSpellcasting(character)
-		if err := commands.GiveStartingSpells(character); err != nil {
-			log.Println("Failed to give starting spells:", err)
-		}
-
-		handleEquipmentAndCombat(character, characterService)
-		handleSpells(character)
-
-		if err := storage.SaveCharacter(character); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
 }
 
 func main() {

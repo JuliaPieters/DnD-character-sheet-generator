@@ -20,13 +20,15 @@ type APIEquipment struct {
 	EquipmentCategory struct {
 		Name string `json:"name"`
 	} `json:"equipment_category"`
+	WeaponCategory string `json:"weapon_category"` 
+	WeaponRange    string `json:"weapon_range"`    
 	ArmorClass struct {
 		Base     int  `json:"base"`
 		DexBonus bool `json:"dex_bonus"`
 		MaxDex   int  `json:"max_bonus"`
 	} `json:"armor_class,omitempty"`
-	TwoHanded bool            `json:"two_handed,omitempty"`
-	Range     json.RawMessage `json:"range,omitempty"`
+	TwoHanded  bool            `json:"two_handed,omitempty"`
+	Range      json.RawMessage `json:"range,omitempty"`
 	Properties []struct {
 		Name string `json:"name"`
 	} `json:"properties,omitempty"`
@@ -52,11 +54,11 @@ func parseRange(raw json.RawMessage) string {
 
 func normalizeDamageDie(d string) string {
 	if d == "" {
-		return "1d4" 
+		return "1d4"
 	}
 
 	if strings.Contains(d, "d") {
-		return d 
+		return d
 	}
 
 	num, err := strconv.Atoi(d)
@@ -67,13 +69,13 @@ func normalizeDamageDie(d string) string {
 	return fmt.Sprintf("%dd%d", num, num)
 }
 
-func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shield, error) {
+func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) {
 	var list APIListResponse
 	if err := getJSON("https://www.dnd5eapi.co/api/equipment", &list); err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	var mainHand, offHand *domain.Weapon
+	var weapons []*domain.Weapon
 	var armor *domain.Armor
 	var shield *domain.Shield
 
@@ -93,28 +95,23 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 		switch eq.EquipmentCategory.Name {
 		case "Weapon":
 			damage := normalizeDamageDie(eq.Damage.DamageDice)
-
 			isFinesse := false
 			for _, p := range eq.Properties {
 				if strings.ToLower(p.Name) == "finesse" {
 					isFinesse = true
-					break
 				}
 			}
 
 			weapon := &domain.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
-				Range:     parseRange(eq.Range), 
+				Range:     parseRange(eq.Range),
 				DamageDie: damage,
 				IsFinesse: isFinesse,
+				Category:  strings.TrimSpace(eq.WeaponCategory + " " + eq.WeaponRange),
 			}
 
-			if mainHand == nil {
-				mainHand = weapon
-			} else if offHand == nil {
-				offHand = weapon
-			}
+			weapons = append(weapons, weapon)
 
 		case "Armor":
 			armor = &domain.Armor{
@@ -132,5 +129,5 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 		}
 	}
 
-	return mainHand, offHand, armor, shield, nil
+	return weapons, armor, shield, nil
 }

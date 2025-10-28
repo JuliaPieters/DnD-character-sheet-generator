@@ -1,72 +1,72 @@
 {
-  "Jules": {
-    "ID": 3,
-    "Name": "Jules",
+  "Kael": {
+    "ID": 1,
+    "Name": "Kael",
     "PlayerName": "",
-    "Race": "dwarf",
-    "Class": "sorcerer",
-    "Level": 8,
-    "Background": "",
+    "Race": "human",
+    "Class": "fighter",
+    "Level": 3,
+    "Background": "acolyte",
     "Alignment": "",
-    "ProficiencyBonus": 3,
+    "ProficiencyBonus": 2,
     "Abilities": {
-      "Strength": 10,
-      "Dexterity": 10,
-      "Constitution": 12,
-      "Intelligence": 17,
-      "Wisdom": 2,
-      "Charisma": 15
+      "Strength": 17,
+      "Dexterity": 15,
+      "Constitution": 15,
+      "Intelligence": 11,
+      "Wisdom": 13,
+      "Charisma": 11
     },
     "SkillProficiencies": [
-      "Arcana",
+      "Acrobatics",
+      "Animal Handling",
       "Insight",
-      "Medicine",
-      "Perception"
+      "Religion"
     ],
     "Skills": {
-      "Acrobatics": 0,
-      "Animal Handling": -4,
-      "Arcana": 6,
-      "Athletics": 0,
-      "Deception": 2,
-      "History": 3,
-      "Insight": -1,
-      "Intimidation": 2,
-      "Investigation": 3,
-      "Medicine": -1,
-      "Nature": 3,
-      "Perception": -1,
-      "Performance": 2,
-      "Persuasion": 2,
-      "Religion": 3,
-      "Sleight of Hand": 0,
-      "Stealth": 0,
-      "Survival": -4
+      "Acrobatics": 4,
+      "Animal Handling": 3,
+      "Arcana": 0,
+      "Athletics": 3,
+      "Deception": 0,
+      "History": 0,
+      "Insight": 3,
+      "Intimidation": 0,
+      "Investigation": 0,
+      "Medicine": 1,
+      "Nature": 0,
+      "Perception": 1,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 2,
+      "Sleight of Hand": 2,
+      "Stealth": 2,
+      "Survival": 1
     },
-    "StrengthMod": 0,
-    "DexterityMod": 0,
-    "ConstitutionMod": 1,
-    "IntelligenceMod": 3,
-    "WisdomMod": -4,
-    "CharismaMod": 2,
+    "StrengthMod": 3,
+    "DexterityMod": 2,
+    "ConstitutionMod": 2,
+    "IntelligenceMod": 0,
+    "WisdomMod": 1,
+    "CharismaMod": 0,
     "Equipment": {
       "MainHand": {
-        "Name": "Battleaxe",
-        "Category": "",
+        "Name": "rapier",
+        "Category": "Martial Melee",
         "Range": "5",
         "TwoHanded": false,
-        "DamageDie": "1d4",
-        "IsFinesse": false,
-        "Damage": ""
+        "DamageDie": "1d8",
+        "IsFinesse": true,
+        "Damage": "1d8 + 3"
       },
       "OffHand": {
         "Name": "Blowgun",
-        "Category": "",
+        "Category": "Martial Ranged",
         "Range": "25",
         "TwoHanded": false,
-        "DamageDie": "1d4",
+        "DamageDie": "1d1",
         "IsFinesse": false,
-        "Damage": ""
+        "Damage": "1d1 + 3"
       },
       "Armor": {
         "Name": "Studded Leather Armor",
@@ -76,133 +76,14 @@
       },
       "Shield": null
     },
-    "Spells": [
-      {
-        "Name": "Dispel Magic",
-        "Level": 3,
-        "Prepared": false,
-        "School": "Abjuration",
-        "Range": "120 feet"
-      },
-      {
-        "Name": "Daylight",
-        "Level": 3,
-        "Prepared": false,
-        "School": "Evocation",
-        "Range": "60 feet"
-      },
-      {
-        "Name": "Stinking Cloud",
-        "Level": 3,
-        "Prepared": false,
-        "School": "Conjuration",
-        "Range": "90 feet"
-      },
-      {
-        "Name": "Stoneskin",
-        "Level": 4,
-        "Prepared": false,
-        "School": "Abjuration",
-        "Range": "Touch"
-      },
-      {
-        "Name": "Confusion",
-        "Level": 4,
-        "Prepared": false,
-        "School": "Enchantment",
-        "Range": "90 feet"
-      },
-      {
-        "Name": "Acid Splash",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Conjuration",
-        "Range": "60 feet"
-      },
-      {
-        "Name": "Dancing Lights",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Evocation",
-        "Range": "120 feet"
-      },
-      {
-        "Name": "Ray of Frost",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Evocation",
-        "Range": "60 feet"
-      },
-      {
-        "Name": "Mending",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Transmutation",
-        "Range": "Touch"
-      },
-      {
-        "Name": "Detect Magic",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Divination",
-        "Range": "Self"
-      },
-      {
-        "Name": "Sleep",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Enchantment",
-        "Range": "90 feet"
-      },
-      {
-        "Name": "Expeditious Retreat",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Transmutation",
-        "Range": "Self"
-      },
-      {
-        "Name": "Color Spray",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Illusion",
-        "Range": "Self"
-      },
-      {
-        "Name": "Suggestion",
-        "Level": 2,
-        "Prepared": false,
-        "School": "Enchantment",
-        "Range": "30 feet"
-      },
-      {
-        "Name": "See Invisibility",
-        "Level": 2,
-        "Prepared": false,
-        "School": "Divination",
-        "Range": "Self"
-      },
-      {
-        "Name": "Darkvision",
-        "Level": 2,
-        "Prepared": false,
-        "School": "Transmutation",
-        "Range": "Touch"
-      }
-    ],
-    "SpellSlots": {
-      "0": 4,
-      "1": 4,
-      "2": 3,
-      "3": 3,
-      "4": 2
-    },
+    "Spells": null,
+    "SpellSlots": null,
     "ArmorClass": 12,
-    "Initiative": 0,
-    "PassivePerception": 9,
-    "SpellcastingAbility": "Charisma",
-    "SpellSaveDC": 13,
-    "SpellAttackBonus": 5,
+    "Initiative": 2,
+    "PassivePerception": 11,
+    "SpellcastingAbility": "",
+    "SpellSaveDC": 0,
+    "SpellAttackBonus": 0,
     "CanPrepareSpells": false,
     "ExperiencePoints": 0,
     "Speed": 30,
@@ -224,74 +105,75 @@
     "Bonds": "",
     "Flaws": "",
     "Features": ""
-  },"Aria": {
-    "ID": 1,
-    "Name": "Aria",
+  },
+  "Lyra": {
+    "ID": 2,
+    "Name": "Lyra",
     "PlayerName": "",
     "Race": "elf",
-    "Class": "wizard",
-    "Level": 1,
+    "Class": "ranger",
+    "Level": 4,
     "Background": "acolyte",
     "Alignment": "",
     "ProficiencyBonus": 2,
     "Abilities": {
-      "Strength": 8,
-      "Dexterity": 16,
-      "Constitution": 12,
-      "Intelligence": 16,
-      "Wisdom": 10,
-      "Charisma": 12
+      "Strength": 11,
+      "Dexterity": 19,
+      "Constitution": 13,
+      "Intelligence": 12,
+      "Wisdom": 14,
+      "Charisma": 10
     },
     "SkillProficiencies": [
-      "Arcana",
-      "History",
+      "Animal Handling",
+      "Athletics",
       "Insight",
-      "Religion"
+      "Investigation"
     ],
     "Skills": {
-      "Acrobatics": 3,
-      "Animal Handling": 0,
-      "Arcana": 5,
-      "Athletics": -1,
-      "Deception": 1,
-      "History": 5,
-      "Insight": 2,
-      "Intimidation": 1,
+      "Acrobatics": 4,
+      "Animal Handling": 4,
+      "Arcana": 1,
+      "Athletics": 2,
+      "Deception": 0,
+      "History": 1,
+      "Insight": 4,
+      "Intimidation": 0,
       "Investigation": 3,
-      "Medicine": 0,
-      "Nature": 3,
-      "Perception": 0,
-      "Performance": 1,
-      "Persuasion": 1,
-      "Religion": 5,
-      "Sleight of Hand": 3,
-      "Stealth": 3,
-      "Survival": 0
+      "Medicine": 2,
+      "Nature": 1,
+      "Perception": 2,
+      "Performance": 0,
+      "Persuasion": 0,
+      "Religion": 1,
+      "Sleight of Hand": 4,
+      "Stealth": 4,
+      "Survival": 2
     },
-    "StrengthMod": -1,
-    "DexterityMod": 3,
+    "StrengthMod": 0,
+    "DexterityMod": 4,
     "ConstitutionMod": 1,
-    "IntelligenceMod": 3,
-    "WisdomMod": 0,
-    "CharismaMod": 1,
+    "IntelligenceMod": 1,
+    "WisdomMod": 2,
+    "CharismaMod": 0,
     "Equipment": {
       "MainHand": {
-        "Name": "Battleaxe",
-        "Category": "",
+        "Name": "Handaxe",
+        "Category": "Simple Melee",
         "Range": "5",
         "TwoHanded": false,
-        "DamageDie": "1d4",
+        "DamageDie": "1d6",
         "IsFinesse": false,
-        "Damage": "1d4 - 1"
+        "Damage": "1d6 + 0"
       },
       "OffHand": {
-        "Name": "Blowgun",
-        "Category": "",
-        "Range": "25",
+        "Name": "Shortsword",
+        "Category": "Martial Melee",
+        "Range": "5",
         "TwoHanded": false,
-        "DamageDie": "1d4",
-        "IsFinesse": false,
-        "Damage": "1d4 - 1"
+        "DamageDie": "1d6",
+        "IsFinesse": true,
+        "Damage": "1d6 + 4"
       },
       "Armor": {
         "Name": "Studded Leather Armor",
@@ -301,54 +183,15 @@
       },
       "Shield": null
     },
-    "Spells": [
-      {
-        "Name": "Chill Touch",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Necromancy",
-        "Range": "120 feet"
-      },
-      {
-        "Name": "Dancing Lights",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Evocation",
-        "Range": "120 feet"
-      },
-      {
-        "Name": "Mending",
-        "Level": 0,
-        "Prepared": false,
-        "School": "Transmutation",
-        "Range": "Touch"
-      },
-      {
-        "Name": "False Life",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Necromancy",
-        "Range": "Self"
-      },
-      {
-        "Name": "Illusory Script",
-        "Level": 1,
-        "Prepared": false,
-        "School": "Illusion",
-        "Range": "Touch"
-      }
-    ],
-    "SpellSlots": {
-      "0": 3,
-      "1": 2
-    },
-    "ArmorClass": 13,
-    "Initiative": 3,
-    "PassivePerception": 10,
-    "SpellcastingAbility": "Intelligence",
-    "SpellSaveDC": 13,
-    "SpellAttackBonus": 5,
-    "CanPrepareSpells": true,
+    "Spells": null,
+    "SpellSlots": null,
+    "ArmorClass": 14,
+    "Initiative": 4,
+    "PassivePerception": 12,
+    "SpellcastingAbility": "Wisdom",
+    "SpellSaveDC": 12,
+    "SpellAttackBonus": 4,
+    "CanPrepareSpells": false,
     "ExperiencePoints": 0,
     "Speed": 30,
     "MaxHitPoints": 10,

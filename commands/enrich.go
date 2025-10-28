@@ -7,6 +7,9 @@ import (
 	"dnd-character-sheet/storage"
 	"fmt"
 	"log"
+	"math/rand"
+	"strings"
+	"time"
 )
 
 func EnrichCharacter(name string) error {
@@ -16,18 +19,21 @@ func EnrichCharacter(name string) error {
 	}
 
 	addSpells(char)
-	addEquipment(char)
+	mergeEquipment(char)
 
 	if err := storage.SaveCharacter(char); err != nil {
 		return fmt.Errorf("failed to save enriched character: %w", err)
 	}
 
-	fmt.Println("Character enriched successfully!")
+	fmt.Printf("Enriched character %s with API data\n", char.Name)
 	return nil
 }
 
 func addSpells(char *domain.Character) {
 	if char.Level == 0 || len(char.SpellSlots) == 0 {
+		return
+	}
+	if len(char.Spells) > 0 {
 		return
 	}
 
@@ -40,27 +46,66 @@ func addSpells(char *domain.Character) {
 	char.Spells = spells
 }
 
-func addEquipment(char *domain.Character) {
-	mainHand, offHand, armor, shield, err := api.GetEquipment()
+func mergeEquipment(char *domain.Character) {
+	equipService := application.EquipmentService{}
+
+	allWeapons, armorAPI, shieldAPI, err := api.GetAllEquipment()
 	if err != nil {
 		log.Println("failed to get equipment:", err)
 		return
 	}
 
-	equipService := application.EquipmentService{}
+	rand.Seed(time.Now().UnixNano())
 
-	if mainHand != nil {
-		char.Equipment.MainHand = mainHand
-		char.Equipment.MainHand.Damage = equipService.CalculateWeaponDamage(char, mainHand)
+	if char.Equipment.MainHand == nil && len(allWeapons) > 0 {
+		randomIndex := rand.Intn(len(allWeapons))
+		char.Equipment.MainHand = allWeapons[randomIndex]
+	} else if char.Equipment.MainHand != nil {
+		fillWeaponData(char.Equipment.MainHand, allWeapons)
 	}
-	if offHand != nil {
-		char.Equipment.OffHand = offHand
-		char.Equipment.OffHand.Damage = equipService.CalculateWeaponDamage(char, offHand)
+	if char.Equipment.MainHand != nil {
+		char.Equipment.MainHand.Damage = equipService.CalculateWeaponDamage(char, char.Equipment.MainHand)
 	}
-	if armor != nil {
-		char.Equipment.Armor = armor
+
+	if char.Equipment.OffHand == nil && len(allWeapons) > 1 {
+		randomIndex := rand.Intn(len(allWeapons))
+		char.Equipment.OffHand = allWeapons[randomIndex]
+	} else if char.Equipment.OffHand != nil {
+		fillWeaponData(char.Equipment.OffHand, allWeapons)
 	}
-	if shield != nil {
-		char.Equipment.Shield = shield
+	if char.Equipment.OffHand != nil {
+		char.Equipment.OffHand.Damage = equipService.CalculateWeaponDamage(char, char.Equipment.OffHand)
+	}
+
+	if char.Equipment.Armor == nil && armorAPI != nil {
+		char.Equipment.Armor = armorAPI
+	}
+
+	if char.Equipment.Shield == nil && shieldAPI != nil {
+		char.Equipment.Shield = shieldAPI
 	}
 }
+
+
+func fillWeaponData(existing *domain.Weapon, allWeapons []*domain.Weapon) {
+	for _, w := range allWeapons {
+		if strings.EqualFold(w.Name, existing.Name) {
+			existing.Category = w.Category
+
+			if existing.DamageDie == "" && w.DamageDie != "" {
+				existing.DamageDie = w.DamageDie
+			}
+			if existing.Range == "" && w.Range != "" {
+				existing.Range = w.Range
+			}
+			if !existing.TwoHanded && w.TwoHanded {
+				existing.TwoHanded = true
+			}
+			if !existing.IsFinesse && w.IsFinesse {
+				existing.IsFinesse = true
+			}
+			break
+		}
+	}
+}
+
