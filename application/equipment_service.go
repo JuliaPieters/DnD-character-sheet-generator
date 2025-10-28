@@ -45,9 +45,7 @@ func (s *CharacterService) CalculateCombatStats(c *domain.Character) {
 
 	c.ArmorClass = ac
 }
-// ------------------------
-// Exam feature: weapon damage
-// ------------------------
+
 func (s *EquipmentService) CalculateWeaponDamage(c *domain.Character, w *domain.Weapon) string {
 	if w == nil {
 		return ""

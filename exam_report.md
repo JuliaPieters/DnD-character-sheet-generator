@@ -117,19 +117,19 @@ project/
 └─ character.json # CLI-specifieke opslag
 
 - Wijzigingen in bijvoorbeeld `api/` of `domain/` hebben geen impact op `commands/` of `server/`.  
-- Functies zijn modulair, goed benoemd en gelogd, wat onderhoudbaarheid verhoogt.
+- De functies doen telkens één duidelijk ding, hebben duidelijke namen en laten belangrijke acties of fouten zien in de logs. Dit maakt het makkelijker om de code later te begrijpen en aan te passen.
 
 ### Functie-indeling
 
-- Elke functie heeft één duidelijke verantwoordelijkheid:  
+- Elke functie heeft één duidelijke verantwoordelijkheid voorbeelden:  
   - `CalculateArmorClass()` – berekent alleen AC  
   - `SetupSpellcasting()` – regelt spellcasting  
   - `WeaponDamage()` – berekent damage van een wapen  
-- Cyclomatic complexity is laag (<10 per functie), wat testen en debuggen vereenvoudigt.  
-- Bestanden zijn groot, maar modulair met duidelijke subfuncties en tests.  
+- Cyclomatic complexity is laag (<10 per functie), wat testen en debuggen vereenvoudigt.    
 
 ---
 ## SonarQube als bewijs
+Om te controleren hoe goed mijn code is heb ik gebruik gemaakt van SonarQube.
 SonarQube analyseert de code automatisch op maintainability issues, zoals:
 - Te lange functies of te veel logica in één plek.  
 - Onnodige duplicatie.  
@@ -138,7 +138,7 @@ SonarQube analyseert de code automatisch op maintainability issues, zoals:
 ### Screenshots
 1. **Eerste afbeelding:**  
    ![SonarQube Issues](image.png)  
-   Hier zijn nog enkele maintainability issues zichtbaar (rode/oranje markeringen).
+   Hier zijn nog enkele maintainability issues zichtbaar. Deze issues gaan vooral over enorme functies, en herhalingen van stukken code.
 
 2. **Tweede afbeelding:**  
    ![SonarQube Verbeterd](image-1.png)  
@@ -147,11 +147,12 @@ SonarQube analyseert de code automatisch op maintainability issues, zoals:
 ---
 
 ## Concreet bewijs van kwaliteit
+Voorbeelden:
 - Functies zoals `GenerateSpellSlots`, `SetupSpellcasting` en `GiveStartingSpells` zijn opgesplitst per verantwoordelijkheid.  
 - Full casters, half casters en warlocks hebben hun eigen generatorfuncties, wat duplicatie voorkomt en aanpassingen makkelijker maakt.  
 - CSV parsing, spell lookup en karakterlogica zijn duidelijk gescheiden.  
 
-## Testing – 20/20
+## Testing 
 
 Weapon damage-functionaliteit is volledig getest met **geautomatiseerde tests**, inclusief happy path en edge cases.
 
@@ -176,11 +177,11 @@ PS C:\Users\julia\DnD character sheet generator> go test ./application -v
 PASS
 ok      dnd-character-sheet/application (cached)
 
-### Argumentatie per criterium
+### Argumentatie 
 
 Tests zijn aanwezig en uitgevoerd via `go test ./application -v`.
 
-**Happy path – ✅**  
+**Happy path**  
 De functionaliteit werkt correct voor voorbeeldkarakters:  
 
 - Half-Orc Barbarian met Greataxe → `1d12 +3`  
@@ -189,7 +190,7 @@ De functionaliteit werkt correct voor voorbeeldkarakters:
 
 Dit bewijst dat de hoofdfunctionaliteit correct wordt uitgevoerd.
 
-**Edge cases / combination of manual and automated tests – ✅**  
+**Edge cases / combination of manual and automated tests**  
 Edge cases zijn getest:  
 
 - Negatieve modifiers (bijv. DEX/STR < 0) → correcte berekening (`-1`)  

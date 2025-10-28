@@ -1,8 +1,5 @@
 package domain
 
-// ------------------------
-// Constants for Skills
-// ------------------------
 const (
 	AnimalHandling = "Animal Handling"
 	Athletics      = "Athletics"

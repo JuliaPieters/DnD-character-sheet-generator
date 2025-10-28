@@ -1,223 +1,373 @@
 {
-  "Thoradin": {
-    "id": 0,
-    "name": "Thoradin",
-    "race": "gnome",
-    "class": "sorcerer",
-    "level": 8,
-    "background": "Acolyte",
-    "proficiency_bonus": 3,
-    "abilities": {
-      "strength": 10,
-      "dexterity": 12,
-      "constitution": 10,
-      "intelligence": 12,
-      "wisdom": 12,
-      "charisma": 8
+  "Jules": {
+    "ID": 3,
+    "Name": "Jules",
+    "PlayerName": "",
+    "Race": "dwarf",
+    "Class": "sorcerer",
+    "Level": 8,
+    "Background": "",
+    "Alignment": "",
+    "ProficiencyBonus": 3,
+    "Abilities": {
+      "Strength": 10,
+      "Dexterity": 10,
+      "Constitution": 12,
+      "Intelligence": 17,
+      "Wisdom": 2,
+      "Charisma": 15
     },
-    "skill_proficiencies": [
+    "SkillProficiencies": [
       "Arcana",
-      "History",
-      "Persuasion"
+      "Insight",
+      "Medicine",
+      "Perception"
     ],
-    "skills": {
-      "Acrobatics": 1,
-      "Animal Handling": 1,
-      "Arcana": 4,
+    "Skills": {
+      "Acrobatics": 0,
+      "Animal Handling": -4,
+      "Arcana": 6,
       "Athletics": 0,
-      "Deception": -1,
-      "History": 4,
-      "Insight": 1,
-      "Intimidation": -1,
-      "Investigation": 1,
-      "Medicine": 1,
-      "Nature": 1,
-      "Perception": 1,
-      "Performance": -1,
+      "Deception": 2,
+      "History": 3,
+      "Insight": -1,
+      "Intimidation": 2,
+      "Investigation": 3,
+      "Medicine": -1,
+      "Nature": 3,
+      "Perception": -1,
+      "Performance": 2,
       "Persuasion": 2,
-      "Religion": 1,
-      "Sleight of Hand": 1,
-      "Stealth": 1,
-      "Survival": 1
+      "Religion": 3,
+      "Sleight of Hand": 0,
+      "Stealth": 0,
+      "Survival": -4
     },
-    "strength_mod": 0,
-    "dexterity_mod": 1,
-    "constitution_mod": 0,
-    "intelligence_mod": 1,
-    "wisdom_mod": 1,
-    "charisma_mod": -1,
-    "equipment": {
-      "main_hand": {
-        "name": "Battleaxe",
-        "range": "5"
+    "StrengthMod": 0,
+    "DexterityMod": 0,
+    "ConstitutionMod": 1,
+    "IntelligenceMod": 3,
+    "WisdomMod": -4,
+    "CharismaMod": 2,
+    "Equipment": {
+      "MainHand": {
+        "Name": "Battleaxe",
+        "Category": "",
+        "Range": "5",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false,
+        "Damage": ""
       },
-      "off_hand": {
-        "name": "Blowgun",
-        "range": "25"
+      "OffHand": {
+        "Name": "Blowgun",
+        "Category": "",
+        "Range": "25",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false,
+        "Damage": ""
       },
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
+      "Armor": {
+        "Name": "Studded Leather Armor",
+        "ArmorClass": 12,
+        "DexBonus": true,
+        "MaxDexBonus": 0
+      },
+      "Shield": null
     },
-    "spells": [
+    "Spells": [
       {
-        "name": "Fly",
-        "level": 3,
-        "prepared": false,
-        "school": "Transmutation",
-        "range": "Touch"
+        "Name": "Dispel Magic",
+        "Level": 3,
+        "Prepared": false,
+        "School": "Abjuration",
+        "Range": "120 feet"
       },
       {
-        "name": "Protection From Energy",
-        "level": 3,
-        "prepared": false,
-        "school": "Abjuration",
-        "range": "Touch"
+        "Name": "Daylight",
+        "Level": 3,
+        "Prepared": false,
+        "School": "Evocation",
+        "Range": "60 feet"
       },
       {
-        "name": "Fear",
-        "level": 3,
-        "prepared": false,
-        "school": "Illusion",
-        "range": "Self"
+        "Name": "Stinking Cloud",
+        "Level": 3,
+        "Prepared": false,
+        "School": "Conjuration",
+        "Range": "90 feet"
       },
       {
-        "name": "Stoneskin",
-        "level": 4,
-        "prepared": false,
-        "school": "Abjuration",
-        "range": "Touch"
+        "Name": "Stoneskin",
+        "Level": 4,
+        "Prepared": false,
+        "School": "Abjuration",
+        "Range": "Touch"
       },
       {
-        "name": "Sleep",
-        "level": 1,
-        "prepared": false,
-        "school": "Enchantment",
-        "range": "90 feet"
+        "Name": "Confusion",
+        "Level": 4,
+        "Prepared": false,
+        "School": "Enchantment",
+        "Range": "90 feet"
       },
       {
-        "name": "Fog Cloud",
-        "level": 1,
-        "prepared": false,
-        "school": "Conjuration",
-        "range": "120 feet"
+        "Name": "Acid Splash",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Conjuration",
+        "Range": "60 feet"
       },
       {
-        "name": "Disguise Self",
-        "level": 1,
-        "prepared": false,
-        "school": "Illusion",
-        "range": "Self"
+        "Name": "Dancing Lights",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Evocation",
+        "Range": "120 feet"
       },
       {
-        "name": "Silent Image",
-        "level": 1,
-        "prepared": false,
-        "school": "Illusion",
-        "range": "60 feet"
+        "Name": "Ray of Frost",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Evocation",
+        "Range": "60 feet"
       },
       {
-        "name": "Enlarge/Reduce",
-        "level": 2,
-        "prepared": false,
-        "school": "Transmutation",
-        "range": "30 feet"
+        "Name": "Mending",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Transmutation",
+        "Range": "Touch"
       },
       {
-        "name": "Alter Self",
-        "level": 2,
-        "prepared": false,
-        "school": "Transmutation",
-        "range": "Self"
+        "Name": "Detect Magic",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Divination",
+        "Range": "Self"
       },
       {
-        "name": "Shatter",
-        "level": 2,
-        "prepared": false,
-        "school": "Evocation",
-        "range": "60 feet"
+        "Name": "Sleep",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Enchantment",
+        "Range": "90 feet"
+      },
+      {
+        "Name": "Expeditious Retreat",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Transmutation",
+        "Range": "Self"
+      },
+      {
+        "Name": "Color Spray",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Illusion",
+        "Range": "Self"
+      },
+      {
+        "Name": "Suggestion",
+        "Level": 2,
+        "Prepared": false,
+        "School": "Enchantment",
+        "Range": "30 feet"
+      },
+      {
+        "Name": "See Invisibility",
+        "Level": 2,
+        "Prepared": false,
+        "School": "Divination",
+        "Range": "Self"
+      },
+      {
+        "Name": "Darkvision",
+        "Level": 2,
+        "Prepared": false,
+        "School": "Transmutation",
+        "Range": "Touch"
       }
     ],
-    "spell_slots": {
+    "SpellSlots": {
+      "0": 4,
       "1": 4,
       "2": 3,
       "3": 3,
-      "4": 1
+      "4": 2
     },
-    "armor_class": 11,
-    "initiative": 1,
-    "passive_perception": 11,
-    "spellcasting_ability": "Charisma",
-    "spell_save_dc": 10,
-    "spell_attack_bonus": 2,
-    "can_prepare_spells": false
-  },
-  "Wynnie": {
-    "id": 0,
-    "name": "Wynnie",
-    "race": "dragonborn",
-    "class": "monk",
-    "level": 10,
-    "background": "Acolyte",
-    "proficiency_bonus": 4,
-    "abilities": {
-      "strength": 12,
-      "dexterity": 12,
-      "constitution": 10,
-      "intelligence": 10,
-      "wisdom": 10,
-      "charisma": 9
+    "ArmorClass": 12,
+    "Initiative": 0,
+    "PassivePerception": 9,
+    "SpellcastingAbility": "Charisma",
+    "SpellSaveDC": 13,
+    "SpellAttackBonus": 5,
+    "CanPrepareSpells": false,
+    "ExperiencePoints": 0,
+    "Speed": 30,
+    "MaxHitPoints": 10,
+    "CurrentHitPoints": 10,
+    "TemporaryHitPoints": 0,
+    "HitDiceTotal": "",
+    "HitDiceRemaining": "",
+    "DeathSaveSuccesses": 0,
+    "DeathSaveFailures": 0,
+    "CopperPieces": 0,
+    "SilverPieces": 0,
+    "ElectrumPieces": 0,
+    "GoldPieces": 0,
+    "PlatinumPieces": 0,
+    "EquipmentText": "",
+    "Personality": "",
+    "Ideals": "",
+    "Bonds": "",
+    "Flaws": "",
+    "Features": ""
+  },"Aria": {
+    "ID": 1,
+    "Name": "Aria",
+    "PlayerName": "",
+    "Race": "elf",
+    "Class": "wizard",
+    "Level": 1,
+    "Background": "acolyte",
+    "Alignment": "",
+    "ProficiencyBonus": 2,
+    "Abilities": {
+      "Strength": 8,
+      "Dexterity": 16,
+      "Constitution": 12,
+      "Intelligence": 16,
+      "Wisdom": 10,
+      "Charisma": 12
     },
-    "skill_proficiencies": [
-      "Animal Handling",
-      "Insight"
+    "SkillProficiencies": [
+      "Arcana",
+      "History",
+      "Insight",
+      "Religion"
     ],
-    "skills": {
-      "Acrobatics": 1,
-      "Animal Handling": 4,
-      "Arcana": 0,
-      "Athletics": 1,
-      "Deception": -1,
-      "History": 0,
-      "Insight": 4,
-      "Intimidation": -1,
-      "Investigation": 0,
+    "Skills": {
+      "Acrobatics": 3,
+      "Animal Handling": 0,
+      "Arcana": 5,
+      "Athletics": -1,
+      "Deception": 1,
+      "History": 5,
+      "Insight": 2,
+      "Intimidation": 1,
+      "Investigation": 3,
       "Medicine": 0,
-      "Nature": 0,
+      "Nature": 3,
       "Perception": 0,
-      "Performance": -1,
-      "Persuasion": -1,
-      "Religion": 0,
-      "Sleight of Hand": 1,
-      "Stealth": 1,
+      "Performance": 1,
+      "Persuasion": 1,
+      "Religion": 5,
+      "Sleight of Hand": 3,
+      "Stealth": 3,
       "Survival": 0
     },
-    "strength_mod": 1,
-    "dexterity_mod": 1,
-    "constitution_mod": 0,
-    "intelligence_mod": 0,
-    "wisdom_mod": 0,
-    "charisma_mod": -1,
-    "equipment": {
-      "main_hand": {
-        "name": "Battleaxe",
-        "range": "5"
+    "StrengthMod": -1,
+    "DexterityMod": 3,
+    "ConstitutionMod": 1,
+    "IntelligenceMod": 3,
+    "WisdomMod": 0,
+    "CharismaMod": 1,
+    "Equipment": {
+      "MainHand": {
+        "Name": "Battleaxe",
+        "Category": "",
+        "Range": "5",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false,
+        "Damage": "1d4 - 1"
       },
-      "off_hand": {
-        "name": "Blowgun",
-        "range": "25"
+      "OffHand": {
+        "Name": "Blowgun",
+        "Category": "",
+        "Range": "25",
+        "TwoHanded": false,
+        "DamageDie": "1d4",
+        "IsFinesse": false,
+        "Damage": "1d4 - 1"
       },
-      "armor": {
-        "name": "Studded Leather Armor",
-        "armor_class": 12,
-        "dex_bonus": true
-      }
+      "Armor": {
+        "Name": "Studded Leather Armor",
+        "ArmorClass": 12,
+        "DexBonus": true,
+        "MaxDexBonus": 0
+      },
+      "Shield": null
     },
-    "armor_class": 11,
-    "initiative": 1,
-    "passive_perception": 10,
-    "can_prepare_spells": false
+    "Spells": [
+      {
+        "Name": "Chill Touch",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Necromancy",
+        "Range": "120 feet"
+      },
+      {
+        "Name": "Dancing Lights",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Evocation",
+        "Range": "120 feet"
+      },
+      {
+        "Name": "Mending",
+        "Level": 0,
+        "Prepared": false,
+        "School": "Transmutation",
+        "Range": "Touch"
+      },
+      {
+        "Name": "False Life",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Necromancy",
+        "Range": "Self"
+      },
+      {
+        "Name": "Illusory Script",
+        "Level": 1,
+        "Prepared": false,
+        "School": "Illusion",
+        "Range": "Touch"
+      }
+    ],
+    "SpellSlots": {
+      "0": 3,
+      "1": 2
+    },
+    "ArmorClass": 13,
+    "Initiative": 3,
+    "PassivePerception": 10,
+    "SpellcastingAbility": "Intelligence",
+    "SpellSaveDC": 13,
+    "SpellAttackBonus": 5,
+    "CanPrepareSpells": true,
+    "ExperiencePoints": 0,
+    "Speed": 30,
+    "MaxHitPoints": 10,
+    "CurrentHitPoints": 10,
+    "TemporaryHitPoints": 0,
+    "HitDiceTotal": "",
+    "HitDiceRemaining": "",
+    "DeathSaveSuccesses": 0,
+    "DeathSaveFailures": 0,
+    "CopperPieces": 0,
+    "SilverPieces": 0,
+    "ElectrumPieces": 0,
+    "GoldPieces": 0,
+    "PlatinumPieces": 0,
+    "EquipmentText": "",
+    "Personality": "",
+    "Ideals": "",
+    "Bonds": "",
+    "Flaws": "",
+    "Features": ""
   }
 }

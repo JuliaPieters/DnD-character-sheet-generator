@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// ---------- Structs ----------
 
 type APIResource struct {
 	Name string `json:"name"`
@@ -19,7 +18,6 @@ type APIListResponse struct {
 	Results []APIResource `json:"results"`
 }
 
-// ---------- Helpers ----------
 
 func getJSON(url string, target interface{}) error {
 	url = strings.ToLower(strings.ReplaceAll(url, " ", "-"))

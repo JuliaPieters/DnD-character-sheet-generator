@@ -5,8 +5,9 @@ type Weapon struct {
 	Category  string
 	Range     string
 	TwoHanded bool
-	DamageDie string 
-	IsFinesse bool 
+	DamageDie string
+	IsFinesse bool
+	Damage    string
 }
 
 type Armor struct {

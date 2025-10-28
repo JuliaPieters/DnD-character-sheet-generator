@@ -59,7 +59,6 @@ func ViewCharacter(name string) error {
 		}
 	}
 
-	// Gebruik de geëxporteerde FullCasters en PactCasters uit spell.go
 	if FullCasters[strings.ToLower(charPtr.Class)] || PactCasters[strings.ToLower(charPtr.Class)] {
 		if charPtr.SpellcastingAbility != "" {
 			fmt.Printf("Spellcasting ability: %s\n", strings.ToLower(charPtr.SpellcastingAbility))

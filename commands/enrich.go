@@ -2,6 +2,7 @@ package commands
 
 import (
 	"dnd-character-sheet/api"
+	"dnd-character-sheet/application"
 	"dnd-character-sheet/domain"
 	"dnd-character-sheet/storage"
 	"fmt"
@@ -46,11 +47,15 @@ func addEquipment(char *domain.Character) {
 		return
 	}
 
+	equipService := application.EquipmentService{}
+
 	if mainHand != nil {
 		char.Equipment.MainHand = mainHand
+		char.Equipment.MainHand.Damage = equipService.CalculateWeaponDamage(char, mainHand)
 	}
 	if offHand != nil {
 		char.Equipment.OffHand = offHand
+		char.Equipment.OffHand.Damage = equipService.CalculateWeaponDamage(char, offHand)
 	}
 	if armor != nil {
 		char.Equipment.Armor = armor

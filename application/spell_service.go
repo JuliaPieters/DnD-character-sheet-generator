@@ -64,9 +64,6 @@ func (s *SpellService) UpdateSpellSlots(c *domain.Character) {
 	}
 }
 
-// ------------------------
-// Spell Slot Helpers
-// ------------------------
 func calculatePaladinSlots(level int) map[int]int {
 	slots := map[int]int{}
 	if level >= 1 {

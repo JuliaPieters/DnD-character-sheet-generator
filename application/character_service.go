@@ -8,9 +8,6 @@ import (
 
 type CharacterService struct{}
 
-// ------------------------
-// Parameter struct voor NewCharacter
-// ------------------------
 type NewCharacterParams struct {
 	ID            int
 	Name          string
@@ -23,9 +20,6 @@ type NewCharacterParams struct {
 	SpellService  *SpellService
 }
 
-// ------------------------
-// Character creation
-// ------------------------
 func (s *CharacterService) NewCharacter(params NewCharacterParams) *domain.Character {
 	raceKey := strings.ToLower(params.Race)
 	classKey := strings.ToLower(params.Class)
@@ -77,9 +71,6 @@ func (s *CharacterService) prepareAbilities(scores []int, mod map[string]int) do
 	return s.AssignAbilities(mod)
 }
 
-// ------------------------
-// Leveling
-// ------------------------
 func (s *CharacterService) LevelUp(c *domain.Character, newLevel int, spellService *SpellService) {
 	c.Level = newLevel
 	c.ProficiencyBonus = s.CalculateProfBonus(newLevel)
@@ -91,9 +82,6 @@ func (s *CharacterService) LevelUp(c *domain.Character, newLevel int, spellServi
 	}
 }
 
-// ------------------------
-// Abilities
-// ------------------------
 func (s *CharacterService) AssignAbilities(mod map[string]int) domain.AbilityScores {
 	abilities := domain.AbilityScores{}
 	order := []string{"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"}
@@ -130,9 +118,6 @@ func (s *CharacterService) UpdateModifiers(c *domain.Character) {
 	c.CharismaMod = c.Abilities.Modifier("Charisma")
 }
 
-// ------------------------
-// Skills
-// ------------------------
 func (s *CharacterService) CalculateAllSkills(c *domain.Character) {
 	c.Skills = make(map[string]int)
 	for skill, ability := range domain.SkillAbilities {
@@ -152,9 +137,6 @@ func (s *CharacterService) GetAvailableSkills(className string) []string {
 	return []string{}
 }
 
-// ------------------------
-// Utility
-// ------------------------
 func (s *CharacterService) contains(slice []string, val string) bool {
 	for _, s := range slice {
 		if s == val {

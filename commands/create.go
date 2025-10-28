@@ -18,9 +18,6 @@ type CreateCharacterParams struct {
 	SkillProficiencies []string
 }
 
-// ------------------------
-// CreateCharacter
-// ------------------------
 func CreateCharacter(params CreateCharacterParams) error {
 	existingCharacters, err := storage.LoadCharacters()
 	if err != nil {

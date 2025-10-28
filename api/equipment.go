@@ -5,17 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
 
-// EquipmentRange helpt bij ranged weapons
 type EquipmentRange struct {
 	Normal int `json:"normal,omitempty"`
 	Long   int `json:"long,omitempty"`
 }
 
-// APIEquipment representeert API response
 type APIEquipment struct {
 	Name              string `json:"name"`
 	EquipmentCategory struct {
@@ -31,9 +30,11 @@ type APIEquipment struct {
 	Properties []struct {
 		Name string `json:"name"`
 	} `json:"properties,omitempty"`
+	Damage struct {
+		DamageDice string `json:"damage_dice"`
+	} `json:"damage,omitempty"`
 }
 
-// parseRange haalt de normale range eruit
 func parseRange(raw json.RawMessage) string {
 	var s string
 	if err := json.Unmarshal(raw, &s); err == nil {
@@ -49,25 +50,30 @@ func parseRange(raw json.RawMessage) string {
 	return ""
 }
 
-// weaponDamageMap bevat exam-testcases en hun stats
-var weaponDamageMap = map[string]struct{
-	DamageDie string
-	IsFinesse bool
-}{
-	"greataxe":     {"1d12", false},
-	"shortsword":   {"1d6", true},
-	"rapier":       {"1d8", true},
+func normalizeDamageDie(d string) string {
+	if d == "" {
+		return "1d4" 
+	}
+
+	if strings.Contains(d, "d") {
+		return d 
+	}
+
+	num, err := strconv.Atoi(d)
+	if err != nil || num <= 0 {
+		return "1d4"
+	}
+
+	return fmt.Sprintf("%dd%d", num, num)
 }
 
-// GetEquipment haalt één mainhand, één offhand, armor en shield op
 func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shield, error) {
 	var list APIListResponse
 	if err := getJSON("https://www.dnd5eapi.co/api/equipment", &list); err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	var mainHand *domain.Weapon
-	var offHand *domain.Weapon
+	var mainHand, offHand *domain.Weapon
 	var armor *domain.Armor
 	var shield *domain.Shield
 
@@ -76,6 +82,7 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 
 	for _, res := range list.Results {
 		<-ticker.C
+
 		var eq APIEquipment
 		url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
 		if err := getJSON(url, &eq); err != nil {
@@ -85,18 +92,20 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 
 		switch eq.EquipmentCategory.Name {
 		case "Weapon":
-			nameKey := strings.ToLower(eq.Name)
-			damage := "1d4"
+			damage := normalizeDamageDie(eq.Damage.DamageDice)
+
 			isFinesse := false
-			if val, ok := weaponDamageMap[nameKey]; ok {
-				damage = val.DamageDie
-				isFinesse = val.IsFinesse
+			for _, p := range eq.Properties {
+				if strings.ToLower(p.Name) == "finesse" {
+					isFinesse = true
+					break
+				}
 			}
 
 			weapon := &domain.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
-				Range:     parseRange(eq.Range),
+				Range:     parseRange(eq.Range), 
 				DamageDie: damage,
 				IsFinesse: isFinesse,
 			}
@@ -106,6 +115,7 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 			} else if offHand == nil {
 				offHand = weapon
 			}
+
 		case "Armor":
 			armor = &domain.Armor{
 				Name:        eq.Name,
@@ -113,6 +123,7 @@ func GetEquipment() (*domain.Weapon, *domain.Weapon, *domain.Armor, *domain.Shie
 				DexBonus:    eq.ArmorClass.DexBonus,
 				MaxDexBonus: eq.ArmorClass.MaxDex,
 			}
+
 		case "Shield":
 			shield = &domain.Shield{
 				Name:       eq.Name,

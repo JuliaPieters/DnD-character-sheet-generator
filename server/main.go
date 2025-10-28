@@ -76,9 +76,9 @@ func setupCharacterFromForm(r *http.Request, spellService *application.SpellServ
 		skillProficiencies = service.GetAvailableSkills(class)
 	}
 
-	existingChar, err := storage.GetCharacterByName(charName)
+	existingChar, _ := storage.GetCharacterByName(charName)
 	var char *domain.Character
-	if err != nil || existingChar == nil {
+	if existingChar == nil {
 		allChars, _ := storage.LoadCharacters()
 		newID := len(allChars) + 1
 
@@ -120,6 +120,17 @@ func setupCharacterFromForm(r *http.Request, spellService *application.SpellServ
 	char.Speed = speed
 	char.ExperiencePoints = expPoints
 
+	if char.Equipment == (domain.Equipment{}) {
+		char.Equipment = domain.Equipment{}
+	}
+
+	if char.Skills == nil {
+		char.Skills = make(map[string]int)
+	}
+	if char.Spells == nil {
+		char.Spells = []domain.Spell{}
+	}
+
 	return char, nil
 }
 
@@ -155,9 +166,22 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		characterID := r.URL.Query().Get("id")
 		var character *domain.Character
+
 		if characterID != "" {
 			character, _ = storage.GetCharacterByName(characterID)
+			if character == nil {
+				http.Error(w, "Character not found", http.StatusNotFound)
+				return
+			}
+		} else {
+			character = &domain.Character{
+				Abilities: domain.AbilityScores{},
+				Equipment: domain.Equipment{},
+				Skills:    make(map[string]int),
+				Spells:    []domain.Spell{},
+			}
 		}
+
 		if err := templates.ExecuteTemplate(w, "charactersheet.html", character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -168,7 +192,11 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		character, _ := setupCharacterFromForm(r, spellService, characterService)
+		character, err := setupCharacterFromForm(r, spellService, characterService)
+		if err != nil {
+			http.Error(w, "Failed to setup character", http.StatusInternalServerError)
+			return
+		}
 
 		spellService.SetupSpellcasting(character)
 		if err := commands.GiveStartingSpells(character); err != nil {
