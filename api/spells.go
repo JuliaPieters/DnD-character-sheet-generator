@@ -21,47 +21,71 @@ type APISpell struct {
 	} `json:"classes"`
 }
 
+type SpellResult struct {
+	Spell domain.Spell
+	Err   error
+}
+
 func GetSpellsForClass(className string, slots map[int]int) ([]domain.Spell, error) {
-	var list APIListResponse
-	if err := getJSON("https://www.dnd5eapi.co/api/spells", &list); err != nil {
+	list, err := fetchSpellList()
+	if err != nil {
 		return nil, err
 	}
 
-	type SpellResult struct {
-		Spell domain.Spell
-		Err   error
+	spells := fetchClassSpells(list.Results, className)
+	selected := filterSpellsBySlots(spells, slots)
+	final := selectRandomSpells(selected, slots)
+
+	return final, nil
+}
+
+func fetchSpellList() (APIListResponse, error) {
+	var list APIListResponse
+	if err := getJSON("https://www.dnd5eapi.co/api/spells", &list); err != nil {
+		return APIListResponse{}, err
 	}
+	return list, nil
+}
+
+func fetchClassSpells(resources []APIResource, className string) []domain.Spell {
+	classNameLower := strings.ToLower(className)
 
 	results := make(chan SpellResult)
 	ticker := time.NewTicker(200 * time.Millisecond)
 	defer ticker.Stop()
 
-	classNameLower := strings.ToLower(className)
-
-	for _, res := range list.Results {
+	for _, res := range resources {
 		<-ticker.C
 		go func(res APIResource) {
-			url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
-			var spell APISpell
-			err := getJSON(url, &spell)
-			if err != nil {
-				results <- SpellResult{Err: fmt.Errorf("error fetching %s: %w", res.Name, err)}
-				return
-			}
+			results <- fetchSpell(res, classNameLower)
+		}(res)
+	}
 
-			isForClass := false
-			for _, c := range spell.Classes {
-				if strings.ToLower(c.Name) == classNameLower {
-					isForClass = true
-					break
-				}
-			}
-			if !isForClass {
-				results <- SpellResult{Err: nil}
-				return
-			}
+	var spells []domain.Spell
+	for i := 0; i < len(resources); i++ {
+		result := <-results
+		if result.Err != nil {
+			log.Println(result.Err)
+			continue
+		}
+		if result.Spell.Name != "" {
+			spells = append(spells, result.Spell)
+		}
+	}
 
-			results <- SpellResult{
+	return spells
+}
+
+func fetchSpell(res APIResource, classNameLower string) SpellResult {
+	url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
+	var spell APISpell
+	if err := getJSON(url, &spell); err != nil {
+		return SpellResult{Err: fmt.Errorf("error fetching %s: %w", res.Name, err)}
+	}
+
+	for _, c := range spell.Classes {
+		if strings.ToLower(c.Name) == classNameLower {
+			return SpellResult{
 				Spell: domain.Spell{
 					Name:   spell.Name,
 					Level:  spell.Level,
@@ -69,33 +93,34 @@ func GetSpellsForClass(className string, slots map[int]int) ([]domain.Spell, err
 					Range:  spell.Range,
 				},
 			}
-		}(res)
-	}
-
-	selected := []domain.Spell{}
-	for i := 0; i < len(list.Results); i++ {
-		result := <-results
-		if result.Err != nil {
-			log.Println(result.Err)
-			continue
-		}
-		if result.Spell.Name == "" {
-			continue
-		}
-		if _, ok := slots[result.Spell.Level]; ok {
-			selected = append(selected, result.Spell)
 		}
 	}
 
+	return SpellResult{} 
+}
+
+func filterSpellsBySlots(spells []domain.Spell, slots map[int]int) []domain.Spell {
+	var selected []domain.Spell
+	for _, s := range spells {
+		if _, ok := slots[s.Level]; ok {
+			selected = append(selected, s)
+		}
+	}
+	return selected
+}
+
+func selectRandomSpells(spells []domain.Spell, slots map[int]int) []domain.Spell {
 	rand.Seed(time.Now().UnixNano())
-	final := []domain.Spell{}
+	var final []domain.Spell
+
 	for lvl, count := range slots {
-		lvlSpells := []domain.Spell{}
-		for _, s := range selected {
+		var lvlSpells []domain.Spell
+		for _, s := range spells {
 			if s.Level == lvl {
 				lvlSpells = append(lvlSpells, s)
 			}
 		}
+
 		if len(lvlSpells) > count {
 			rand.Shuffle(len(lvlSpells), func(i, j int) { lvlSpells[i], lvlSpells[j] = lvlSpells[j], lvlSpells[i] })
 			final = append(final, lvlSpells[:count]...)
@@ -104,5 +129,5 @@ func GetSpellsForClass(className string, slots map[int]int) ([]domain.Spell, err
 		}
 	}
 
-	return final, nil
+	return final
 }

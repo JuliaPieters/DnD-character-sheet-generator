@@ -8,14 +8,6 @@ import (
 	"strings"
 )
 
-var fullCasters = map[string]bool{
-	"wizard": true, "cleric": true, "druid": true, "bard": true, "sorcerer": true,
-}
-
-var pactCasters = map[string]bool{
-	"warlock": true,
-}
-
 func ViewCharacter(name string) error {
 	charPtr, err := storage.GetCharacterByName(name)
 	if err != nil {
@@ -67,7 +59,8 @@ func ViewCharacter(name string) error {
 		}
 	}
 
-	if fullCasters[strings.ToLower(charPtr.Class)] || pactCasters[strings.ToLower(charPtr.Class)] {
+	// Gebruik de geëxporteerde FullCasters en PactCasters uit spell.go
+	if FullCasters[strings.ToLower(charPtr.Class)] || PactCasters[strings.ToLower(charPtr.Class)] {
 		if charPtr.SpellcastingAbility != "" {
 			fmt.Printf("Spellcasting ability: %s\n", strings.ToLower(charPtr.SpellcastingAbility))
 			fmt.Printf("Spell save DC: %d\n", charPtr.SpellSaveDC)

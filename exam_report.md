@@ -44,71 +44,49 @@ Oorspronkelijk bestond er één `api.go` bestand. Dit is opgesplitst in:
 - `client.go` wordt hergebruikt door `spell.go` en `equipment.go`.  
 - Verbeterde modulariteit en testbaarheid.  
 
-### Diagram van code dependencies
+### Mermaid diagram voor de samenwerking van de lagen
+!Gebruik ctrl + shift + v om de preview te zien!
 
-Flow Diagram – Project Data & Functionality
-──────────────────────────────────────────
+```mermaid
+graph TD
 
-┌─────────────┐
-│ CLI/User │
-└─────┬───────┘
-│ input commands
-▼
-┌─────────────┐
-│ main.go CLI │
-└─────┬───────┘
-│ calls
-▼
-┌─────────────┐
-│ commands/ │
-└─────┬───────┘
-│ invokes
-▼
-┌─────────────┐
-│ domain/ │ <- Core structs & data
-│ character, │
-│ equipment, │
-│ ability, │
-│ spell │
-└─────┬───────┘
-│ used by
-▼
-┌─────────────┐
-│ application/│ <- Business logic
-│ services │
-└─────┬───────┘
-│ fetches/enriches
-▼
-┌─────────────┐
-│ api/ │ <- API calls
-│ client.go, │
-│ spell.go, │
-│ equipment.go│
-└─────┬───────┘
-│ loads
-▼
-┌─────────────┐
-│ data/ │ <- CSV, JSON
-└─────────────┘
+%% CLI commands
+A[Commands Layer<br>view.go<br>delete.go<br>update.go<br>create.go<br>equipment.go<br>spells.go]
 
-Separate server flow:
-─────────────┐
-│ server/ │
-│ main.go │
-│ character.json │
-└─────┬───────┘
-│ serves data
-▼
-┌─────────────┐
-│ templates/ │
-└─────────────┘
-│ renders
-▼
-┌─────────────┐
-│ static/ │
-└─────────────┘
+%% Application services
+B[Application Layer<br>character_service.go<br>equipment_service.go<br>spell_service.go]
 
----
+%% Domain entities
+C[Domain Layer<br>character.go<br>spell.go<br>equipment.go<br>constants.go<br>ability.go]
+
+%% API integration
+D[API Layer<br>client.go<br>spells.go<br>equipment.go]
+
+%% Storage
+E[Storage Layer<br>storage.go]
+
+%% Relations
+A --> B
+A --> E
+B --> C
+D --> C
+E --> C
+
+```
+### Uitleg van de lagen
+
+- **Commands Layer:** bevat alle CLI-functionaliteit en gebruikt Application voor businesslogica en Storage voor directe data-opslag.
+
+- **Application Layer:** voert kernlogica uit en gebruikt Domain; afhankelijk van andere lagen wordt vermeden.
+
+- **Domain Layer:** bevat kernmodellen en constants; volledig onafhankelijk.
+
+- **API Layer:** integreert externe data en gebruikt Domain-modellen.
+
+- **Storage Layer:** beheert dataopslag en gebruikt Domain; Commands spreekt Storage direct aan voor praktische redenen.
+
+**Opmerking:** De directe toegang van Commands naar Storage is een bewuste praktische keuze om CLI-operaties eenvoudig en snel te laten verlopen, zonder extra lagen voor eenvoudige read/write-acties. Hierdoor blijft de kernlogica in Application en Domain schoon en onafhankelijk, terwijl de gebruiker via de CLI direct met data kan werken.
+
 
 ## Maintainability – 20/20
 
@@ -116,9 +94,9 @@ De code is overzichtelijk en onderhoudbaar, met duidelijke scheiding van verantw
 
 ### Mappenstructuur
 project/
-├─ api/ # API calls & enrich functies
+├─ api/ # API calls 
 ├─ commands/ # CLI commands
-├─ data/ # CSV bestanden & JSON
+├─ data/ # CSV bestanden
 ├─ domain/ # Structs & basale logica
 │ ├─ character.go
 │ ├─ ability.go
@@ -150,13 +128,28 @@ project/
 - Cyclomatic complexity is laag (<10 per functie), wat testen en debuggen vereenvoudigt.  
 - Bestanden zijn groot, maar modulair met duidelijke subfuncties en tests.  
 
-### Testbare uitbreidbaarheid
+---
+## SonarQube als bewijs
+SonarQube analyseert de code automatisch op maintainability issues, zoals:
+- Te lange functies of te veel logica in één plek.  
+- Onnodige duplicatie.  
+- Slecht benoemde identifiers.  
 
-- Nieuwe wapens, modifiers of features kunnen volledig binnen `application/` of `domain/` toegevoegd worden.  
-- Bestaande code wordt niet aangepast, waardoor regressie wordt vermeden.  
-- **Automated tests** in `equipment_service_test.go` en `character_test.go` zorgen dat oude functionaliteit intact blijft.
+### Screenshots
+1. **Eerste afbeelding:**  
+   ![SonarQube Issues](image.png)  
+   Hier zijn nog enkele maintainability issues zichtbaar (rode/oranje markeringen).
+
+2. **Tweede afbeelding:**  
+   ![SonarQube Verbeterd](image-1.png)  
+   Alle issues zijn opgelost en de maintainability score is verbeterd naar bijna 0 issues.  
 
 ---
+
+## Concreet bewijs van kwaliteit
+- Functies zoals `GenerateSpellSlots`, `SetupSpellcasting` en `GiveStartingSpells` zijn opgesplitst per verantwoordelijkheid.  
+- Full casters, half casters en warlocks hebben hun eigen generatorfuncties, wat duplicatie voorkomt en aanpassingen makkelijker maakt.  
+- CSV parsing, spell lookup en karakterlogica zijn duidelijk gescheiden.  
 
 ## Testing – 20/20
 
@@ -185,7 +178,6 @@ ok      dnd-character-sheet/application (cached)
 
 ### Argumentatie per criterium
 
-**No testing has been done – ✅ NVT**  
 Tests zijn aanwezig en uitgevoerd via `go test ./application -v`.
 
 **Happy path – ✅**  

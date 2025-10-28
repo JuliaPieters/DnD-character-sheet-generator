@@ -51,64 +51,115 @@
     "CharismaMod": 1,
     "Equipment": {
       "MainHand": {
-        "Name": "Battleaxe",
+        "Name": "longsword",
         "Category": "",
-        "Range": "5",
+        "Range": "",
         "TwoHanded": false,
-        "DamageDie": "1d4",
+        "DamageDie": "",
         "IsFinesse": false
       },
-      "OffHand": {
-        "Name": "Blowgun",
-        "Category": "",
-        "Range": "25",
-        "TwoHanded": false,
-        "DamageDie": "1d4",
-        "IsFinesse": false
-      },
-      "Armor": {
-        "Name": "Studded Leather Armor",
-        "ArmorClass": 12,
-        "DexBonus": true,
-        "MaxDexBonus": 0
-      },
+      "OffHand": null,
+      "Armor": null,
       "Shield": null
     },
     "Spells": [
       {
-        "Name": "Ray of Frost",
+        "Name": "acid splash",
         "Level": 0,
         "Prepared": false,
-        "School": "Evocation",
-        "Range": "60 feet"
+        "School": "",
+        "Range": ""
       },
       {
-        "Name": "Fire Bolt",
+        "Name": "chill touch",
         "Level": 0,
         "Prepared": false,
-        "School": "Evocation",
-        "Range": "120 feet"
+        "School": "",
+        "Range": ""
       },
       {
-        "Name": "Shocking Grasp",
+        "Name": "dancing lights",
         "Level": 0,
         "Prepared": false,
-        "School": "Evocation",
-        "Range": "Touch"
+        "School": "",
+        "Range": ""
       },
       {
-        "Name": "Longstrider",
-        "Level": 1,
+        "Name": "fire bolt",
+        "Level": 0,
         "Prepared": false,
-        "School": "Transmutation",
-        "Range": "Touch"
+        "School": "",
+        "Range": ""
       },
       {
-        "Name": "Mage Armor",
-        "Level": 1,
+        "Name": "light",
+        "Level": 0,
         "Prepared": false,
-        "School": "Abjuration",
-        "Range": "Touch"
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "mage hand",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "mending",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "message",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "minor illusion",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "poison spray",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "prestidigitation",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "ray of frost",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "shocking grasp",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "true strike",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
       }
     ],
     "SpellSlots": {
@@ -121,6 +172,209 @@
     "SpellcastingAbility": "Intelligence",
     "SpellSaveDC": 13,
     "SpellAttackBonus": 5,
+    "CanPrepareSpells": true,
+    "ExperiencePoints": 0,
+    "Speed": 30,
+    "MaxHitPoints": 10,
+    "CurrentHitPoints": 10,
+    "TemporaryHitPoints": 0,
+    "HitDiceTotal": "",
+    "HitDiceRemaining": "",
+    "DeathSaveSuccesses": 0,
+    "DeathSaveFailures": 0,
+    "CopperPieces": 0,
+    "SilverPieces": 0,
+    "ElectrumPieces": 0,
+    "GoldPieces": 0,
+    "PlatinumPieces": 0,
+    "EquipmentText": "",
+    "Personality": "",
+    "Ideals": "",
+    "Bonds": "",
+    "Flaws": "",
+    "Features": ""
+  },
+  "Gandalf": {
+    "ID": 2,
+    "Name": "Gandalf",
+    "PlayerName": "",
+    "Race": "human",
+    "Class": "wizard",
+    "Level": 20,
+    "Background": "acolyte",
+    "Alignment": "",
+    "ProficiencyBonus": 6,
+    "Abilities": {
+      "Strength": 9,
+      "Dexterity": 11,
+      "Constitution": 13,
+      "Intelligence": 15,
+      "Wisdom": 16,
+      "Charisma": 14
+    },
+    "SkillProficiencies": [
+      "Arcana",
+      "History",
+      "Insight",
+      "Religion"
+    ],
+    "Skills": {
+      "Acrobatics": 0,
+      "Animal Handling": 3,
+      "Arcana": 8,
+      "Athletics": -1,
+      "Deception": 2,
+      "History": 8,
+      "Insight": 9,
+      "Intimidation": 2,
+      "Investigation": 2,
+      "Medicine": 3,
+      "Nature": 2,
+      "Perception": 3,
+      "Performance": 2,
+      "Persuasion": 2,
+      "Religion": 8,
+      "Sleight of Hand": 0,
+      "Stealth": 0,
+      "Survival": 3
+    },
+    "StrengthMod": -1,
+    "DexterityMod": 0,
+    "ConstitutionMod": 1,
+    "IntelligenceMod": 2,
+    "WisdomMod": 3,
+    "CharismaMod": 2,
+    "Equipment": {
+      "MainHand": null,
+      "OffHand": null,
+      "Armor": null,
+      "Shield": null
+    },
+    "Spells": [
+      {
+        "Name": "acid splash",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "chill touch",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "dancing lights",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "fire bolt",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "light",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "mage hand",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "mending",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "message",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "minor illusion",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "poison spray",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "prestidigitation",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "ray of frost",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "shocking grasp",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "true strike",
+        "Level": 0,
+        "Prepared": false,
+        "School": "",
+        "Range": ""
+      },
+      {
+        "Name": "burning hands",
+        "Level": 1,
+        "Prepared": true,
+        "School": "",
+        "Range": ""
+      }
+    ],
+    "SpellSlots": {
+      "0": 5,
+      "1": 4,
+      "2": 3,
+      "3": 3,
+      "4": 3,
+      "5": 3,
+      "6": 3,
+      "7": 3,
+      "8": 3,
+      "9": 3
+    },
+    "ArmorClass": 10,
+    "Initiative": 0,
+    "PassivePerception": 13,
+    "SpellcastingAbility": "Intelligence",
+    "SpellSaveDC": 16,
+    "SpellAttackBonus": 8,
     "CanPrepareSpells": true,
     "ExperiencePoints": 0,
     "Speed": 30,

@@ -9,42 +9,41 @@ import (
 type CharacterService struct{}
 
 // ------------------------
+// Parameter struct voor NewCharacter
+// ------------------------
+type NewCharacterParams struct {
+	ID            int
+	Name          string
+	Race          string
+	Class         string
+	Background    string
+	Level         int
+	AbilityScores []int
+	SkillChoices  []string
+	SpellService  *SpellService
+}
+
+// ------------------------
 // Character creation
 // ------------------------
-func (s *CharacterService) NewCharacter(
-	id int, name, race, class, background string, level int,
-	abilityScores []int, skillChoices []string,
-	spellService *SpellService,
-) *domain.Character {
-	raceKey := strings.ToLower(race)
-	classKey := strings.ToLower(class)
+func (s *CharacterService) NewCharacter(params NewCharacterParams) *domain.Character {
+	raceKey := strings.ToLower(params.Race)
+	classKey := strings.ToLower(params.Class)
 
 	mod := domain.RaceModifiers[raceKey]
 
-	var abilities domain.AbilityScores
-	if len(abilityScores) == 6 {
-		abilities = domain.AbilityScores{
-			Strength:     abilityScores[0] + mod["Strength"],
-			Dexterity:    abilityScores[1] + mod["Dexterity"],
-			Constitution: abilityScores[2] + mod["Constitution"],
-			Intelligence: abilityScores[3] + mod["Intelligence"],
-			Wisdom:       abilityScores[4] + mod["Wisdom"],
-			Charisma:     abilityScores[5] + mod["Charisma"],
-		}
-	} else {
-		abilities = s.AssignAbilities(mod)
-	}
+	abilities := s.prepareAbilities(params.AbilityScores, mod)
 
 	char := &domain.Character{
-		ID:                 id,
-		Name:               name,
+		ID:                 params.ID,
+		Name:               params.Name,
 		Race:               raceKey,
 		Class:              classKey,
-		Level:              level,
-		Background:         background,
-		ProficiencyBonus:   s.CalculateProfBonus(level),
+		Level:              params.Level,
+		Background:         params.Background,
+		ProficiencyBonus:   s.CalculateProfBonus(params.Level),
 		Abilities:          abilities,
-		SkillProficiencies: skillChoices,
+		SkillProficiencies: params.SkillChoices,
 		Skills:             make(map[string]int),
 		ArmorClass:         10,
 		Speed:              30,
@@ -57,11 +56,25 @@ func (s *CharacterService) NewCharacter(
 	s.CalculateAllSkills(char)
 	s.CalculateCombatStats(char)
 
-	if spellService != nil {
-		spellService.SetupSpellcasting(char)
+	if params.SpellService != nil {
+		params.SpellService.SetupSpellcasting(char)
 	}
 
 	return char
+}
+
+func (s *CharacterService) prepareAbilities(scores []int, mod map[string]int) domain.AbilityScores {
+	if len(scores) == 6 {
+		return domain.AbilityScores{
+			Strength:     scores[0] + mod["Strength"],
+			Dexterity:    scores[1] + mod["Dexterity"],
+			Constitution: scores[2] + mod["Constitution"],
+			Intelligence: scores[3] + mod["Intelligence"],
+			Wisdom:       scores[4] + mod["Wisdom"],
+			Charisma:     scores[5] + mod["Charisma"],
+		}
+	}
+	return s.AssignAbilities(mod)
 }
 
 // ------------------------

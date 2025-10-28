@@ -1,16 +1,15 @@
 package main
 
 import (
-	"html/template"
-	"log"
-	"net/http"
-	"strconv"
-
 	"dnd-character-sheet/api"
 	"dnd-character-sheet/application"
 	"dnd-character-sheet/commands"
 	"dnd-character-sheet/domain"
 	"dnd-character-sheet/storage"
+	"html/template"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 var templates = template.Must(template.ParseGlob("../templates/*.html"))
@@ -32,132 +31,152 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func parseSkillProficiencies(r *http.Request) []string {
+	var skillProficiencies []string
+	for _, skill := range []string{
+		"Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception",
+		"History", "Insight", "Intimidation", "Investigation", "Medicine",
+		"Nature", "Perception", "Performance", "Persuasion", "Religion",
+		"Sleight of Hand", "Stealth", "Survival",
+	} {
+		if r.FormValue(skill+"-prof") == "on" {
+			skillProficiencies = append(skillProficiencies, skill)
+		}
+	}
+	return skillProficiencies
+}
+
+func getFormInt(r *http.Request, field string, defaultValue int) int {
+	if val, err := strconv.Atoi(r.FormValue(field)); err == nil {
+		return val
+	}
+	return defaultValue
+}
+
+func setupCharacterFromForm(r *http.Request, spellService *application.SpellService, service *application.CharacterService) (*domain.Character, error) {
+	charName := r.FormValue("charname")
+	race := r.FormValue("race")
+	class := r.FormValue("classlevel")
+	background := r.FormValue("background")
+	level := getFormInt(r, "level", 1)
+	expPoints := getFormInt(r, "experiencepoints", 0)
+	speed := getFormInt(r, "Speed", 30)
+
+	abilityScores := []int{
+		getFormInt(r, "Strengthscore", 10),
+		getFormInt(r, "Dexterityscore", 10),
+		getFormInt(r, "Constitutionscore", 10),
+		getFormInt(r, "Intelligencescore", 10),
+		getFormInt(r, "Wisdomscore", 10),
+		getFormInt(r, "Charismascore", 10),
+	}
+
+	skillProficiencies := parseSkillProficiencies(r)
+	if len(skillProficiencies) == 0 {
+		skillProficiencies = service.GetAvailableSkills(class)
+	}
+
+	existingChar, err := storage.GetCharacterByName(charName)
+	var char *domain.Character
+	if err != nil || existingChar == nil {
+		allChars, _ := storage.LoadCharacters()
+		newID := len(allChars) + 1
+
+		char = service.NewCharacter(application.NewCharacterParams{
+			ID:            newID,
+			Name:          charName,
+			Race:          race,
+			Class:         class,
+			Background:    background,
+			Level:         level,
+			AbilityScores: abilityScores,
+			SkillChoices:  skillProficiencies,
+			SpellService:  spellService,
+		})
+	} else {
+		char = existingChar
+		char.PlayerName = r.FormValue("playername")
+		char.Race = race
+		char.Class = class
+		char.Level = level
+		char.Background = background
+		char.ExperiencePoints = expPoints
+		char.Abilities = domain.AbilityScores{
+			Strength:     abilityScores[0],
+			Dexterity:    abilityScores[1],
+			Constitution: abilityScores[2],
+			Intelligence: abilityScores[3],
+			Wisdom:       abilityScores[4],
+			Charisma:     abilityScores[5],
+		}
+		char.SkillProficiencies = skillProficiencies
+		char.Speed = speed
+		service.UpdateModifiers(char)
+		service.CalculateAllSkills(char)
+		service.CalculateCombatStats(char)
+	}
+
+	char.PlayerName = r.FormValue("playername")
+	char.Speed = speed
+	char.ExperiencePoints = expPoints
+
+	return char, nil
+}
+
+func handleEquipmentAndCombat(character *domain.Character, service *application.CharacterService) {
+	mainHand, offHand, armor, shield, err := api.GetEquipment()
+	if err != nil {
+		log.Println("Error fetching equipment:", err)
+		return
+	}
+	character.Equipment = domain.Equipment{
+		MainHand: mainHand,
+		OffHand:  offHand,
+		Armor:    armor,
+		Shield:   shield,
+	}
+	service.CalculateCombatStats(character)
+}
+
+func handleSpells(character *domain.Character) {
+	spells, err := api.GetSpellsForClass(character.Class, character.SpellSlots)
+	if err != nil {
+		log.Println("Error fetching spells:", err)
+		return
+	}
+	character.Spells = spells
+}
+
 func characterHandler(w http.ResponseWriter, r *http.Request) {
-	characterService := application.CharacterService{}
-	spellService := application.SpellService{}
+	characterService := &application.CharacterService{}
+	spellService := &application.SpellService{}
 
 	switch r.Method {
 	case http.MethodGet:
 		characterID := r.URL.Query().Get("id")
 		var character *domain.Character
 		if characterID != "" {
-			foundCharacter, err := storage.GetCharacterByName(characterID)
-			if err == nil {
-				character = foundCharacter
-			}
+			character, _ = storage.GetCharacterByName(characterID)
 		}
-
 		if err := templates.ExecuteTemplate(w, "charactersheet.html", character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
 
 	case http.MethodPost:
-		r.ParseForm()
-
-		charName := r.FormValue("charname")
-		playerName := r.FormValue("playername")
-		race := r.FormValue("race")
-		class := r.FormValue("classlevel")
-		background := r.FormValue("background")
-		level, _ := strconv.Atoi(r.FormValue("level"))
-		expPoints, _ := strconv.Atoi(r.FormValue("experiencepoints"))
-
-		strength, _ := strconv.Atoi(r.FormValue("Strengthscore"))
-		dexterity, _ := strconv.Atoi(r.FormValue("Dexterityscore"))
-		constitution, _ := strconv.Atoi(r.FormValue("Constitutionscore"))
-		intelligence, _ := strconv.Atoi(r.FormValue("Intelligencescore"))
-		wisdom, _ := strconv.Atoi(r.FormValue("Wisdomscore"))
-		charisma, _ := strconv.Atoi(r.FormValue("Charismascore"))
-		speed, _ := strconv.Atoi(r.FormValue("Speed"))
-
-		abilityScores := []int{strength, dexterity, constitution, intelligence, wisdom, charisma}
-
-		var skillProficiencies []string
-		for _, skill := range []string{
-			"Acrobatics", "Animal Handling", "Arcana", "Athletics",
-			"Deception", "History", "Insight", "Intimidation",
-			"Investigation", "Medicine", "Nature", "Perception",
-			"Performance", "Persuasion", "Religion", "Sleight of Hand",
-			"Stealth", "Survival",
-		} {
-			if r.FormValue(skill+"-prof") == "on" {
-				skillProficiencies = append(skillProficiencies, skill)
-			}
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
 		}
 
-		if len(skillProficiencies) == 0 {
-			skillProficiencies = characterService.GetAvailableSkills(class)
-		}
-
-		existingChar, err := storage.GetCharacterByName(charName)
-		var character *domain.Character
-		if err != nil || existingChar == nil {
-			allChars, _ := storage.LoadCharacters()
-			newID := len(allChars) + 1
-
-			character = characterService.NewCharacter(
-				newID,
-				charName,
-				race,
-				class,
-				background,
-				level,
-				abilityScores,
-				skillProficiencies,
-				&spellService, 
-			)
-			character.PlayerName = playerName
-			character.Speed = speed
-			character.ExperiencePoints = expPoints
-		} else {
-			character = existingChar
-			character.PlayerName = playerName
-			character.Race = race
-			character.Class = class
-			character.Level = level
-			character.Background = background
-			character.ExperiencePoints = expPoints
-			character.Abilities = domain.AbilityScores{
-				Strength:     strength,
-				Dexterity:    dexterity,
-				Constitution: constitution,
-				Intelligence: intelligence,
-				Wisdom:       wisdom,
-				Charisma:     charisma,
-			}
-			character.SkillProficiencies = skillProficiencies
-			character.Speed = speed
-
-			characterService.UpdateModifiers(character)
-			characterService.CalculateAllSkills(character)
-			characterService.CalculateCombatStats(character)
-		}
+		character, _ := setupCharacterFromForm(r, spellService, characterService)
 
 		spellService.SetupSpellcasting(character)
 		if err := commands.GiveStartingSpells(character); err != nil {
 			log.Println("Failed to give starting spells:", err)
 		}
 
-		mainHand, offHand, armor, shield, err := api.GetEquipment()
-		if err != nil {
-			log.Println("Error fetching equipment:", err)
-		} else {
-			character.Equipment = domain.Equipment{
-				MainHand: mainHand,
-				OffHand:  offHand,
-				Armor:    armor,
-				Shield:   shield,
-			}
-			characterService.CalculateCombatStats(character)
-		}
-
-		spells, err := api.GetSpellsForClass(class, character.SpellSlots)
-		if err != nil {
-			log.Println("Error fetching spells:", err)
-		} else {
-			character.Spells = spells
-		}
+		handleEquipmentAndCombat(character, characterService)
+		handleSpells(character)
 
 		if err := storage.SaveCharacter(character); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -165,7 +184,6 @@ func characterHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

@@ -7,35 +7,39 @@ import (
 	"fmt"
 )
 
-func CreateCharacter(
-	characterName string,
-	playerName string,
-	characterRace string,
-	characterClass string,
-	characterBackground string,
-	characterLevel int,
-	abilityScores []int,
-	skillProficiencies []string,
-) error {
+type CreateCharacterParams struct {
+	CharacterName      string
+	PlayerName         string
+	Race               string
+	Class              string
+	Background         string
+	Level              int
+	AbilityScores      []int
+	SkillProficiencies []string
+}
 
+// ------------------------
+// CreateCharacter
+// ------------------------
+func CreateCharacter(params CreateCharacterParams) error {
 	existingCharacters, err := storage.LoadCharacters()
 	if err != nil {
 		return fmt.Errorf("failed to load characters: %w", err)
 	}
 
-	if _, exists := existingCharacters[characterName]; exists {
+	if _, exists := existingCharacters[params.CharacterName]; exists {
 		return errors.New("character met deze naam bestaat al")
 	}
 
-	if len(abilityScores) != 6 {
-		abilityScores = nil
+	if len(params.AbilityScores) != 6 {
+		params.AbilityScores = nil
 	}
 
 	characterService := &application.CharacterService{}
 	spellService := &application.SpellService{}
 
-	if len(skillProficiencies) == 0 {
-		availableSkills := characterService.GetAvailableSkills(characterClass)
+	if len(params.SkillProficiencies) == 0 {
+		availableSkills := characterService.GetAvailableSkills(params.Class)
 		uniqueSkills := []string{}
 		skillSet := map[string]bool{}
 		for _, s := range availableSkills {
@@ -47,20 +51,24 @@ func CreateCharacter(
 				break
 			}
 		}
-		skillProficiencies = uniqueSkills
+		params.SkillProficiencies = uniqueSkills
 	}
 
-	newCharacter := characterService.NewCharacter(
-		len(existingCharacters)+1,
-		characterName,
-		characterRace,
-		characterClass,
-		characterBackground,
-		characterLevel,
-		abilityScores,
-		skillProficiencies,
-		spellService, 
-	)
+	newCharacter := characterService.NewCharacter(application.NewCharacterParams{
+		ID:            len(existingCharacters) + 1,
+		Name:          params.CharacterName,
+		Race:          params.Race,
+		Class:         params.Class,
+		Background:    params.Background,
+		Level:         params.Level,
+		AbilityScores: params.AbilityScores,
+		SkillChoices:  params.SkillProficiencies,
+		SpellService:  spellService,
+	})
+
+	newCharacter.PlayerName = params.PlayerName
+
+	spellService.SetupSpellcasting(newCharacter)
 
 	if err := GiveStartingSpells(newCharacter); err != nil {
 		return fmt.Errorf("failed to give starting spells: %w", err)

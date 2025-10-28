@@ -1,6 +1,27 @@
 package domain
 
 // ------------------------
+// Constants for Skills
+// ------------------------
+const (
+	AnimalHandling = "Animal Handling"
+	Athletics      = "Athletics"
+	Insight        = "Insight"
+	Religion       = "Religion"
+	Acrobatics     = "Acrobatics"
+	Deception      = "Deception"
+	History        = "History"
+	Investigation  = "Investigation"
+	Persuasion     = "Persuasion"
+	SleightOfHand  = "Sleight of Hand"
+	Arcana         = "Arcana"
+	Medicine       = "Medicine"
+	Intimidation   = "Intimidation"
+	Stealth        = "Stealth"
+	Survival       = "Survival"
+)
+
+// ------------------------
 // Standard Array
 // ------------------------
 var StandardArray = []int{15, 14, 13, 12, 10, 8}
@@ -26,42 +47,42 @@ var RaceModifiers = map[string]map[string]int{
 // Class Skills
 // ------------------------
 var ClassSkills = map[string][]string{
-	"barbarian": {"Animal Handling", "Athletics", "Insight", "Religion"},
-	"bard":      {"Deception", "History", "Investigation", "Persuasion", "Sleight of Hand"},
-	"cleric":    {"History", "Insight", "Insight", "Religion"},
-	"druid":     {"Arcana", "Animal Handling", "Insight", "Medicine"},
-	"fighter":   {"Acrobatics", "Animal Handling", "Insight", "Religion"},
-	"monk":      {"Acrobatics", "Athletics", "Insight", "Religion"},
-	"paladin":   {"Athletics", "Insight", "Insight", "Religion"},
-	"ranger":    {"Animal Handling", "Athletics", "Insight", "Investigation"},
-	"rogue":     {"Acrobatics", "Athletics", "Deception", "Insight", "Insight", "Religion"},
-	"sorcerer":  {"Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"},
-	"warlock":   {"Arcana", "Deception", "Insight", "Religion"},
-	"wizard":    {"Arcana", "History", "Insight", "Religion"},
+	"barbarian": {AnimalHandling, Athletics, Insight, Religion},
+	"bard":      {Deception, History, Investigation, Persuasion, SleightOfHand},
+	"cleric":    {History, Insight, Insight, Religion},
+	"druid":     {Arcana, AnimalHandling, Insight, Medicine},
+	"fighter":   {Acrobatics, AnimalHandling, Insight, Religion},
+	"monk":      {Acrobatics, Athletics, Insight, Religion},
+	"paladin":   {Athletics, Insight, Insight, Religion},
+	"ranger":    {AnimalHandling, Athletics, Insight, Investigation},
+	"rogue":     {Acrobatics, Athletics, Deception, Insight, Insight, Religion},
+	"sorcerer":  {Arcana, Deception, Insight, Intimidation, Persuasion, Religion},
+	"warlock":   {Arcana, Deception, Insight, Religion},
+	"wizard":    {Arcana, History, Insight, Religion},
 }
 
 // ------------------------
 // Skill Abilities
 // ------------------------
 var SkillAbilities = map[string]string{
-	"Acrobatics":      "Dexterity",
-	"Animal Handling": "Wisdom",
-	"Arcana":          "Intelligence",
-	"Athletics":       "Strength",
-	"Deception":       "Charisma",
-	"History":         "Intelligence",
-	"Insight":         "Wisdom",
-	"Intimidation":    "Charisma",
-	"Investigation":   "Intelligence",
-	"Medicine":        "Wisdom",
-	"Nature":          "Intelligence",
-	"Perception":      "Wisdom",
-	"Performance":     "Charisma",
-	"Persuasion":      "Charisma",
-	"Religion":        "Intelligence",
-	"Sleight of Hand": "Dexterity",
-	"Stealth":         "Dexterity",
-	"Survival":        "Wisdom",
+	Acrobatics:     "Dexterity",
+	AnimalHandling: "Wisdom",
+	Arcana:         "Intelligence",
+	Athletics:      "Strength",
+	Deception:      "Charisma",
+	History:        "Intelligence",
+	Insight:        "Wisdom",
+	Intimidation:   "Charisma",
+	Investigation:  "Intelligence",
+	Medicine:       "Wisdom",
+	"Nature":       "Intelligence",
+	"Perception":   "Wisdom",
+	"Performance":  "Charisma",
+	Persuasion:     "Charisma",
+	Religion:       "Intelligence",
+	SleightOfHand:  "Dexterity",
+	Stealth:        "Dexterity",
+	Survival:       "Wisdom",
 }
 
 // ------------------------
