@@ -230,11 +230,16 @@ De applicatie ondersteunt zowel **CLI**- als **server-gebaseerde interactie** me
 
  **Test 1 – Character aanmaken**
   go run main.go create -name "Elyra" -class "bard" -race "half-elf" -level 2 -str 10 -dex 16 -con 12 -int 13 -wis 11 -cha 15
+  ![alt text](image-2.png)
 
 **Test 2 – Eventueel wapen toevoegen**
   go run main.go equip -name Elyra -weapon shortsword
+  ![alt text](image-3.png)
+  ![alt text](image-6.png)
 
 **Test 3 – API gebruiken om character te verreiken**
   go run main.go enrich -name Elyra
+  ![alt text](image-4.png)
+  ![alt text](image-5.png)
 
 Op deze manier kunnen characters worden gemaakt en verreikt door middel van de API.

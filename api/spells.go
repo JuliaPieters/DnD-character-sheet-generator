@@ -52,7 +52,7 @@ func fetchClassSpells(resources []APIResource, className string) []domain.Spell 
 	results := make(chan SpellResult, len(resources))
 	jobs := make(chan APIResource, len(resources))
 
-	numWorkers := 10
+	numWorkers := 3
 	for i := 0; i < numWorkers; i++ {
 		go func() {
 			for res := range jobs {

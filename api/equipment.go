@@ -82,7 +82,7 @@ func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) 
 	jobs := make(chan APIResource, len(list.Results))
 	results := make(chan result, len(list.Results))
 
-	numWorkers := 10
+	numWorkers := 3
 	for i := 0; i < numWorkers; i++ {
 		go func() {
 			for res := range jobs {
