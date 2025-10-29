@@ -25,7 +25,6 @@ func EnrichCharacter(name string) error {
 		return fmt.Errorf("failed to save enriched character: %w", err)
 	}
 
-	fmt.Printf("Enriched character %s with API data\n", char.Name)
 	return nil
 }
 

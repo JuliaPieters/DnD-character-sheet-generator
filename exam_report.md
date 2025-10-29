@@ -1,8 +1,10 @@
 # Exam Report – Modern Programming Practices
 
-## Architecture (Extensibility) – 60/60
+## Architecture (Extensibility) 
 
-De architectuur van de code is goed ontworpen: functionaliteiten bevinden zich in de juiste lagen en verantwoordelijkheden zijn duidelijk gescheiden.  
+Omdat ik nog best veel moeite heb gestoken in de Architecture wil ik dit even kort toelichten in dit rapport.
+
+### Voorbeelden waarom de code goed is
 
 - De CLI-functionaliteit en server-functionaliteit staan in aparte `main.go` bestanden (`main.go` voor CLI en `server/main.go` voor server), waardoor ze onafhankelijk functioneren.  
 - De commands en berekeningen (skills, combat stats, spellcasting, weapon damage) staan in eigen methodes of mappen, waardoor de logica modulair is.  
@@ -10,7 +12,7 @@ De architectuur van de code is goed ontworpen: functionaliteiten bevinden zich i
 
 ### Opsplitsing van modellen
 
-Het grote bestand `models/character.go` is verwijderd en opgesplitst in **domain** en **application** lagen:  
+Het veel te grote bestand `models/character.go` is verwijderd en opgesplitst in **domain** en **application** lagen omdat ik vind dat 1 groot bestand waar alles in staat zowel berekening als structs niet duidelijk is.
 
 **Domain-lagen (`domain/`)**  
 - `character.go` – structs voor character data  
@@ -28,7 +30,7 @@ Het grote bestand `models/character.go` is verwijderd en opgesplitst in **domain
 **Voordelen:**  
 - Domain bevat enkel data en basale logica.  
 - Application bevat alle business logic.  
-- Nieuwe features kunnen toegevoegd worden in `application` zonder impact op `domain`.  
+- Nieuwe features kunnen makkelijk toegevoegd worden in `application` zonder impact op `domain`.  
 
 ### API opsplitsing
 
@@ -39,33 +41,39 @@ Oorspronkelijk bestond er één `api.go` bestand. Dit is opgesplitst in:
 - `api/equipment.go` – equipment ophalen en enrich-logica  
 
 **Voordelen:**  
-- **Single Responsibility Principle**: elke module heeft één duidelijk doel.  
+- **Single Responsibility Principle**: elke file heeft één duidelijk doel.  
 - Wijzigingen in spells of equipment vereisen geen aanpassing van andere API-functionaliteit.  
 - `client.go` wordt hergebruikt door `spell.go` en `equipment.go`.  
 - Verbeterde modulariteit en testbaarheid.  
 
 ### Mermaid diagram voor de samenwerking van de lagen
-!Gebruik ctrl + shift + v om de preview te zien!
+- Gebruik ctrl + shift + v om de preview te zien!
 
 ```mermaid
 graph TD
 
-%% CLI commands
-A[Commands Layer<br>view.go<br>delete.go<br>update.go<br>create.go<br>equipment.go<br>spells.go]
+%% Binnenste laag: Domain
+subgraph Domain [Domain Layer]
+    C[character.go, spell.go, equipment.go, constants.go, ability.go]
+end
 
-%% Application services
-B[Application Layer<br>character_service.go<br>equipment_service.go<br>spell_service.go]
+%% Tweede laag: Application
+subgraph Application [Application Layer]
+    B[character_service.go, equipment_service.go, spell_service.go]
+end
 
-%% Domain entities
-C[Domain Layer<br>character.go<br>spell.go<br>equipment.go<br>constants.go<br>ability.go]
+%% Derde laag: Integration
+subgraph Integration [Integration Layer]
+    D[API Layer<br>client.go, spells.go, equipment.go]
+    E[Storage Layer<br>storage.go]
+end
 
-%% API integration
-D[API Layer<br>client.go<br>spells.go<br>equipment.go]
+%% Buitenste laag: CLI
+subgraph CLI [Commands Layer]
+    A[view.go, delete.go, update.go, create.go, equipment.go, spells.go]
+end
 
-%% Storage
-E[Storage Layer<br>storage.go]
-
-%% Relations
+%% Dependencies
 A --> B
 A --> E
 B --> C
@@ -77,9 +85,9 @@ E --> C
 
 - **Commands Layer:** bevat alle CLI-functionaliteit en gebruikt Application voor businesslogica en Storage voor directe data-opslag.
 
-- **Application Layer:** voert kernlogica uit en gebruikt Domain; afhankelijk van andere lagen wordt vermeden.
+- **Application Layer:** Deze laag bevat alle business logic van de applicatie. Hier vindt alle kernverwerking plaats die bepaalt hoe de characters, equipment en spells functioneren binnen het systeem.
 
-- **Domain Layer:** bevat kernmodellen en constants; volledig onafhankelijk.
+- **Domain Layer:** Deze laag definieert alle kernmodellen en constanten van het systeem. Het bevat structuren zoals Character, Weapon, Armor, AbilityScores, en vaste waarden zoals spell levels of ability modifiers.
 
 - **API Layer:** integreert externe data en gebruikt Domain-modellen.
 
@@ -88,7 +96,7 @@ E --> C
 **Opmerking:** De directe toegang van Commands naar Storage is een bewuste praktische keuze om CLI-operaties eenvoudig en snel te laten verlopen, zonder extra lagen voor eenvoudige read/write-acties. Hierdoor blijft de kernlogica in Application en Domain schoon en onafhankelijk, terwijl de gebruiker via de CLI direct met data kan werken.
 
 
-## Maintainability – 20/20
+## Maintainability 
 
 De code is overzichtelijk en onderhoudbaar, met duidelijke scheiding van verantwoordelijkheden.
 
@@ -129,7 +137,7 @@ project/
 
 ---
 ## SonarQube als bewijs
-Om te controleren hoe goed mijn code is heb ik gebruik gemaakt van SonarQube.
+Om te controleren hoe goed mijn code is op het gebied van maintainability heb ik gebruik gemaakt van SonarQube.
 SonarQube analyseert de code automatisch op maintainability issues, zoals:
 - Te lange functies of te veel logica in één plek.  
 - Onnodige duplicatie.  
@@ -147,6 +155,7 @@ SonarQube analyseert de code automatisch op maintainability issues, zoals:
 ---
 
 ## Concreet bewijs van kwaliteit
+Ik had veel issues door te lange functies en code dupplicatie. 
 Voorbeelden:
 - Functies zoals `GenerateSpellSlots`, `SetupSpellcasting` en `GiveStartingSpells` zijn opgesplitst per verantwoordelijkheid.  
 - Full casters, half casters en warlocks hebben hun eigen generatorfuncties, wat duplicatie voorkomt en aanpassingen makkelijker maakt.  
@@ -196,8 +205,36 @@ Edge cases zijn getest:
 - Negatieve modifiers (bijv. DEX/STR < 0) → correcte berekening (`-1`)  
 - Zero modifiers → correcte berekening (`+0`)  
 
-
 **Conclusie**  
 - De tests dekken zowel **happy path** als belangrijke randgevallen.  
 - De geautomatiseerde tests zijn volledig succesvol uitgevoerd.  
 - Hierdoor is aangetoond dat de weapon damage-functionaliteit correct, betrouwbaar en uitbreidbaar is.
+
+### Handmatige tests en interactie
+
+De applicatie ondersteunt zowel **CLI**- als **server-gebaseerde interactie** met characters.  
+
+#### Server (localhost)
+- Wanneer de server wordt gedraaid (`server/main.go`), kunnen via de **character sheet** nieuwe characters worden aangemaakt.  
+- Deze characters worden opgeslagen in het bestand `character.json` dat zich bevindt in de **server/** map.  
+- Alle gemaakte characters kunnen worden bekeken via de character sheet interface.  
+
+#### CLI
+- Via de **CLI** kunnen characters worden aangemaakt met het `create`-commando.  
+- Characters kunnen worden **enriched** met het `enrich`-commando, waarbij onder andere weapon stats, spells en equipment worden opgehaald uit de API.  
+- De CLI slaat alle aangemaakte en enriched characters op in het bestand `character.json` in de **root folder**.  
+
+ In beide `character.json` bestanden (server en root) staan alle gemaakte characters overzichtelijk opgeslagen en kunnen deze bekeken worden.  
+
+### Voorbeelden handmatige tests – CLI
+
+ **Test 1 – Character aanmaken**
+  go run main.go create -name "Elyra" -class "bard" -race "half-elf" -level 2 -str 10 -dex 16 -con 12 -int 13 -wis 11 -cha 15
+
+**Test 2 – Eventueel wapen toevoegen**
+  go run main.go equip -name Elyra -weapon shortsword
+
+**Test 3 – API gebruiken om character te verreiken**
+  go run main.go enrich -name Elyra
+
+Op deze manier kunnen characters worden gemaakt en verreikt door middel van de API.

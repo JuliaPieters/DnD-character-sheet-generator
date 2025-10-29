@@ -221,6 +221,14 @@ func handleEquipmentAndCombat(character *domain.Character, service *application.
 		character.Equipment.Shield = shield
 	}
 
+	equipService := &application.EquipmentService{}
+	if character.Equipment.MainHand != nil {
+		character.Equipment.MainHand.Damage = equipService.CalculateWeaponDamage(character, character.Equipment.MainHand)
+	}
+	if character.Equipment.OffHand != nil {
+		character.Equipment.OffHand.Damage = equipService.CalculateWeaponDamage(character, character.Equipment.OffHand)
+	}
+
 	service.CalculateCombatStats(character)
 }
 

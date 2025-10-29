@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"strings"
-	"time"
 )
 
 type APISpell struct {
@@ -50,29 +49,34 @@ func fetchSpellList() (APIListResponse, error) {
 func fetchClassSpells(resources []APIResource, className string) []domain.Spell {
 	classNameLower := strings.ToLower(className)
 
-	results := make(chan SpellResult)
-	ticker := time.NewTicker(200 * time.Millisecond)
-	defer ticker.Stop()
+	results := make(chan SpellResult, len(resources))
+	jobs := make(chan APIResource, len(resources))
+
+	numWorkers := 10
+	for i := 0; i < numWorkers; i++ {
+		go func() {
+			for res := range jobs {
+				results <- fetchSpell(res, classNameLower)
+			}
+		}()
+	}
 
 	for _, res := range resources {
-		<-ticker.C
-		go func(res APIResource) {
-			results <- fetchSpell(res, classNameLower)
-		}(res)
+		jobs <- res
 	}
+	close(jobs)
 
 	var spells []domain.Spell
 	for i := 0; i < len(resources); i++ {
-		result := <-results
-		if result.Err != nil {
-			log.Println(result.Err)
+		r := <-results
+		if r.Err != nil {
+			log.Println(r.Err)
 			continue
 		}
-		if result.Spell.Name != "" {
-			spells = append(spells, result.Spell)
+		if r.Spell.Name != "" {
+			spells = append(spells, r.Spell)
 		}
 	}
-
 	return spells
 }
 
@@ -96,7 +100,7 @@ func fetchSpell(res APIResource, classNameLower string) SpellResult {
 		}
 	}
 
-	return SpellResult{} 
+	return SpellResult{}
 }
 
 func filterSpellsBySlots(spells []domain.Spell, slots map[int]int) []domain.Spell {
@@ -110,9 +114,8 @@ func filterSpellsBySlots(spells []domain.Spell, slots map[int]int) []domain.Spel
 }
 
 func selectRandomSpells(spells []domain.Spell, slots map[int]int) []domain.Spell {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(rand.Int63())
 	var final []domain.Spell
-
 	for lvl, count := range slots {
 		var lvlSpells []domain.Spell
 		for _, s := range spells {
@@ -120,7 +123,6 @@ func selectRandomSpells(spells []domain.Spell, slots map[int]int) []domain.Spell
 				lvlSpells = append(lvlSpells, s)
 			}
 		}
-
 		if len(lvlSpells) > count {
 			rand.Shuffle(len(lvlSpells), func(i, j int) { lvlSpells[i], lvlSpells[j] = lvlSpells[j], lvlSpells[i] })
 			final = append(final, lvlSpells[:count]...)
@@ -128,6 +130,5 @@ func selectRandomSpells(spells []domain.Spell, slots map[int]int) []domain.Spell
 			final = append(final, lvlSpells...)
 		}
 	}
-
 	return final
 }

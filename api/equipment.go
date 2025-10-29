@@ -7,7 +7,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type EquipmentRange struct {
@@ -42,11 +41,10 @@ func parseRange(raw json.RawMessage) string {
 	if err := json.Unmarshal(raw, &s); err == nil {
 		return s
 	}
-
 	var r EquipmentRange
 	if err := json.Unmarshal(raw, &r); err == nil {
 		if r.Normal > 0 {
-			return fmt.Sprintf("%d", r.Normal)
+			return strconv.Itoa(r.Normal)
 		}
 	}
 	return ""
@@ -56,16 +54,13 @@ func normalizeDamageDie(d string) string {
 	if d == "" {
 		return "1d4"
 	}
-
 	if strings.Contains(d, "d") {
 		return d
 	}
-
 	num, err := strconv.Atoi(d)
 	if err != nil || num <= 0 {
 		return "1d4"
 	}
-
 	return fmt.Sprintf("%dd%d", num, num)
 }
 
@@ -79,19 +74,38 @@ func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) 
 	var armor *domain.Armor
 	var shield *domain.Shield
 
-	ticker := time.NewTicker(200 * time.Millisecond)
-	defer ticker.Stop()
+	type result struct {
+		eq  APIEquipment
+		err error
+	}
+
+	jobs := make(chan APIResource, len(list.Results))
+	results := make(chan result, len(list.Results))
+
+	numWorkers := 10
+	for i := 0; i < numWorkers; i++ {
+		go func() {
+			for res := range jobs {
+				var eq APIEquipment
+				url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
+				err := getJSON(url, &eq)
+				results <- result{eq: eq, err: err}
+			}
+		}()
+	}
 
 	for _, res := range list.Results {
-		<-ticker.C
+		jobs <- res
+	}
+	close(jobs)
 
-		var eq APIEquipment
-		url := "https://www.dnd5eapi.co" + strings.ToLower(strings.ReplaceAll(res.URL, " ", "-"))
-		if err := getJSON(url, &eq); err != nil {
-			log.Println("Error fetching equipment:", res.Name, err)
+	for i := 0; i < len(list.Results); i++ {
+		r := <-results
+		if r.err != nil {
+			log.Println("Error fetching equipment:", r.err)
 			continue
 		}
-
+		eq := r.eq
 		switch eq.EquipmentCategory.Name {
 		case "Weapon":
 			damage := normalizeDamageDie(eq.Damage.DamageDice)
@@ -101,7 +115,6 @@ func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) 
 					isFinesse = true
 				}
 			}
-
 			weapon := &domain.Weapon{
 				Name:      eq.Name,
 				TwoHanded: eq.TwoHanded,
@@ -110,9 +123,7 @@ func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) 
 				IsFinesse: isFinesse,
 				Category:  strings.TrimSpace(eq.WeaponCategory + " " + eq.WeaponRange),
 			}
-
 			weapons = append(weapons, weapon)
-
 		case "Armor":
 			armor = &domain.Armor{
 				Name:        eq.Name,
@@ -120,7 +131,6 @@ func GetAllEquipment() ([]*domain.Weapon, *domain.Armor, *domain.Shield, error) 
 				DexBonus:    eq.ArmorClass.DexBonus,
 				MaxDexBonus: eq.ArmorClass.MaxDex,
 			}
-
 		case "Shield":
 			shield = &domain.Shield{
 				Name:       eq.Name,
