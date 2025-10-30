@@ -16,7 +16,7 @@ func ListCharacters() error {
 		return nil
 	}
 
-	fmt.Println("📜 Characters:")
+	fmt.Println("Characters:")
 	for _, character := range allCharacters {
 		fmt.Printf("- Name: %s | Level: %d | Race: %s | Class: %s\n",
 			character.Name, character.Level, character.Race, character.Class)

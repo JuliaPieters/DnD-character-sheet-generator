@@ -1,14 +1,8 @@
 # Exam Report – Modern Programming Practices
 
-## Architecture (Extensibility) 
+## Architecture 
 
 Omdat ik nog best veel moeite heb gestoken in de Architecture wil ik dit even kort toelichten in dit rapport.
-
-### Voorbeelden waarom de code goed is
-
-- De CLI-functionaliteit en server-functionaliteit staan in aparte `main.go` bestanden (`main.go` voor CLI en `server/main.go` voor server), waardoor ze onafhankelijk functioneren.  
-- De commands en berekeningen (skills, combat stats, spellcasting, weapon damage) staan in eigen methodes of mappen, waardoor de logica modulair is.  
-- De codebase volgt het **Open/Closed Principle**: nieuwe features kunnen toegevoegd worden zonder bestaande code te wijzigen.  
 
 ### Opsplitsing van modellen
 
@@ -228,18 +222,36 @@ De applicatie ondersteunt zowel **CLI**- als **server-gebaseerde interactie** me
 
 ### Voorbeelden handmatige tests – CLI
 
- **Test 1 – Character aanmaken**
-  go run main.go create -name "Elyra" -class "bard" -race "half-elf" -level 2 -str 10 -dex 16 -con 12 -int 13 -wis 11 -cha 15
-  ![alt text](image-2.png)
+ **Testcase 1 — Half-Orc Barbarian (Greataxe)**
+Commands:
+```bash
+go run main.go create -name "Grom" -class "barbarian" -race "half-orc" -level 1 -str 17 -dex 14 -con 15 -int 10 -wis 12 -cha 8
+go run main.go equip -name "Grom" -weapon "greataxe"
+go run main.go enrich -name "Grom"
+```
+ ![alt text](image-7.png)
 
-**Test 2 – Eventueel wapen toevoegen**
-  go run main.go equip -name Elyra -weapon shortsword
-  ![alt text](image-3.png)
-  ![alt text](image-6.png)
+Character.json:
+![alt text](image-8.png)
 
-**Test 3 – API gebruiken om character te verreiken**
-  go run main.go enrich -name Elyra
-  ![alt text](image-4.png)
-  ![alt text](image-5.png)
+ **Testcase 2 — Tiefling Ranger (Shortsword)**
+ ```bash
+go run main.go create -name "Elyra" -class "ranger" -race "tiefling" -level 1 -str 13 -dex 15 -con 12 -int 10 -wis 14 -cha 8
+go run main.go equip -name "Elyra" -weapon "shortsword"
+go run main.go enrich -name "Elyra"
+```
+![alt text](image-9.png)
+Character.json:
+![alt text](image-10.png)
 
-Op deze manier kunnen characters worden gemaakt en verreikt door middel van de API.
+ **Testcase 3 — Dwarf Rogue (Rapier)**
+ ```bash
+go run main.go create -name "Borin" -class "rogue" -race "dwarf" -level 1 -str 8 -dex 15 -con 16 -int 10 -wis 12 -cha 13
+go run main.go equip -name "Borin" -weapon "rapier"
+go run main.go enrich -name "Borin"
+```
+![alt text](image-11.png)
+Character.json:
+![alt text](image-12.png)
+
+Op deze manier kunnen characters worden gemaakt en verreikt in de CLI door middel van de API.
